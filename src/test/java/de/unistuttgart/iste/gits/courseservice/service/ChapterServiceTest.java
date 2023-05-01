@@ -72,7 +72,7 @@ public class ChapterServiceTest {
         // verify that the repository and validator were called
         verify(chapterValidator)
                 .validateCreateChapterInputDto(testCreateChapterInput);
-        verify(chapterRepository, atMostOnce())
+        verify(chapterRepository, times(1))
                 .save(any(ChapterEntity.class));
     }
 
@@ -132,9 +132,11 @@ public class ChapterServiceTest {
     public void testUpdateChapterSuccessful() {
         // arrange test data
         ChapterEntity expectedChapter = dummyChapterEntityBuilder()
+                .description("new description")
                 .course(dummyCourseEntityBuilder().build())
                 .build();
         UpdateChapterInputDto testUpdateChapterInput = dummyUpdateChapterInputDtoBuilder(expectedChapter.getId())
+                .setDescription("new description")
                 .build();
 
         // mock repository
@@ -160,7 +162,7 @@ public class ChapterServiceTest {
         // verify that the repository and validator were called
         verify(chapterValidator)
                 .validateUpdateChapterInputDto(testUpdateChapterInput);
-        verify(chapterRepository, atMostOnce())
+        verify(chapterRepository, times(1))
                 .save(any(ChapterEntity.class));
     }
 
