@@ -1,0 +1,60 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.0.6'
+	id 'io.spring.dependency-management' version '1.1.0'
+	id "io.github.kobylynskyi.graphql.codegen" version "5.7.2"
+}
+
+group = 'de.unistuttgart.iste.gits'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+// Automatically generate DTOs from GraphQL schema:
+graphqlCodegen {
+	// all config options:
+	// https://github.com/kobylynskyi/graphql-java-codegen/blob/main/docs/codegen-options.md
+	outputDir = new File("$buildDir/generated")
+	packageName = "de.unistuttgart.iste.gits.template.dto" // TODO: change to your package name
+	modelNameSuffix = "DTO"
+	generatedAnnotation = "jakarta.annotation.Generated"
+	modelValidationAnnotation = "jakarta.validation.constraints.NotNull"
+	generateApis = false // set to false as the generator does not support spring boot graphQL
+}
+
+// Automatically generate GraphQL code on project build:
+compileJava.dependsOn 'graphqlCodegen'
+
+// Add generated sources to your project source sets:
+sourceSets.main.java.srcDir "$buildDir/generated"
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-graphql'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.modelmapper:modelmapper:3.+'
+	compileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'org.postgresql:postgresql'
+	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework:spring-webflux'
+	testImplementation 'org.springframework.graphql:spring-graphql-test'
+	testImplementation "org.mockito:mockito-core:3.+"
+	testImplementation 'org.hamcrest:hamcrest:2.+'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
