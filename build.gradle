@@ -14,7 +14,7 @@ graphqlCodegen {
 	// all config options:
 	// https://github.com/kobylynskyi/graphql-java-codegen/blob/main/docs/codegen-options.md
 	outputDir = new File("$buildDir/generated")
-	packageName = "de.unistuttgart.iste.gits.template.dto" // TODO: change to your package name
+	packageName = "de.unistuttgart.iste.gits.courseservice.dto"
 	modelNameSuffix = "DTO"
 	generatedAnnotation = "jakarta.annotation.Generated"
 	modelValidationAnnotation = "jakarta.validation.constraints.NotNull"
