@@ -80,6 +80,17 @@ After cloning the repository, you need to do the following steps:
 - [ ] Create a new database
 <!-- TODO there probably more TODOs -->
 
+### Pull new changes from this template
+
+If this template changes and you want to pull the changes to the actual microservice, you can run the following commands:
+```bash
+git remote add template https://github.com/IT-REX-Platform/template-microservice # only necessary once
+git fetch --all
+git checkout [branch] # replace [branch] with the branch name you want the changes to be merged into (preferably not main)
+git merge template/main --allow-unrelated-histories
+# you will probably need to commit afterwars
+```
+
 ### Guides
 The following guides illustrate how to use some features concretely:
 
