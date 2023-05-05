@@ -18,7 +18,7 @@ public class CourseMapper {
         this.modelMapper = modelMapper;
     }
 
-    public CourseDto mapEntityToDto(CourseEntity courseEntity) {
+    public CourseDto entityToDto(CourseEntity courseEntity) {
         CourseDto courseDto = modelMapper.map(courseEntity, CourseDto.class);
         if (courseDto.getChapters() == null) {
             courseDto.setChapters(Collections.emptyList());
@@ -26,11 +26,11 @@ public class CourseMapper {
         return courseDto;
     }
 
-    public CourseEntity mapInputDtoToEntity(CreateCourseInputDto courseInputDTO) {
+    public CourseEntity dtoToEntity(CreateCourseInputDto courseInputDTO) {
         return modelMapper.map(courseInputDTO, CourseEntity.class);
     }
 
-    public CourseEntity mapInputDtoToEntity(UpdateCourseInputDto input) {
+    public CourseEntity dtoToEntity(UpdateCourseInputDto input) {
         return modelMapper.map(input, CourseEntity.class);
     }
 }

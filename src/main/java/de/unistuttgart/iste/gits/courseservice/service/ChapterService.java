@@ -8,46 +8,78 @@ import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.mapper.ChapterMapper;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
+import de.unistuttgart.iste.gits.courseservice.persistence.validation.ChapterValidator;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Service that handles chapter related operations.
+ */
 @Service
+@RequiredArgsConstructor
 public class ChapterService {
 
     private final ChapterMapper chapterMapper;
     private final ChapterRepository chapterRepository;
     private final CourseRepository courseRepository;
+    private final ChapterValidator chapterValidator;
 
-    public ChapterService(ChapterMapper chapterMapper, ChapterRepository chapterRepository, CourseRepository courseRepository) {
-        this.chapterMapper = chapterMapper;
-        this.chapterRepository = chapterRepository;
-        this.courseRepository = courseRepository;
-    }
-
+    /**
+     * Creates a chapter.
+     *
+     * @param chapterData The data of the chapter to create.
+     * @return The created chapter.
+     * @throws EntityNotFoundException If the course with the given id does not exist.
+     */
     public ChapterDto createChapter(CreateChapterInputDto chapterData) {
-        ChapterEntity chapterEntity = chapterMapper.mapInputDtoToEntity(chapterData);
-        CourseEntity course = courseRepository.getById(UUID.fromString(chapterData.getCourseId()));
-        chapterEntity.setCourse(course);
+        chapterValidator.validateCreateChapterInputDto(chapterData);
+        if (!courseRepository.existsById(chapterData.getCourseId())) {
+            throw new EntityNotFoundException("Course with id " + chapterData.getCourseId() + " does not exist.");
+        }
+
+        ChapterEntity chapterEntity = chapterMapper.dtoToEntity(chapterData);
         chapterEntity = chapterRepository.save(chapterEntity);
-        return chapterMapper.mapEntityToDto(chapterEntity);
+
+        return chapterMapper.entityToDto(chapterEntity);
     }
 
+    /**
+     * Updates a chapter.
+     *
+     * @param chapterData The data of the chapter to update.
+     * @return The updated chapter.
+     */
     public ChapterDto updateChapter(UpdateChapterInputDto chapterData) {
-        ChapterEntity chapterEntity = chapterRepository.getById(UUID.fromString(chapterData.getId()));
-        ChapterEntity updatedChapterEntity = chapterMapper.mapInputDtoToEntity(chapterData);
-        updatedChapterEntity.setCourse(chapterEntity.getCourse());
+        chapterValidator.validateUpdateChapterInputDto(chapterData);
+
+        CourseEntity course = chapterRepository.findById(chapterData.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Chapter with id " + chapterData.getId() + " not found"))
+                .getCourse();
+
+        ChapterEntity updatedChapterEntity = chapterMapper.dtoToEntity(chapterData);
+        updatedChapterEntity.setCourse(course);
         updatedChapterEntity = chapterRepository.save(updatedChapterEntity);
-        return chapterMapper.mapEntityToDto(updatedChapterEntity);
+
+        return chapterMapper.entityToDto(updatedChapterEntity);
     }
 
-    public Optional<UUID> deleteChapter(String id) {
-        if (!chapterRepository.existsById(UUID.fromString(id))) {
+    /**
+     * Deletes a chapter.
+     *
+     * @param uuid The id of the chapter to delete.
+     * @return The id of the deleted chapter or an empty optional if the chapter
+     * does not exist.
+     */
+    public Optional<UUID> deleteChapter(UUID uuid) {
+        if (!chapterRepository.existsById(uuid)) {
             return Optional.empty();
         }
 
-        chapterRepository.deleteById(UUID.fromString(id));
-        return Optional.of(UUID.fromString(id));
+        chapterRepository.deleteById(uuid);
+        return Optional.of(uuid);
     }
 }

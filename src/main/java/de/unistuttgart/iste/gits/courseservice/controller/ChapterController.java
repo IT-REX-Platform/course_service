@@ -34,7 +34,7 @@ public class ChapterController {
     }
 
     @MutationMapping
-    public Optional<UUID> deleteChapter(@Argument(name = "id") String id) {
+    public Optional<UUID> deleteChapter(@Argument(name = "id") UUID id) {
         return chapterService.deleteChapter(id);
     }
 }

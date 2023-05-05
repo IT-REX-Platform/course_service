@@ -7,7 +7,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Length;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -25,27 +24,22 @@ public class CourseEntity {
     private UUID id;
 
     @Column(nullable = false, length = 255)
-    @NotNull
-    @Length(max = 255)
     private String title;
 
     @Column(nullable = false, length = 3000)
-    @NotNull
-    @Length(max = 3000)
     private String description;
 
     @Column(nullable = false)
-    @NotNull
     private OffsetDateTime startDate;
 
     @Column(nullable = false)
-    @NotNull
     private OffsetDateTime endDate;
 
     @Column(nullable = false)
     private boolean published;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("number ASC")
     private List<@NotNull @Valid ChapterEntity> chapters;
 
 }

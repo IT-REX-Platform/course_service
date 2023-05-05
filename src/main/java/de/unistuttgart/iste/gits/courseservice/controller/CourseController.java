@@ -30,7 +30,7 @@ public class CourseController {
     }
 
     @QueryMapping
-    public List<CourseDto> coursesById(@Argument(name = "ids") List<String> ids) {
+    public List<CourseDto> coursesById(@Argument(name = "ids") List<UUID> ids) {
         return courseService.getCoursesByIds(ids);
     }
 
@@ -45,7 +45,7 @@ public class CourseController {
     }
 
     @MutationMapping
-    public Optional<UUID> deleteCourse(@Argument(name = "id") String id) {
+    public Optional<UUID> deleteCourse(@Argument(name = "id") UUID id) {
         return courseService.deleteCourse(id);
     }
 
