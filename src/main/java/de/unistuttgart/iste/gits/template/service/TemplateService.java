@@ -1,31 +1,24 @@
 package de.unistuttgart.iste.gits.template.service;
 
-import de.unistuttgart.iste.gits.template.dto.TemplateDTO;
+import de.unistuttgart.iste.gits.template.dto.TemplateDto;
 import de.unistuttgart.iste.gits.template.persistence.dao.TemplateEntity;
+import de.unistuttgart.iste.gits.template.persistence.mapper.TemplateMapper;
 import de.unistuttgart.iste.gits.template.persistence.repository.TemplateRepository;
-import org.modelmapper.ModelMapper;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class TemplateService {
 
     private final TemplateRepository templateRepository;
-    private final ModelMapper modelMapper;
+    private final TemplateMapper templateMapper;
 
-    public TemplateService(TemplateRepository templateRepository, ModelMapper modelMapper) {
-        this.templateRepository = templateRepository;
-        this.modelMapper = modelMapper;
-    }
-
-    public List<TemplateDTO> getAllTemplates() {
+    public List<TemplateDto> getAllTemplates() {
         List<TemplateEntity> templates = templateRepository.findAll();
-        return templates.stream().map(this::convertEntityToDto).toList();
+        return templates.stream().map(templateMapper::entityToDto).toList();
     }
 
-    private TemplateDTO convertEntityToDto(TemplateEntity templateEntity) {
-        // add specific mapping here if needed
-        return modelMapper.map(templateEntity, TemplateDTO.class);
-    }
 }
