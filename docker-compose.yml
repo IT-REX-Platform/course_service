@@ -1,0 +1,31 @@
+services:
+  database:
+    image: postgres:alpine
+    network_mode: bridge
+    expose:
+      - 1032
+    ports:
+      - "1032:5432"
+    volumes:
+      - templatedata:/var/lib/postgresql/data
+    restart: always
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=templatedatabase
+  app:
+    image: 'template-microservice:latest'
+    network_mode: bridge
+    container_name: template_microservice
+    expose:
+      - 1000
+      - 1001
+    ports:
+      - 1000:1000
+      - 1001:1001
+    depends_on:
+      - database
+    links:
+      - database
+volumes:
+  templatedata:

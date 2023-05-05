@@ -13,8 +13,6 @@ ENV PATH="/opt/dapr/:${PATH}"
 # initialize dapr in slim mode (not containerized as we already are inside of a container)
 RUN dapr init --slim
 
-# TODO database init
-
 WORKDIR /opt/dapr
 
 # build and run app
