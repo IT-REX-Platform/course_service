@@ -27,5 +27,7 @@ services:
       - database
     links:
       - database
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/templatedatabase
 volumes:
   templatedata:
