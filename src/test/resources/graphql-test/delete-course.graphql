@@ -1,0 +1,3 @@
+mutation($uuid: UUID!) {
+    deleteCourse(id: $uuid)
+}
