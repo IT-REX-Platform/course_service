@@ -1,6 +1,7 @@
 services:
   database:
     image: postgres:alpine
+    restart: always
     network_mode: bridge
     expose:
       - 1032
@@ -8,13 +9,13 @@ services:
       - "1032:5432"
     volumes:
       - templatedata:/var/lib/postgresql/data
-    restart: always
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=templatedatabase
   app:
-    image: 'template-microservice:latest'
+    build: .
+    restart: always
     network_mode: bridge
     container_name: template_microservice
     expose:
