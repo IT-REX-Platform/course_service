@@ -1,16 +1,120 @@
-# schema file of the microservice
 
-# TODO define data types, queries and mutations
-# this can be done in a separate files as long as they are in this folder and
-# end with .graphqls
+# Course of the application
+type Course {
+    # UUID of the course
+    id: UUID!
+    # Title of the course, max 255 characters
+    title: String!
+    # Description of the course, max 3000 characters
+    description: String!
+    # Start date of the course, ISO 8601 format
+    startDate: DateTime!
+    # End date of the course, ISO 8601 format
+    endDate: DateTime!
+    # Published status of the course
+    published: Boolean!
+    # Chapters of the course
+    chapters: [Chapter!]!
+}
 
 
-# example
-type Template {
-  id: ID!
-  name: String!
+input CreateCourseInput {
+    # Title of the course, max 255 characters
+    title: String! @NotBlank @Size(max: 255)
+    # Description of the course, max 3000 characters
+    description: String! @Size(max: 3000)
+    # Start date of the course, ISO 8601 format
+    startDate: DateTime!
+    # End date of the course, ISO 8601 format
+    endDate: DateTime!
+    # Published status of the course
+    published: Boolean!
+}
+
+input UpdateCourseInput {
+    # UUID of the course
+    id: UUID!
+    # Title of the course, max 255 characters
+    title: String! @NotBlank @Size(max: 255)
+    # Description of the course, max 3000 characters
+    description: String! @Size(max: 3000)
+    # Start date of the course, ISO 8601 format
+    startDate: DateTime!
+    # End date of the course, ISO 8601 format
+    endDate: DateTime!
+    # Published status of the course
+    published: Boolean!
+}
+
+# Chapter of a course
+type Chapter {
+    # UUID of the chapter
+    id: UUID!
+    # Title of the chapter, max 255 characters
+    title: String!
+    # Description of the chapter, max 3000 characters
+    description: String!
+    # Number of the chapter, determines the order of the chapters
+    number: Int!
+    # Start date of the chapter, ISO 8601 format
+    startDate: DateTime!
+    # End date of the chapter, ISO 8601 format
+    endDate: DateTime!
+    # The course the chapter belongs to
+    course: Course!
+}
+
+
+input CreateChapterInput {
+    # Title of the chapter, max 255 characters
+    title: String! @NotBlank @Size(max: 255)
+    # Description of the chapter, max 3000 characters
+    description: String! @Size(max: 3000)
+    # Number of the chapter, determines the order of the chapters
+    number: Int! @Positive
+    # Start date of the chapter, ISO 8601 format
+    startDate: DateTime!
+    # End date of the chapter, ISO 8601 format
+    endDate: DateTime!
+    # The course the chapter belongs to
+    courseId: UUID!
+}
+
+input UpdateChapterInput {
+    id: UUID!
+    # Title of the chapter, max 255 characters
+    title: String! @NotBlank @Size(max: 255)
+    # Description of the chapter, max 3000 characters
+    description: String! @Size(max: 3000)
+    # Number of the chapter, determines the order of the chapters
+    number: Int! @Positive
+    # Start date of the chapter, ISO 8601 format
+    startDate: DateTime!
+    # End date of the chapter, ISO 8601 format
+    endDate: DateTime!
 }
 
 type Query {
-  templates: [Template]
+    # get all courses
+    courses: [Course!]!
+    # get courses by ids
+    coursesById(ids: [UUID!]!): [Course!]!
 }
+
+type Mutation {
+    # Create a new course
+    createCourse(input: CreateCourseInput!): Course!
+    # Create a new chapter
+    createChapter(input: CreateChapterInput!): Chapter!
+
+    # Update an existing course
+    updateCourse(input: UpdateCourseInput!): Course!
+    # Update an existing chapter
+    updateChapter(input: UpdateChapterInput!): Chapter!
+
+    # Delete an existing course
+    deleteCourse(id: UUID!): UUID
+    # Delete an existing chapter
+    deleteChapter(id: UUID!): UUID
+}
+
