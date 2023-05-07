@@ -87,6 +87,7 @@ After cloning the repository, you need to do the following steps:
 - [ ] Rename the package in the `src/main/java` folder to  a more suitable name (should be the same as the package name in the `build.gradle` file)
 - [ ] Remove the package-info.java files in the `src/main/java` folder (or update with the microservice specific information)
 - [ ] Update the application.properties file in the `src/main/resources` folder (check the TODOS in the file)
+- [ ] Change the ports and name of the database in the docker-compose.yml (see wiki on how to)
 - [ ] Define the GraphQL schema in the `src/main/resources/schema.graphqls` file
 - [ ] Create a new database
 <!-- TODO there probably more TODOs -->
