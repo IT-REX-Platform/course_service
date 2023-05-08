@@ -12,6 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+/**
+ * Custom Keycloak Logout Handler Class required by RestTemplate applications.
+ */
 @Component
 public class KeycloakLogoutHandler implements LogoutHandler {
 
@@ -27,6 +30,10 @@ public class KeycloakLogoutHandler implements LogoutHandler {
         logoutFromKeycloak((OidcUser) auth.getPrincipal());
     }
 
+    /**
+     * implements the logout of users from the keycloak app
+     * @param user to be logged out
+     */
     private void logoutFromKeycloak(OidcUser user) {
         String endSessionEndpoint = user.getIssuer() + "/protocol/openid-connect/logout";
         UriComponentsBuilder builder = UriComponentsBuilder
