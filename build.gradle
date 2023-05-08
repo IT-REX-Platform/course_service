@@ -65,6 +65,9 @@ dependencies {
     testImplementation 'org.springframework.graphql:spring-graphql-test'
     testImplementation "org.mockito:mockito-core:3.+"
     testImplementation 'org.hamcrest:hamcrest:2.+'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 }
 
 tasks.named('test') {
