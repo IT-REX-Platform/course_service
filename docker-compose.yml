@@ -1,0 +1,34 @@
+services:
+  database:
+    image: postgres:alpine
+    restart: always
+    network_mode: bridge
+    expose:
+      - 1032
+    ports:
+      - "1032:5432"
+    volumes:
+      - templatedata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=templatedatabase
+  app:
+    build: .
+    restart: always
+    network_mode: bridge
+    container_name: template_microservice
+    expose:
+      - 1000
+      - 1001
+    ports:
+      - 1000:1000
+      - 1001:1001
+    depends_on:
+      - database
+    links:
+      - database
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/templatedatabase
+volumes:
+  templatedata:
