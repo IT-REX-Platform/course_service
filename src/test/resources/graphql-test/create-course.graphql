@@ -1,12 +1,6 @@
-mutation {
+mutation($title: String!, $description: String!, $startDate: DateTime!, $endDate: DateTime!, $published: Boolean!) {
     createCourse(
-        input: {
-            title: "New Course"
-            description: "This is a new course"
-            startDate: "2020-01-01T00:00:00.000Z"
-            endDate: "2021-01-01T00:00:00.000Z"
-            published: false
-        }
+        input: {title: $title, description: $description, startDate: $startDate, endDate: $endDate, published: $published}
     ) {
         id
         title
