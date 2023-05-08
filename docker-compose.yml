@@ -8,27 +8,27 @@ services:
     ports:
       - "1032:5432"
     volumes:
-      - templatedata:/var/lib/postgresql/data
+      - coursedata:/var/lib/postgresql/data
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=templatedatabase
+      - POSTGRES_DB=course_service
   app:
     build: .
     restart: always
     network_mode: bridge
-    container_name: template_microservice
+    container_name: course_service
     expose:
-      - 1000
-      - 1001
+      - 2000
+      - 2001
     ports:
-      - 1000:1000
-      - 1001:1001
+      - 2000:2000
+      - 2001:2001
     depends_on:
       - database
     links:
       - database
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/templatedatabase
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/course_service
 volumes:
-  templatedata:
+  coursedata:
