@@ -1,0 +1,25 @@
+{
+  "realm" : "SpringBootKeycloak",
+  "users" : [ {
+    "id" : "7488627f-68af-4838-a990-960329eb2c8d",
+    "createdTimestamp" : 1682606816022,
+    "username" : "maxmustermann",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "firstName" : "Max",
+    "lastName" : "Mustermann",
+    "credentials" : [ {
+      "id" : "4da8f166-cae3-44ab-a562-b88d4007ea05",
+      "type" : "password",
+      "createdDate" : 1683534809933,
+      "secretData" : "{\"value\":\"Hl/ZxmN3LLLq7bSrpjfMycxeYNTQV4AwWqEVVJhBwBs=\",\"salt\":\"QCIABusH0LO1Q2jH/vXbFA==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "student", "default-roles-springbootkeycloak" ],
+    "notBefore" : 0,
+    "groups" : [ "/sampleCourse1" ]
+  } ]
+}

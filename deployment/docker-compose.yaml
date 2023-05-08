@@ -1,0 +1,45 @@
+version: '3'
+
+volumes:
+  postgres_data:
+      driver: local
+
+services:
+  postgres:
+      image: postgres
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      environment:
+        #TODO: change values for PROD
+        POSTGRES_DB: keycloak
+        POSTGRES_USER: keycloak
+        POSTGRES_PASSWORD: password
+      ports:
+        - 1035:5432
+  keycloak:
+      image: quay.io/keycloak/keycloak:latest
+      volumes:
+      - ./imports:/opt/keycloak/data/import
+      environment:
+        DB_VENDOR: POSTGRES
+        DB_ADDR: postgres
+        #TODO: change values for prod. Values must match postgres values above
+        DB_DATABASE: keycloak
+        DB_USER: keycloak
+        DB_SCHEMA: public
+        DB_PASSWORD: password
+        # TODO: change values for PROD
+        KEYCLOAK_ADMIN: myadmin
+        KEYCLOAK_ADMIN_PASSWORD: admin
+        # Uncomment the line below if you want to specify JDBC parameters. The parameter below is just an example, and it shouldn't be used in production without knowledge. It is highly recommended that you read the PostgreSQL JDBC driver documentation in order to use it.
+        #JDBC_PARAMS: "ssl=true"
+        KEYCLOAK_HOSTNAME: localhost
+      command:
+      # change to start --import-realm for PROD
+      # set up dev environment instead -> less config required
+      # imports realm. default behaviour is not to overwrite if realm exists
+        - start-dev --import-realm
+      ports:
+        - 8080:8080
+      depends_on:
+        - postgres
