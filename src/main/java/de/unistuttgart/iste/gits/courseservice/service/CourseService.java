@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Service that handles course related operations.
@@ -58,9 +58,7 @@ public class CourseService {
      */
     public CourseDto updateCourse(UpdateCourseInputDto input) {
         courseValidator.validateUpdateCourseInputDto(input);
-        if (!courseRepository.existsById(input.getId())) {
-            throw new EntityNotFoundException("Course with id " + input.getId() + " not found");
-        }
+        requireCourseExisting(input.getId());
 
         CourseEntity updatedCourseEntity = courseRepository.save(courseMapper.dtoToEntity(input));
 
@@ -71,31 +69,50 @@ public class CourseService {
      * Deletes a course.
      *
      * @param uuid The id of the course to delete.
-     * @return The id of the deleted course or empty if the course was not found.
+     * @return The id of the deleted course.
+     * @throws EntityNotFoundException If a course with the given id does not exist.
      */
-    public Optional<UUID> deleteCourse(UUID uuid) {
-        if (!courseRepository.existsById(uuid)) {
-            return Optional.empty();
-        }
+    public UUID deleteCourse(UUID uuid) {
+        requireCourseExisting(uuid);
         courseRepository.deleteById(uuid);
-        return Optional.of(uuid);
+        return uuid;
     }
 
     /**
      * Returns a list of courses by their ids.
+     *
      * @param ids The ids of the courses to return.
      * @return A list of courses with the given ids, preserving the order of the ids.
-     * @throws EntityNotFoundException If a course with one of the given ids does not exist.
+     * @throws EntityNotFoundException If a course with at least one of the given ids does not exist.
      */
     public List<CourseDto> getCoursesByIds(List<UUID> ids) {
         var result = new ArrayList<CourseDto>(ids.size());
+        var missingIds = new ArrayList<UUID>();
 
         for (var id : ids) {
-            CourseEntity courseEntity = courseRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Course with id " + id + " not found"));
-            result.add(courseMapper.entityToDto(courseEntity));
+            courseRepository.findById(id)
+                    .ifPresentOrElse(
+                            courseEntity -> result.add(courseMapper.entityToDto(courseEntity)),
+                            () -> missingIds.add(id));
+        }
+
+        if (!missingIds.isEmpty()) {
+            throw new EntityNotFoundException("Course(s) with id(s) "
+                    + missingIds.stream().map(UUID::toString).collect(Collectors.joining(", "))
+                    + " not found");
         }
 
         return result;
+    }
+
+    /**
+     * Checks if a course with the given id exists. If not, an EntityNotFoundException is thrown.
+     * @param id The id of the course to check.
+     * @throws EntityNotFoundException If a course with the given id does not exist.
+     */
+    public void requireCourseExisting(UUID id) {
+        if (!courseRepository.existsById(id)) {
+            throw new EntityNotFoundException("Course with id " + id + " not found");
+        }
     }
 }

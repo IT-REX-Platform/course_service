@@ -7,13 +7,11 @@ import de.unistuttgart.iste.gits.courseservice.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.mapper.ChapterMapper;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ChapterRepository;
-import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.validation.ChapterValidator;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -25,7 +23,7 @@ public class ChapterService {
 
     private final ChapterMapper chapterMapper;
     private final ChapterRepository chapterRepository;
-    private final CourseRepository courseRepository;
+    private final CourseService courseService;
     private final ChapterValidator chapterValidator;
 
     /**
@@ -37,9 +35,7 @@ public class ChapterService {
      */
     public ChapterDto createChapter(CreateChapterInputDto chapterData) {
         chapterValidator.validateCreateChapterInputDto(chapterData);
-        if (!courseRepository.existsById(chapterData.getCourseId())) {
-            throw new EntityNotFoundException("Course with id " + chapterData.getCourseId() + " does not exist.");
-        }
+        courseService.requireCourseExisting(chapterData.getCourseId());
 
         ChapterEntity chapterEntity = chapterMapper.dtoToEntity(chapterData);
         chapterEntity = chapterRepository.save(chapterEntity);
@@ -55,9 +51,10 @@ public class ChapterService {
      */
     public ChapterDto updateChapter(UpdateChapterInputDto chapterData) {
         chapterValidator.validateUpdateChapterInputDto(chapterData);
+        requireChapterExisting(chapterData.getId());
 
         CourseEntity course = chapterRepository.findById(chapterData.getId())
-                .orElseThrow(() -> new EntityNotFoundException("Chapter with id " + chapterData.getId() + " not found"))
+                .orElseThrow()
                 .getCourse();
 
         ChapterEntity updatedChapterEntity = chapterMapper.dtoToEntity(chapterData);
@@ -71,15 +68,24 @@ public class ChapterService {
      * Deletes a chapter.
      *
      * @param uuid The id of the chapter to delete.
-     * @return The id of the deleted chapter or an empty optional if the chapter
-     * does not exist.
+     * @return The id of the deleted chapter.
+     * @throws EntityNotFoundException If the chapter does not exist.
      */
-    public Optional<UUID> deleteChapter(UUID uuid) {
-        if (!chapterRepository.existsById(uuid)) {
-            return Optional.empty();
-        }
+    public UUID deleteChapter(UUID uuid) {
+        requireChapterExisting(uuid);
 
         chapterRepository.deleteById(uuid);
-        return Optional.of(uuid);
+        return uuid;
+    }
+
+    /**
+     * Checks if a chapter exists.
+     * @param uuid The id of the chapter to check.
+     * @throws EntityNotFoundException If the chapter does not exist.
+     */
+    private void requireChapterExisting(UUID uuid) {
+        if (!chapterRepository.existsById(uuid)) {
+            throw new EntityNotFoundException("Chapter with id " + uuid + " not found");
+        }
     }
 }

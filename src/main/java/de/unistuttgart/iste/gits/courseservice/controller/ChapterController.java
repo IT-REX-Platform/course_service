@@ -9,7 +9,6 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.stereotype.Controller;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @Controller
@@ -34,7 +33,7 @@ public class ChapterController {
     }
 
     @MutationMapping
-    public Optional<UUID> deleteChapter(@Argument(name = "id") UUID id) {
+    public UUID deleteChapter(@Argument(name = "id") UUID id) {
         return chapterService.deleteChapter(id);
     }
 }
