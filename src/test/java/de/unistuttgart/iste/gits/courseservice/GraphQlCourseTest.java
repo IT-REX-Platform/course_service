@@ -1,8 +1,8 @@
 package de.unistuttgart.iste.gits.courseservice;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.graphql.test.tester.HttpGraphQlTester;
+import org.springframework.test.web.reactive.server.WebTestClient;
 
 import java.util.UUID;
 
@@ -11,11 +11,17 @@ import java.util.UUID;
  * <p>
  * HINT: This is just an example. We need a more sophisticated approach for API testing.
  */
-@ExtendWith(GraphQlIntegrationTest.class)
 public class GraphQlCourseTest {
 
     @Test
-    public void testCreateCourse(GraphQlTester tester) {
+    public void testCreateCourse() {
+        WebTestClient client =
+                WebTestClient.bindToServer()
+                        .baseUrl("http://localhost:2001/graphql")
+                        .build();
+
+        HttpGraphQlTester tester = HttpGraphQlTester.create(client);
+
         UUID id = tester.documentName("create-course")
                 .execute()
                 .path("createCourse.title").entity(String.class).isEqualTo("New Course")
