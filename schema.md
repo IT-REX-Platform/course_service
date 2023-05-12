@@ -1,6 +1,5 @@
 # Schema Types
 
-<!--suppress ALL -->
 <details>
   <summary><strong>Table of Contents</strong></summary>
 
@@ -133,10 +132,10 @@
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>deleteCourse</strong></td>
-<td valign="top"><a href="#uuid">UUID</a></td>
+<td valign="top"><a href="#uuid">UUID</a>!</td>
 <td>
 
- Delete an existing course
+ Delete an existing course, throws an error if no course with the given id exists
 
 </td>
 </tr>
@@ -147,10 +146,10 @@
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>deleteChapter</strong></td>
-<td valign="top"><a href="#uuid">UUID</a></td>
+<td valign="top"><a href="#uuid">UUID</a>!</td>
 <td>
 
- Delete an existing chapter
+ Delete an existing chapter, throws an error if no chapter with the given id exists
 
 </td>
 </tr>
@@ -467,7 +466,11 @@
 <tr>
 <td colspan="2" valign="top"><strong>id</strong></td>
 <td valign="top"><a href="#uuid">UUID</a>!</td>
-<td></td>
+<td>
+
+ UUID of the chapter that should be updated
+
+</td>
 </tr>
 <tr>
 <td colspan="2" valign="top"><strong>title</strong></td>
@@ -533,7 +536,7 @@
 <td valign="top"><a href="#uuid">UUID</a>!</td>
 <td>
 
- UUID of the course
+ UUID of the course that should be updated
 
 </td>
 </tr>
