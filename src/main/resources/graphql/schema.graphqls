@@ -114,8 +114,8 @@ type Mutation {
     updateChapter(input: UpdateChapterInput!): Chapter!
 
     # Delete an existing course, throws an error if no course with the given id exists
-    deleteCourse(id: UUID!): UUID
+    deleteCourse(id: UUID!): UUID!
     # Delete an existing chapter, throws an error if no chapter with the given id exists
-    deleteChapter(id: UUID!): UUID
+    deleteChapter(id: UUID!): UUID!
 }
 
