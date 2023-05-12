@@ -32,7 +32,7 @@ input CreateCourseInput {
 }
 
 input UpdateCourseInput {
-    # UUID of the course
+    # UUID of the course that should be updated
     id: UUID!
     # Title of the course, max 255 characters
     title: String! @NotBlank @Size(max: 255)
@@ -81,6 +81,7 @@ input CreateChapterInput {
 }
 
 input UpdateChapterInput {
+    # UUID of the chapter that should be updated
     id: UUID!
     # Title of the chapter, max 255 characters
     title: String! @NotBlank @Size(max: 255)
@@ -112,9 +113,9 @@ type Mutation {
     # Update an existing chapter
     updateChapter(input: UpdateChapterInput!): Chapter!
 
-    # Delete an existing course
+    # Delete an existing course, throws an error if no course with the given id exists
     deleteCourse(id: UUID!): UUID
-    # Delete an existing chapter
+    # Delete an existing chapter, throws an error if no chapter with the given id exists
     deleteChapter(id: UUID!): UUID
 }
 
