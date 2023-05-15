@@ -22,7 +22,7 @@ import java.lang.annotation.*;
 @ExtendWith(GraphQlTestParameterResolver.class)
 @SpringBootTest(properties = {
         "spring.jpa.hibernate.ddl-auto=create-drop", // create and drop tables before and after tests
-        "spring.datasource.url=jdbc:postgresql://localhost:1032/test_data", // use the test database
+        "spring.datasource.url=jdbc:postgresql://localhost:1033/test_data", // use the test database
 })
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
