@@ -27,6 +27,8 @@ graphqlCodegen {
 			"UUID"     : "java.util.UUID",
 			"Url"      : "java.net.URL",
 	]
+	generateEqualsAndHashCode = true
+	generateToString = true
 }
 
 // Automatically generate GraphQL code on project build:
