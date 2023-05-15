@@ -38,7 +38,7 @@ public class CourseEntity {
     @Column(nullable = false)
     private boolean published;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     @OrderBy("number ASC")
     private List<@NotNull @Valid ChapterEntity> chapters;
 

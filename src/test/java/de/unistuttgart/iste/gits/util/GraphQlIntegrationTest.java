@@ -1,124 +1,31 @@
 package de.unistuttgart.iste.gits.util;
 
-import org.junit.jupiter.api.extension.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
-import org.springframework.graphql.test.tester.HttpGraphQlTester;
-import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.annotation.DirtiesContext;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.Properties;
+import java.lang.annotation.*;
 
 /**
- * This is an extension for JUnit 5 that starts the application in a docker container
- * with dapr.
- * This will stop the application after the tests are finished.
- * It provides a {@link GraphQlTester} instance that can be used to test
- * the GraphQL API.
+ * This annotation can be used to annotate a test class to run it as a graphQL integration test.
+ * It will do the following:
+ * <ul>
+ *     <li>Use a different database than the production database</li>
+ *     <li>Drop and recreate the database before and after the test</li>
+ *     <li>Inject a {@link GraphQlTester} into the test methods, see {@link GraphQlTestParameterResolver} </li>
+ * </ul>
  * <p>
- * Usage:
- * <pre>
- *     &#64;ExtendWith(GraphQlIntegrationTest.class)
- *     public class GraphQlTest {
- * </pre>
- * In the test methods, the {@link GraphQlTester} can be injected as a parameter.
- * <pre>
- *     &#64;Test
- *     public void test(GraphQlTester tester) {
- *        // ...
- * </pre>
+ * Test methods that create or modify data should be annotated with {@link DirtiesContext @DirtiesContext}
+ * to ensure that the database is recreated before the next test method is executed.
  */
-public class GraphQlIntegrationTest implements BeforeAllCallback, AfterAllCallback, ParameterResolver {
-
-    private Process dockerProcess;
-    private WebTestClient client;
-    private Properties applicationProperties;
-
-    @Override
-    public void beforeAll(ExtensionContext context) throws Exception {
-        applicationProperties = readApplicationProperties();
-
-        stopDockerAndWait();
-
-        dockerProcess = startDocker();
-        dockerProcess.waitFor();
-        waitForSpringToBeInitialized();
-
-        client = createWebTestClient();
-    }
-
-    @Override
-    public void afterAll(ExtensionContext context) throws Exception {
-        dockerProcess.destroy();
-        stopDockerAndWait();
-    }
-
-    @Override
-    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return parameterContext.getParameter().getType().equals(GraphQlTester.class);
-    }
-
-    @Override
-    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return HttpGraphQlTester.create(client);
-    }
-
-    /**
-     * Waits for the spring application to be initialized.
-     * This determined by looking for the log message "Completed initialization in ..."
-     * in the docker compose logs.
-     */
-    private void waitForSpringToBeInitialized() {
-        var logProcess = runCommand("docker compose logs -f -n 10 --no-log-prefix");
-
-        try (var logReader = new BufferedReader(new InputStreamReader(logProcess.getInputStream()))) {
-            while (true) {
-                var line = logReader.readLine();
-                System.out.println(line);
-
-                if (line != null && line.contains("Completed initialization in")) {
-                    logProcess.destroy();
-                    return;
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Process runCommand(String command) {
-        try {
-            return Runtime.getRuntime().exec(command);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void stopDockerAndWait() throws Exception {
-        runCommand("docker compose stop").waitFor();
-    }
-
-    private Process startDocker() {
-        return runCommand("docker compose up -d");
-    }
-
-    private WebTestClient createWebTestClient() {
-        return WebTestClient.bindToServer()
-                .baseUrl("http://localhost:" + applicationProperties.getProperty("dapr.port") + "/graphql")
-                // app id is required in header for dapr to route the request to the correct service
-                .defaultHeader("dapr-app-id", applicationProperties.getProperty("dapr.appId"))
-                .build();
-    }
-
-    private Properties readApplicationProperties() {
-        var properties = new Properties();
-        try {
-            properties.load(getClass().getResourceAsStream("/application.properties"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return properties;
-    }
-
+@ExtendWith(GraphQlTestParameterResolver.class)
+@SpringBootTest(properties = {
+        "spring.jpa.hibernate.ddl-auto=create-drop", // create and drop tables before and after tests
+        "spring.datasource.url=jdbc:postgresql://localhost:1032/test_data", // use the test database
+})
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+public @interface GraphQlIntegrationTest {
 }
