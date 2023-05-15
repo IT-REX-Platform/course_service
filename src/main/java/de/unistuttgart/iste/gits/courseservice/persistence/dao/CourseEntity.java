@@ -1,8 +1,6 @@
 package de.unistuttgart.iste.gits.courseservice.persistence.dao;
 
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,6 +38,6 @@ public class CourseEntity {
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
     @OrderBy("number ASC")
-    private List<@NotNull @Valid ChapterEntity> chapters;
+    private List<ChapterEntity> chapters;
 
 }
