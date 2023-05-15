@@ -1,0 +1,91 @@
+"""
+Specifies the sort direction, either ascending or descending.
+"""
+enum SortDirection {
+    ASC
+    DESC
+}
+
+"""
+Specifies the page size and page number for paginated results.
+"""
+input Pagination {
+    """
+    The page number, starting at 0.
+    If not specified, the default value is 0.
+    For values greater than 0, the page size must be specified.
+    If this value is larger than the number of pages, the last page will be returned.
+    """
+    page: Int! = 0 @PositiveOrZero
+    """
+    The number of elements per page.
+    """
+    size: Int! @Positive
+}
+
+"""
+Return type for information about paginated results.
+"""
+type PaginationInfo {
+    """
+    The current page number.
+    """
+    page: Int!
+    """
+    The number of elements per page.
+    """
+    size: Int!
+    """
+    The total number of elements across all pages.
+    """
+    totalElements: Int!
+    """
+    The total number of pages.
+    """
+    totalPages: Int!
+    """
+    Whether there is a next page.
+    """
+    hasNext: Boolean!
+}
+
+input StringFilter {
+    value: String!
+    operator: StringFilterOperator! = EQUALS
+    ignoreCase: Boolean! = false
+}
+
+enum StringFilterOperator {
+    EQUALS
+    CONTAINS
+    STARTS_WITH
+    ENDS_WITH
+    MATCHES
+}
+
+input IntFilter {
+    value: Int!
+    operator: IntFilterOperator! = EQUALS
+}
+
+enum IntFilterOperator {
+    EQUALS
+    GREATER_THAN
+    LESS_THAN
+}
+
+input DateTimeFilter {
+    value: DateTime!
+    operator: DateTimeFilterOperator! = EQUALS
+}
+
+enum DateTimeFilterOperator {
+    BEFORE
+    AFTER
+    EQUALS
+}
+
+input Sort {
+    field: String!
+    direction: SortDirection! = ASC
+}

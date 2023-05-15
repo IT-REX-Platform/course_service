@@ -1,0 +1,123 @@
+"""
+Courses are the main entity of the application. They are the top level of the
+hierarchy and contain chapters.
+"""
+type Course {
+    """
+    UUID of the course. Generated automatically when creating a new course.
+    """
+    id: UUID!
+    """
+    Title of the course. Maximal length is 255 characters, must not be blank.
+    """
+    title: String!
+    """
+    Detailed description of the course. Maximal length is 3000 characters.
+    """
+    description: String!
+    """
+    Start date of the course, ISO 8601 format.
+    Users can only access the course and work on course content after the start date.
+    Must be before the end date.
+    """
+    startDate: DateTime!
+    """
+    End date of the course, ISO 8601 format.
+    Users can no longer access the course and work on course content after the end date.
+    Must be after the start date.
+    """
+    endDate: DateTime!
+    """
+    Published state of the course. If the course is published, it is visible to users.
+    """
+    published: Boolean!
+    """
+    Chapters of the course. Can be filtered and sorted.
+    """
+    chapters(chapterSort: [Sort!], filter: ChapterFilter, pagination: Pagination): [Chapter!]!
+}
+
+
+"""
+Input type for creating a new course. See also on the course type for detailed field descriptions.
+"""
+input CreateCourseInput {
+    """
+    Title of the course, max 255 characters, must not be blank.
+    """
+    title: String! @NotBlank @Size(max: 255)
+    """
+    Description of the course, max 3000 characters.
+    """
+    description: String! @Size(max: 3000)
+    """
+    Start date of the course, ISO 8601 format.
+    Must be before the end date.
+    """
+    startDate: DateTime!
+    """
+    End date of the course, ISO 8601 format.
+    Must be after the start date.
+    """
+    endDate: DateTime!
+    """
+    Published status of the course.
+    """
+    published: Boolean!
+}
+
+"""
+Input type for updating an existing course. See also on the course type for detailed field descriptions.
+The id specifies the course that should be updated, the other fields specify the new values.
+"""
+input UpdateCourseInput {
+    """
+    UUID of the course that should be updated.
+    Must be an id of an existing course, otherwise an error is returned.
+    """
+    id: UUID!
+    """
+    The new title of the course, max 255 characters, must not be blank.
+    """
+    title: String! @NotBlank @Size(max: 255)
+    """
+    The new description of the course, max 3000 characters.
+    """
+    description: String! @Size(max: 3000)
+    """
+    The new start date of the course, ISO 8601 format.
+    """
+    startDate: DateTime!
+    """
+    The new end date of the course, ISO 8601 format.
+    """
+    endDate: DateTime!
+    """
+    The new published status of the course.
+    """
+    published: Boolean!
+}
+
+"""
+Input type for filtering courses. All fields are optional.
+If multiple filters are specified, they are combined with AND.
+"""
+input CourseFilter {
+    title: StringFilter
+    description: StringFilter
+    startDate: DateTimeFilter
+    endDate: DateTimeFilter
+    published: Boolean
+
+    and: [CourseFilter!]
+    or: [CourseFilter!]
+    not: CourseFilter
+}
+
+"""
+Return type for the course query. Contains the course and the pagination info.
+"""
+type CoursePayload {
+    courses: [Course!]!
+    pagination: PaginationInfo!
+}

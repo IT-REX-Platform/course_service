@@ -1,0 +1,25 @@
+type Query {
+    """
+    Get a list of courses. Can be filtered, sorted and paginated.
+    """
+    courses(
+        filter: CourseFilter,
+        sort: [Sort!],
+        pagination: Pagination): CoursePayload!
+
+    """
+    Returns the courses with the given ids.
+    """
+    coursesById(ids: [UUID!]!): [Course!]!
+
+    """
+    Get the list of chapters for a course. Can be filtered, sorted and paginated.
+    Throws an error if the course does not exist.
+    The default sort order is by chapter number.
+    """
+    chapters(
+        courseId: UUID!,
+        filter: ChapterFilter,
+        sort: [Sort!],
+        pagination: Pagination): ChapterPayload!
+}
