@@ -4,12 +4,11 @@ import de.unistuttgart.iste.gits.courseservice.dto.ChapterDto;
 import de.unistuttgart.iste.gits.courseservice.dto.CourseDto;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.util.GraphQlIntegrationTest;
+import de.unistuttgart.iste.gits.util.GraphQlApiTest;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -23,7 +22,7 @@ import static org.hamcrest.Matchers.hasSize;
 /**
  * Tests for the GraphQL API.
  */
-@GraphQlIntegrationTest
+@GraphQlApiTest
 public class CourseIntegrationTest {
 
     @Autowired
@@ -35,7 +34,6 @@ public class CourseIntegrationTest {
      * Tests that a course can be created and the correct values are returned.
      */
     @Test
-    @DirtiesContext
     public void testCreateCourse(GraphQlTester tester) {
         String query = """
                 mutation {
@@ -91,7 +89,6 @@ public class CourseIntegrationTest {
      * Test that the courses can be retrieved correctly.
      */
     @Test
-    @DirtiesContext
     public void testGetCourses(GraphQlTester tester) {
         // create two courses in the database
         var initialData = Stream.of(
@@ -139,7 +136,6 @@ public class CourseIntegrationTest {
      * Tests that courses can be retrieved by its id.
      */
     @Test
-    @DirtiesContext
     public void testGetByIds(GraphQlTester tester) {
         // create two courses in the database
         var initialData = Stream.of(
@@ -184,7 +180,6 @@ public class CourseIntegrationTest {
      * Test that a course can be updated.
      */
     @Test
-    @DirtiesContext
     public void testUpdateCourseSuccessful(GraphQlTester tester) {
         // create a course in the database
         var initialData = courseRepository.save(CourseEntity.builder().title("Course 1")
@@ -233,7 +228,6 @@ public class CourseIntegrationTest {
      * Tests that after deleting a course, it is no longer returned.
      */
     @Test
-    @DirtiesContext
     public void testDeletion(GraphQlTester tester) {
         // create two courses in the database
         var initialData = Stream.of(

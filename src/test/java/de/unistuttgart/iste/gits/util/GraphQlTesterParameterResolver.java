@@ -19,7 +19,7 @@ import org.springframework.web.context.WebApplicationContext;
  *     &#64;ExtendWith(GraphQlIntegrationTestParameterResolver.class)
  *     public class GraphQlTest {
  * </pre>
- * or using the {@link GraphQlIntegrationTest} annotation.
+ * or using the {@link GraphQlApiTest} annotation.
  * <p>
  * In the test methods, the {@link GraphQlTester} can be injected as a parameter.
  * <pre>
@@ -28,7 +28,7 @@ import org.springframework.web.context.WebApplicationContext;
  *        // ...
  * </pre>
  */
-public class GraphQlTestParameterResolver implements ParameterResolver {
+public class GraphQlTesterParameterResolver implements ParameterResolver {
 
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
