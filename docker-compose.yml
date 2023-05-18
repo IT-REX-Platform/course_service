@@ -1,0 +1,34 @@
+services:
+  database:
+    image: postgres:alpine
+    restart: always
+    network_mode: bridge
+    expose:
+      - 1032
+    ports:
+      - "1032:5432"
+    volumes:
+      - coursedata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=course_service
+  app:
+    build: .
+    restart: always
+    network_mode: bridge
+    container_name: course_service
+    expose:
+      - 2000
+      - 2001
+    ports:
+      - 2000:2000
+      - 2001:2001
+    depends_on:
+      - database
+    links:
+      - database
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/course_service
+volumes:
+  coursedata:
