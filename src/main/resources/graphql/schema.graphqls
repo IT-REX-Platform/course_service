@@ -62,6 +62,8 @@ type Chapter {
     endDate: DateTime!
     # The course the chapter belongs to
     course: Course!
+    # The content ids of the chapter
+    contentIds: [UUID!]!
 }
 
 
@@ -78,6 +80,8 @@ input CreateChapterInput {
     endDate: DateTime!
     # The course the chapter belongs to
     courseId: UUID!
+    # Content ids of the chapter
+    contentIds: [UUID!]!
 }
 
 input UpdateChapterInput {
@@ -93,6 +97,8 @@ input UpdateChapterInput {
     startDate: DateTime!
     # End date of the chapter, ISO 8601 format
     endDate: DateTime!
+    # Content ids of the chapter
+    contentIds: [UUID!]!
 }
 
 type Query {
