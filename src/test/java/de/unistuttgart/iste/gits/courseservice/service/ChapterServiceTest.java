@@ -7,7 +7,6 @@ import de.unistuttgart.iste.gits.courseservice.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.mapper.ChapterMapper;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ChapterRepository;
-import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.validation.ChapterValidator;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
@@ -34,13 +33,13 @@ import static org.mockito.Mockito.*;
 public class ChapterServiceTest {
 
     private final ChapterRepository chapterRepository = mock(ChapterRepository.class);
-    private final CourseRepository courseRepository = mock(CourseRepository.class);
+    private final CourseService courseService = mock(CourseService.class);
     private final ChapterMapper chapterMapper = new ChapterMapper(new ModelMapper());
     private final ChapterValidator chapterValidator = spy(new ChapterValidator());
     private final ChapterService chapterService = new ChapterService(
             chapterMapper,
             chapterRepository,
-            courseRepository,
+            courseService,
             chapterValidator);
 
     /**
@@ -54,9 +53,8 @@ public class ChapterServiceTest {
         CreateChapterInputDto testCreateChapterInput = dummyCreateChapterInputDtoBuilder().build();
         ChapterEntity expectedChapter = dummyChapterEntityBuilder().build();
 
-        // mock repository
-        when(courseRepository.existsById(testCreateChapterInput.getCourseId()))
-                .thenReturn(true);
+        // mock repository and service
+        doNothing().when(courseService).requireCourseExisting(any());
         when(chapterRepository.save(any()))
                 .thenReturn(expectedChapter);
 
@@ -74,7 +72,7 @@ public class ChapterServiceTest {
         // verify that the repository and validator were called
         verify(chapterValidator)
                 .validateCreateChapterInputDto(testCreateChapterInput);
-        verify(chapterRepository, atMostOnce())
+        verify(chapterRepository, times(1))
                 .save(any(ChapterEntity.class));
     }
 
@@ -91,9 +89,8 @@ public class ChapterServiceTest {
                 .setEndDate(OffsetDateTime.now())
                 .build();
 
-        // mock repository
-        when(courseRepository.existsById(testCreateChapterInput.getCourseId()))
-                .thenReturn(true);
+        // mock service
+        doNothing().when(courseService).requireCourseExisting(any());
 
         // act and assert
         assertThrows(ValidationException.class, () -> chapterService.createChapter(testCreateChapterInput));
@@ -115,8 +112,8 @@ public class ChapterServiceTest {
                 .setCourseId(UUID.randomUUID())
                 .build();
 
-        // mock repository
-        when(courseRepository.existsById(any())).thenReturn(false);
+        // mock service
+        doThrow(EntityNotFoundException.class).when(courseService).requireCourseExisting(any());
 
         // act and assert
         assertThrows(EntityNotFoundException.class, () -> chapterService.createChapter(testCreateChapterInput));
@@ -135,14 +132,18 @@ public class ChapterServiceTest {
     public void testUpdateChapterSuccessful() {
         // arrange test data
         ChapterEntity expectedChapter = dummyChapterEntityBuilder()
+                .description("new description")
                 .course(dummyCourseEntityBuilder().build())
                 .build();
         UpdateChapterInputDto testUpdateChapterInput = dummyUpdateChapterInputDtoBuilder(expectedChapter.getId())
+                .setDescription("new description")
                 .build();
 
         // mock repository
         when(chapterRepository.save(any()))
                 .thenReturn(expectedChapter);
+        when(chapterRepository.existsById(testUpdateChapterInput.getId()))
+                .thenReturn(true);
         when(chapterRepository.findById(testUpdateChapterInput.getId()))
                 .thenReturn(Optional.of(expectedChapter));
 
@@ -161,7 +162,7 @@ public class ChapterServiceTest {
         // verify that the repository and validator were called
         verify(chapterValidator)
                 .validateUpdateChapterInputDto(testUpdateChapterInput);
-        verify(chapterRepository, atMostOnce())
+        verify(chapterRepository, times(1))
                 .save(any(ChapterEntity.class));
     }
 
@@ -208,11 +209,10 @@ public class ChapterServiceTest {
                 .when(chapterRepository).existsById(any());
 
         // act
-        Optional<UUID> deletedChapterId = chapterService.deleteChapter(testChapterId);
+        UUID deletedChapterId = chapterService.deleteChapter(testChapterId);
 
         // assert
-        assertThat(deletedChapterId.isPresent(), is(true));
-        assertThat(deletedChapterId.get(), is(testChapterId));
+        assertThat(deletedChapterId, is(testChapterId));
 
         // verify that the repository was called
         verify(chapterRepository).deleteById(testChapterId);
@@ -221,7 +221,7 @@ public class ChapterServiceTest {
     /**
      * Given a non-existing ChapterId
      * When deleteChapter is called
-     * Then an empty Optional is returned
+     * Then a EntityNotFoundException is thrown
      */
     @Test
     public void testDeleteChapterNotExisting() {
@@ -233,10 +233,7 @@ public class ChapterServiceTest {
                 .when(chapterRepository).existsById(any());
 
         // act
-        Optional<UUID> deletedChapterId = chapterService.deleteChapter(testChapterId);
-
-        // assert
-        assertThat(deletedChapterId.isEmpty(), is(true));
+        assertThrows(EntityNotFoundException.class, () -> chapterService.deleteChapter(testChapterId));
     }
 
     private static CourseEntity.CourseEntityBuilder dummyCourseEntityBuilder() {
