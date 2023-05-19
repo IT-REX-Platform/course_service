@@ -13,6 +13,20 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=templatedatabase
+  testDb:
+    image: postgres:alpine
+    restart: always
+    network_mode: bridge
+    expose:
+      - 1033
+    ports:
+      - "1033:5432"
+    volumes:
+      - coursedata:/var/lib/postgresql/testdata
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=test_data
   app:
     build: .
     restart: always
