@@ -4,7 +4,15 @@ type Query {
     """
     courses(
         filter: CourseFilter,
-        sort: [Sort!],
+        """
+        The fields to sort by.
+        Throws an error if no field with the given name exists.
+        """
+        sortBy: [String!],
+        """
+        The sort direction for each field. If not specified, defaults to ASC.
+        """
+        sortDirection: [SortDirection!]! = ASC,
         pagination: Pagination): CoursePayload!
 
     """
@@ -20,6 +28,14 @@ type Query {
     chapters(
         courseId: UUID!,
         filter: ChapterFilter,
-        sort: [Sort!],
+        """
+        The fields to sort by. The default sort order is by chapter number.
+        Throws an error if no field with the given name exists.
+        """
+        sortBy: [String!]! = [],
+        """
+        The sort direction for each field. If not specified, defaults to ASC.
+        """
+        sortDirection: [SortDirection!]! = ASC,
         pagination: Pagination): ChapterPayload!
 }

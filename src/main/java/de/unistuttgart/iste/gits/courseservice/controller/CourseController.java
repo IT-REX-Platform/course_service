@@ -1,8 +1,6 @@
 package de.unistuttgart.iste.gits.courseservice.controller;
 
-import de.unistuttgart.iste.gits.courseservice.dto.CourseDto;
-import de.unistuttgart.iste.gits.courseservice.dto.CreateCourseInputDto;
-import de.unistuttgart.iste.gits.courseservice.dto.UpdateCourseInputDto;
+import de.unistuttgart.iste.gits.courseservice.dto.*;
 import de.unistuttgart.iste.gits.courseservice.service.CourseService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -11,6 +9,7 @@ import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -24,8 +23,13 @@ public class CourseController {
     }
 
     @QueryMapping
-    public List<CourseDto> courses() {
-        return courseService.getAllCourses();
+    public CoursePayloadDto courses(
+            @Argument(name = "filter") Optional<CourseFilterDto> filter,
+            @Argument(name = "sortBy") List<String> sortBy,
+            @Argument(name = "sortDirection") List<SortDirectionDto> sortDirection,
+            @Argument(name = "pagination") Optional<PaginationDto> pagination
+    ) {
+        return courseService.getCourses(filter, sortBy, sortDirection, pagination);
     }
 
     @QueryMapping

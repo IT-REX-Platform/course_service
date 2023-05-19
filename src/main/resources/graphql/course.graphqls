@@ -34,7 +34,17 @@ type Course {
     """
     Chapters of the course. Can be filtered and sorted.
     """
-    chapters(chapterSort: [Sort!], filter: ChapterFilter, pagination: Pagination): [Chapter!]!
+    chapters(filter: ChapterFilter,
+        """
+        The fields to sort by. The default sort order is by chapter number.
+        Throws an error if no field with the given name exists.
+        """
+        sortBy: [String!]! = [],
+        """
+        The sort direction for each field. If not specified, defaults to ASC.
+        """
+        sortDirection: [SortDirection!]! = ASC,
+        pagination: Pagination): ChapterPayload!
 }
 
 
@@ -118,6 +128,6 @@ input CourseFilter {
 Return type for the course query. Contains the course and the pagination info.
 """
 type CoursePayload {
-    courses: [Course!]!
+    elements: [Course!]!
     pagination: PaginationInfo!
 }

@@ -115,6 +115,6 @@ input ChapterFilter {
 Return type of the chapters query, contains a list of chapters and pagination info.
 """
 type ChapterPayload {
-    chapters: [Chapter!]!
+    elements: [Chapter!]!
     pagination: PaginationInfo!
 }

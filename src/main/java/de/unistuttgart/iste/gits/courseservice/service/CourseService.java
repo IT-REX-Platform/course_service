@@ -1,18 +1,24 @@
 package de.unistuttgart.iste.gits.courseservice.service;
 
-import de.unistuttgart.iste.gits.courseservice.dto.CourseDto;
-import de.unistuttgart.iste.gits.courseservice.dto.CreateCourseInputDto;
-import de.unistuttgart.iste.gits.courseservice.dto.UpdateCourseInputDto;
+import de.unistuttgart.iste.gits.courseservice.dto.*;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.mapper.CourseMapper;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
+import de.unistuttgart.iste.gits.courseservice.persistence.specification.CourseFilterSpecification;
 import de.unistuttgart.iste.gits.courseservice.persistence.validation.CourseValidator;
+import de.unistuttgart.iste.gits.courseservice.util.PaginationUtil;
+import de.unistuttgart.iste.gits.courseservice.util.SortUtil;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -26,15 +32,6 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final CourseMapper courseMapper;
     private final CourseValidator courseValidator;
-
-    /**
-     * Returns all courses.
-     *
-     * @return All courses.
-     */
-    public List<CourseDto> getAllCourses() {
-        return courseRepository.findAll().stream().map(courseMapper::entityToDto).toList();
-    }
 
     /**
      * Creates a course.
@@ -98,8 +95,8 @@ public class CourseService {
 
         if (!missingIds.isEmpty()) {
             throw new EntityNotFoundException("Course(s) with id(s) "
-                    + missingIds.stream().map(UUID::toString).collect(Collectors.joining(", "))
-                    + " not found");
+                                              + missingIds.stream().map(UUID::toString).collect(Collectors.joining(", "))
+                                              + " not found");
         }
 
         return result;
@@ -107,6 +104,7 @@ public class CourseService {
 
     /**
      * Checks if a course with the given id exists. If not, an EntityNotFoundException is thrown.
+     *
      * @param id The id of the course to check.
      * @throws EntityNotFoundException If a course with the given id does not exist.
      */
@@ -115,4 +113,45 @@ public class CourseService {
             throw new EntityNotFoundException("Course with id " + id + " not found");
         }
     }
+
+    /**
+     * Returns a list of all courses.
+     *
+     * @param filter        optional filter for the courses
+     * @param sortBy        list of sort fields
+     * @param sortDirection list of sort directions
+     * @param pagination    optional pagination
+     * @return a list of all courses
+     */
+    public CoursePayloadDto getCourses(Optional<CourseFilterDto> filter,
+                                       List<String> sortBy,
+                                       List<SortDirectionDto> sortDirection,
+                                       Optional<PaginationDto> pagination) {
+
+        Sort sort = SortUtil.createSort(sortBy, sortDirection);
+        Pageable pageRequest = pagination
+                .map(dto -> PaginationUtil.createPageable(dto, sort))
+                .orElse(Pageable.unpaged());
+
+        Specification<CourseEntity> specification = filter
+                .map(CourseFilterSpecification::courseFilter)
+                .orElse(null);
+
+        if (pageRequest.isPaged()) {
+            Page<CourseEntity> result = courseRepository.findAll(specification, pageRequest);
+            return createCoursePayloadDtoPaged(result);
+        }
+
+        List<CourseEntity> result = courseRepository.findAll(specification, sort);
+        return createCoursePayloadDtoUnpaged(result);
+    }
+
+    private CoursePayloadDto createCoursePayloadDtoPaged(Page<CourseEntity> result) {
+        return courseMapper.createPayloadDto(result.stream(), PaginationUtil.createPaginationInfoDto(result));
+    }
+
+    private CoursePayloadDto createCoursePayloadDtoUnpaged(List<CourseEntity> result) {
+        return courseMapper.createPayloadDto(result.stream(), PaginationUtil.unpagedPaginationInfoDto(result.size()));
+    }
+
 }
