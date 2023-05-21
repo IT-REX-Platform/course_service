@@ -93,10 +93,6 @@ If multiple filters are specified, they are combined with AND.
 """
 input DateTimeFilter {
     """
-    If specified, filters for dates that are equal to the specified value.
-    """
-    equals: DateTime
-    """
     If specified, filters for dates after the specified value.
     """
     after: DateTime
