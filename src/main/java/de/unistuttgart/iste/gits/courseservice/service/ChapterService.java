@@ -3,7 +3,6 @@ package de.unistuttgart.iste.gits.courseservice.service;
 import de.unistuttgart.iste.gits.common.util.PaginationUtil;
 import de.unistuttgart.iste.gits.common.util.SortUtil;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.ChapterEntity;
-import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.mapper.ChapterMapper;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.validation.ChapterValidator;
@@ -63,12 +62,12 @@ public class ChapterService {
         chapterValidator.validateUpdateChapterInputDto(chapterData);
         requireChapterExisting(chapterData.getId());
 
-        CourseEntity course = chapterRepository.findById(chapterData.getId())
+        UUID courseID = chapterRepository.findById(chapterData.getId())
                 .orElseThrow()
-                .getCourse();
+                .getCourseId();
 
         ChapterEntity updatedChapterEntity = chapterMapper.dtoToEntity(chapterData);
-        updatedChapterEntity.setCourse(course);
+        updatedChapterEntity.setCourseId(courseID);
         updatedChapterEntity = chapterRepository.save(updatedChapterEntity);
 
         return chapterMapper.entityToDto(updatedChapterEntity);

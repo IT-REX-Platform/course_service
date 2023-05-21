@@ -25,7 +25,7 @@ public class ExceptionResolver extends DataFetcherExceptionResolverAdapter {
     @Override
     protected GraphQLError resolveToSingleError(@NonNull Throwable ex, @NonNull DataFetchingEnvironment env) {
         log.error("Exception occurred during data fetching. Class: {}, Message: {}", ex.getClass().getSimpleName(), ex.getMessage());
-        log.debug("Exception trace: ", ex);
+        log.warn("Exception trace: ", ex);
 
         return GraphqlErrorBuilder.newError()
                 .extensions(buildExtensions(ex))

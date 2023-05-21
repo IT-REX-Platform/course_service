@@ -1,7 +1,6 @@
 package de.unistuttgart.iste.gits.courseservice.service;
 
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.ChapterEntity;
-import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.mapper.ChapterMapper;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.validation.ChapterValidator;
@@ -36,6 +35,7 @@ public class ChapterServiceTest {
     private final CourseService courseService = mock(CourseService.class);
     private final ChapterMapper chapterMapper = new ChapterMapper(new ModelMapper());
     private final ChapterValidator chapterValidator = spy(new ChapterValidator());
+
     private final ChapterService chapterService = new ChapterService(
             chapterMapper,
             chapterRepository,
@@ -133,7 +133,7 @@ public class ChapterServiceTest {
         // arrange test data
         ChapterEntity expectedChapter = dummyChapterEntityBuilder()
                 .description("new description")
-                .course(dummyCourseEntityBuilder().build())
+                .courseId(UUID.randomUUID())
                 .build();
         UpdateChapterInputDto testUpdateChapterInput = dummyUpdateChapterInputDtoBuilder(expectedChapter.getId())
                 .setDescription("new description")
@@ -157,7 +157,7 @@ public class ChapterServiceTest {
         assertThat(updatedChapter.getStartDate(), is(expectedChapter.getStartDate()));
         assertThat(updatedChapter.getEndDate(), is(expectedChapter.getEndDate()));
         assertThat(updatedChapter.getNumber(), is(expectedChapter.getNumber()));
-        assertThat(updatedChapter.getCourse().getId(), is(expectedChapter.getCourse().getId()));
+        assertThat(updatedChapter.getCourse().getId(), is(expectedChapter.getCourseId()));
 
         // verify that the repository and validator were called
         verify(chapterValidator)
@@ -234,15 +234,6 @@ public class ChapterServiceTest {
 
         // act
         assertThrows(EntityNotFoundException.class, () -> chapterService.deleteChapter(testChapterId));
-    }
-
-    private static CourseEntity.CourseEntityBuilder dummyCourseEntityBuilder() {
-        return CourseEntity.builder()
-                .id(UUID.randomUUID())
-                .title("testTitle")
-                .description("testDescription")
-                .startDate(LocalDate.of(2021, 1, 1).atStartOfDay().atOffset(ZoneOffset.UTC))
-                .endDate(LocalDate.of(2021, 2, 1).atStartOfDay().atOffset(ZoneOffset.UTC));
     }
 
     private static UpdateChapterInputDto.Builder dummyUpdateChapterInputDtoBuilder(UUID uuid) {

@@ -13,7 +13,7 @@ import static de.unistuttgart.iste.gits.common.util.SpecificationUtil.*;
 public class ChapterFilterSpecification {
 
     public static Specification<ChapterEntity> courseIdEquals(UUID courseId) {
-        return SpecificationUtil.equalTo("course", courseId);
+        return SpecificationUtil.equalTo("courseId", courseId);
     }
 
     public static Specification<ChapterEntity> chapterFilter(@Nullable ChapterFilterDto filterDto) {

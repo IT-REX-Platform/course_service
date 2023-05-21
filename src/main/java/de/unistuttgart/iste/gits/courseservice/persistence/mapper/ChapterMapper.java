@@ -1,7 +1,6 @@
 package de.unistuttgart.iste.gits.courseservice.persistence.mapper;
 
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.ChapterEntity;
-import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.generated.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -21,11 +20,7 @@ public class ChapterMapper {
 
     public ChapterEntity dtoToEntity(CreateChapterInputDto chapterInputDto) {
         ChapterEntity entity = modelMapper.map(chapterInputDto, ChapterEntity.class);
-
-        // set reference to course
-        CourseEntity course = CourseEntity.builder().id(chapterInputDto.getCourseId()).build();
-        entity.setCourse(course);
-
+        entity.setCourseId(chapterInputDto.getCourseId());
         return entity;
     }
 
