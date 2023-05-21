@@ -1,18 +1,27 @@
 package de.unistuttgart.iste.gits.courseservice.service;
 
-import de.unistuttgart.iste.gits.courseservice.dto.ChapterDto;
-import de.unistuttgart.iste.gits.courseservice.dto.CreateChapterInputDto;
-import de.unistuttgart.iste.gits.courseservice.dto.UpdateChapterInputDto;
+import de.unistuttgart.iste.gits.common.util.PaginationUtil;
+import de.unistuttgart.iste.gits.common.util.SortUtil;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.ChapterEntity;
-import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.mapper.ChapterMapper;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.validation.ChapterValidator;
+import de.unistuttgart.iste.gits.generated.dto.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
+
+import static de.unistuttgart.iste.gits.courseservice.persistence.specification.ChapterFilterSpecification.chapterFilter;
+import static de.unistuttgart.iste.gits.courseservice.persistence.specification.ChapterFilterSpecification.courseIdEquals;
+import static org.springframework.data.jpa.domain.Specification.where;
 
 /**
  * Service that handles chapter related operations.
@@ -53,12 +62,12 @@ public class ChapterService {
         chapterValidator.validateUpdateChapterInputDto(chapterData);
         requireChapterExisting(chapterData.getId());
 
-        CourseEntity course = chapterRepository.findById(chapterData.getId())
+        UUID courseID = chapterRepository.findById(chapterData.getId())
                 .orElseThrow()
-                .getCourse();
+                .getCourseId();
 
         ChapterEntity updatedChapterEntity = chapterMapper.dtoToEntity(chapterData);
-        updatedChapterEntity.setCourse(course);
+        updatedChapterEntity.setCourseId(courseID);
         updatedChapterEntity = chapterRepository.save(updatedChapterEntity);
 
         return chapterMapper.entityToDto(updatedChapterEntity);
@@ -80,6 +89,7 @@ public class ChapterService {
 
     /**
      * Checks if a chapter exists.
+     *
      * @param uuid The id of the chapter to check.
      * @throws EntityNotFoundException If the chapter does not exist.
      */
@@ -87,5 +97,37 @@ public class ChapterService {
         if (!chapterRepository.existsById(uuid)) {
             throw new EntityNotFoundException("Chapter with id " + uuid + " not found");
         }
+    }
+
+    public ChapterPayloadDto getChapters(UUID courseId,
+                                         @Nullable ChapterFilterDto filter,
+                                         List<String> sortBy,
+                                         List<SortDirectionDto> sortDirection,
+                                         @Nullable PaginationDto pagination) {
+        courseService.requireCourseExisting(courseId);
+
+        Sort sort = SortUtil.createSort(sortBy, sortDirection);
+        Pageable pageRequest = PaginationUtil.createPageable(pagination, sort);
+
+        Specification<ChapterEntity> specification =
+                where(courseIdEquals(courseId)).and(chapterFilter(filter));
+
+        if (pageRequest.isPaged()) {
+            Page<ChapterEntity> result = chapterRepository.findAll(specification, pageRequest);
+            return createChapterPayloadDtoPaged(result);
+        }
+
+        List<ChapterEntity> result = chapterRepository.findAll(specification, sort);
+        return createChapterPayloadDtoUnpaged(result);
+    }
+
+    private ChapterPayloadDto createChapterPayloadDtoPaged(Page<ChapterEntity> chapters) {
+        return chapterMapper.createChapterPayloadDto(chapters.stream(),
+                PaginationUtil.createPaginationInfoDto(chapters));
+    }
+
+    private ChapterPayloadDto createChapterPayloadDtoUnpaged(List<ChapterEntity> chapters) {
+        return chapterMapper.createChapterPayloadDto(chapters.stream(),
+                PaginationUtil.unpagedPaginationInfoDto(chapters.size()));
     }
 }

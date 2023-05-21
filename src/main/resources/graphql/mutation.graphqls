@@ -1,0 +1,31 @@
+type Mutation {
+    """
+    Creates a new course with the given input and returns the created course.
+    """
+    createCourse(input: CreateCourseInput!): Course!
+    """
+    Creates a new chapter with the given input and returns the created chapter.
+    The course id must be a course id of an existing course.
+    """
+    createChapter(input: CreateChapterInput!): Chapter!
+
+    """
+    Updates an existing course with the given input and returns the updated course.
+    The course id must be a course id of an existing course.
+    """
+    updateCourse(input: UpdateCourseInput!): Course!
+    """
+    Updates an existing chapter with the given input and returns the updated chapter.
+    The chapter id must be a chapter id of an existing chapter.
+    """
+    updateChapter(input: UpdateChapterInput!): Chapter!
+
+    """
+    Deletes an existing course, throws an error if no course with the given id exists.
+    """
+    deleteCourse(id: UUID!): UUID!
+    """
+    Deletes an existing chapter, throws an error if no chapter with the given id exists.
+    """
+    deleteChapter(id: UUID!): UUID!
+}

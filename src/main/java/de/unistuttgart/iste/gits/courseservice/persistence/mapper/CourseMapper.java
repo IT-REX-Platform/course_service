@@ -1,13 +1,11 @@
 package de.unistuttgart.iste.gits.courseservice.persistence.mapper;
 
-import de.unistuttgart.iste.gits.courseservice.dto.CourseDto;
-import de.unistuttgart.iste.gits.courseservice.dto.CreateCourseInputDto;
-import de.unistuttgart.iste.gits.courseservice.dto.UpdateCourseInputDto;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
+import de.unistuttgart.iste.gits.generated.dto.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
+import java.util.stream.Stream;
 
 @Component
 public class CourseMapper {
@@ -19,11 +17,7 @@ public class CourseMapper {
     }
 
     public CourseDto entityToDto(CourseEntity courseEntity) {
-        CourseDto courseDto = modelMapper.map(courseEntity, CourseDto.class);
-        if (courseDto.getChapters() == null) {
-            courseDto.setChapters(Collections.emptyList());
-        }
-        return courseDto;
+        return modelMapper.map(courseEntity, CourseDto.class);
     }
 
     public CourseEntity dtoToEntity(CreateCourseInputDto courseInputDTO) {
@@ -32,5 +26,13 @@ public class CourseMapper {
 
     public CourseEntity dtoToEntity(UpdateCourseInputDto input) {
         return modelMapper.map(input, CourseEntity.class);
+    }
+
+    public CoursePayloadDto createPayloadDto(Stream<CourseEntity> courseEntities,
+                                             PaginationInfoDto paginationInfoDto) {
+        return CoursePayloadDto.builder()
+                .setElements(courseEntities.map(this::entityToDto).toList())
+                .setPagination(paginationInfoDto)
+                .build();
     }
 }

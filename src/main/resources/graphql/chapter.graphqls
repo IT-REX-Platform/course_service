@@ -1,0 +1,120 @@
+"""
+A chapter is a part of a course.
+"""
+type Chapter {
+    """
+    UUID of the chapter, generated automatically
+    """
+    id: UUID!
+    """
+    Title of the chapter, maximum length is 255 characters.
+    """
+    title: String!
+    """
+    Description of the chapter, maximum length is 3000 characters.
+    """
+    description: String!
+    """
+    Number of the chapter, determines the order of the chapters.
+    """
+    number: Int!
+    """
+    Start date of the chapter, ISO 8601 format.
+    """
+    startDate: DateTime!
+    """
+    End date of the chapter, ISO 8601 format.
+    """
+    endDate: DateTime!
+    """
+    The course the chapter belongs to.
+    """
+    course: Course!
+}
+
+
+"""
+Input type for creating chapters.
+"""
+input CreateChapterInput {
+    """
+    Title of the chapter, maximum length is 255 characters, must not be blank.
+    """
+    title: String! @NotBlank @Size(max: 255)
+    """
+    Description of the chapter, maximum length is 3000 characters.
+    """
+    description: String! @Size(max: 3000)
+    """
+    Number of the chapter, determines the order of the chapters, must be positive.
+    """
+    number: Int! @Positive
+    """
+    Start date of the chapter, ISO 8601 format.
+    Must be before the end date.
+    """
+    startDate: DateTime!
+    """
+    End date of the chapter, ISO 8601 format.
+    Must be after the start date.
+    """
+    endDate: DateTime!
+    """
+    ID of the course the chapter belongs to.
+    Must be a UUID of an existing course.
+    """
+    courseId: UUID!
+}
+
+"""
+Input type for updating chapters.
+The ID field specifies which chapter should be updated, all other fields specify the new values.
+"""
+input UpdateChapterInput {
+    """
+    UUID of the chapter that should be updated.
+    """
+    id: UUID!
+    """
+    Title of the chapter, maximum length is 255 characters, must not be blank.
+    """
+    title: String! @NotBlank @Size(max: 255)
+    """
+    Description of the chapter, maximum length is 3000 characters.
+    """
+    description: String! @Size(max: 3000)
+    """
+    Number of the chapter, determines the order of the chapters, must be positive.
+    """
+    number: Int! @Positive
+    """
+    Start date of the chapter, ISO 8601 format.
+    Must be before the end date.
+    """
+    startDate: DateTime!
+    """
+    End date of the chapter, ISO 8601 format.
+    Must be after the start date.
+    """
+    endDate: DateTime!
+}
+
+input ChapterFilter {
+    title: StringFilter
+    description: StringFilter
+    number: IntFilter
+    startDate: DateTimeFilter
+    endDate: DateTimeFilter
+
+    and: [ChapterFilter!]
+    or: [ChapterFilter!]
+    not: ChapterFilter
+}
+
+"""
+Return type of the chapters query, contains a list of chapters and pagination info.
+"""
+type ChapterPayload {
+    elements: [Chapter!]!
+    pagination: PaginationInfo!
+}

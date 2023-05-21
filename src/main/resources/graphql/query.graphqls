@@ -1,0 +1,41 @@
+type Query {
+    """
+    Get a list of courses. Can be filtered, sorted and paginated.
+    """
+    courses(
+        filter: CourseFilter,
+        """
+        The fields to sort by.
+        Throws an error if no field with the given name exists.
+        """
+        sortBy: [String!],
+        """
+        The sort direction for each field. If not specified, defaults to ASC.
+        """
+        sortDirection: [SortDirection!]! = [ASC],
+        pagination: Pagination): CoursePayload!
+
+    """
+    Returns the courses with the given ids.
+    """
+    coursesById(ids: [UUID!]!): [Course!]!
+
+    """
+    Get the list of chapters for a course. Can be filtered, sorted and paginated.
+    Throws an error if the course does not exist.
+    The default sort order is by chapter number.
+    """
+    chapters(
+        courseId: UUID!,
+        filter: ChapterFilter,
+        """
+        The fields to sort by. The default sort order is by chapter number.
+        Throws an error if no field with the given name exists.
+        """
+        sortBy: [String!]! = [],
+        """
+        The sort direction for each field. If not specified, defaults to ASC.
+        """
+        sortDirection: [SortDirection!]! = [ASC],
+        pagination: Pagination): ChapterPayload!
+}

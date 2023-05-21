@@ -1,13 +1,15 @@
 package de.unistuttgart.iste.gits.courseservice.persistence.dao;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Entity(name = "Chapter")
@@ -36,10 +38,7 @@ public class ChapterEntity {
     @Column(nullable = false)
     private OffsetDateTime endDate;
 
-    @ManyToOne
-    private CourseEntity course;
-
-    @ElementCollection
-    private List<UUID> contentIds;
+    @Column(nullable = false, name = "course_id")
+    private UUID courseId;
 
 }
