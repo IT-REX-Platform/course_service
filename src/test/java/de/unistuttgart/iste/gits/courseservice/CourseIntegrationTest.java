@@ -1,12 +1,11 @@
 package de.unistuttgart.iste.gits.courseservice;
 
-import de.unistuttgart.iste.gits.courseservice.dto.CourseDto;
-import de.unistuttgart.iste.gits.courseservice.dto.CreateCourseInputDto;
-import de.unistuttgart.iste.gits.util.GraphQlIntegrationTest;
+import de.unistuttgart.iste.gits.generated.dto.CourseDto;
+import de.unistuttgart.iste.gits.generated.dto.CreateCourseInputDto;
+import de.unistuttgart.iste.gits.util.GraphQlApiTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.graphql.test.tester.GraphQlTester;
 
 import java.time.OffsetDateTime;
@@ -16,12 +15,8 @@ import java.util.UUID;
 
 /**
  * Tests for the GraphQL API.
- * <p>
- * HINT: This is just an example. This class should be extended with more tests.
- * <p>
- * HINT: requires an empty database. We need to use a test database for this in the future.
  */
-@ExtendWith(GraphQlIntegrationTest.class)
+@GraphQlApiTest
 public class CourseIntegrationTest {
 
     private List<UUID> uuids = new ArrayList<>();
@@ -190,8 +185,7 @@ public class CourseIntegrationTest {
                 input.getDescription(),
                 input.getStartDate(),
                 input.getEndDate(),
-                input.getPublished(),
-                List.of()
+                input.getPublished()
         );
     }
 
