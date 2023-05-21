@@ -1,7 +1,7 @@
 package de.unistuttgart.iste.gits.courseservice.persistence.mapper;
 
-import de.unistuttgart.iste.gits.courseservice.dto.*;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
+import de.unistuttgart.iste.gits.generated.dto.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 

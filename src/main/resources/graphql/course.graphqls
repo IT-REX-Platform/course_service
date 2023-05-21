@@ -43,7 +43,7 @@ type Course {
         """
         The sort direction for each field. If not specified, defaults to ASC.
         """
-        sortDirection: [SortDirection!]! = ASC,
+        sortDirection: [SortDirection!]! = [ASC],
         pagination: Pagination): ChapterPayload!
 }
 
@@ -110,7 +110,7 @@ input UpdateCourseInput {
 
 """
 Input type for filtering courses. All fields are optional.
-If multiple filters are specified, they are combined with AND.
+If multiple filters are specified, they are combined with AND (except for the or field).
 """
 input CourseFilter {
     title: StringFilter

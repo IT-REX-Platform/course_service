@@ -12,7 +12,7 @@ type Query {
         """
         The sort direction for each field. If not specified, defaults to ASC.
         """
-        sortDirection: [SortDirection!]! = ASC,
+        sortDirection: [SortDirection!]! = [ASC],
         pagination: Pagination): CoursePayload!
 
     """
@@ -36,6 +36,6 @@ type Query {
         """
         The sort direction for each field. If not specified, defaults to ASC.
         """
-        sortDirection: [SortDirection!]! = ASC,
+        sortDirection: [SortDirection!]! = [ASC],
         pagination: Pagination): ChapterPayload!
 }

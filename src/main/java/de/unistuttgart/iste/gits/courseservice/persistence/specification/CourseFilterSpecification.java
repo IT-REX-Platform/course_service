@@ -1,16 +1,19 @@
 package de.unistuttgart.iste.gits.courseservice.persistence.specification;
 
-import de.unistuttgart.iste.gits.courseservice.dto.CourseFilterDto;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
+import de.unistuttgart.iste.gits.generated.dto.CourseFilterDto;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 
-import static de.unistuttgart.iste.gits.courseservice.persistence.specification.SpecificationUtil.*;
+import static de.unistuttgart.iste.gits.common.util.SpecificationUtil.*;
 
 
 public class CourseFilterSpecification {
 
-    public static Specification<CourseEntity> courseFilter(@NonNull CourseFilterDto filterDto) {
+    public static Specification<CourseEntity> courseFilter(@Nullable CourseFilterDto filterDto) {
+        if (filterDto == null) {
+            return null;
+        }
         return Specification.allOf(
                         stringFilter("title", filterDto.getTitle()),
                         stringFilter("description", filterDto.getDescription()),

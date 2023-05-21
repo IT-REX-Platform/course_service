@@ -1,13 +1,13 @@
 package de.unistuttgart.iste.gits.courseservice.service;
 
-import de.unistuttgart.iste.gits.courseservice.dto.ChapterDto;
-import de.unistuttgart.iste.gits.courseservice.dto.CreateChapterInputDto;
-import de.unistuttgart.iste.gits.courseservice.dto.UpdateChapterInputDto;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.mapper.ChapterMapper;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.validation.ChapterValidator;
+import de.unistuttgart.iste.gits.generated.dto.ChapterDto;
+import de.unistuttgart.iste.gits.generated.dto.CreateChapterInputDto;
+import de.unistuttgart.iste.gits.generated.dto.UpdateChapterInputDto;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;

@@ -68,15 +68,41 @@ input StringFilter {
     ignoreCase: Boolean! = false
 }
 
+"""
+Filter for integer values.
+If multiple filters are specified, they are combined with AND.
+"""
 input IntFilter {
+    """
+    An integer value to match exactly.
+    """
     equals: Int
+    """
+    If specified, filters for values greater than to the specified value.
+    """
     greaterThan: Int
+    """
+    If specified, filters for values less than to the specified value.
+    """
     lessThan: Int
 }
 
+"""
+Filter for date values.
+If multiple filters are specified, they are combined with AND.
+"""
 input DateTimeFilter {
+    """
+    If specified, filters for dates that are equal to the specified value.
+    """
     equals: DateTime
+    """
+    If specified, filters for dates after the specified value.
+    """
     after: DateTime
+    """
+    If specified, filters for dates before the specified value.
+    """
     before: DateTime
 }
 

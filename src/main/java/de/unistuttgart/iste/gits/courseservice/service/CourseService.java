@@ -1,13 +1,13 @@
 package de.unistuttgart.iste.gits.courseservice.service;
 
-import de.unistuttgart.iste.gits.courseservice.dto.*;
+import de.unistuttgart.iste.gits.common.util.PaginationUtil;
+import de.unistuttgart.iste.gits.common.util.SortUtil;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.mapper.CourseMapper;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.specification.CourseFilterSpecification;
 import de.unistuttgart.iste.gits.courseservice.persistence.validation.CourseValidator;
-import de.unistuttgart.iste.gits.courseservice.util.PaginationUtil;
-import de.unistuttgart.iste.gits.courseservice.util.SortUtil;
+import de.unistuttgart.iste.gits.generated.dto.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -123,19 +122,15 @@ public class CourseService {
      * @param pagination    optional pagination
      * @return a list of all courses
      */
-    public CoursePayloadDto getCourses(Optional<CourseFilterDto> filter,
+    public CoursePayloadDto getCourses(CourseFilterDto filter,
                                        List<String> sortBy,
                                        List<SortDirectionDto> sortDirection,
-                                       Optional<PaginationDto> pagination) {
+                                       PaginationDto pagination) {
 
         Sort sort = SortUtil.createSort(sortBy, sortDirection);
-        Pageable pageRequest = pagination
-                .map(dto -> PaginationUtil.createPageable(dto, sort))
-                .orElse(Pageable.unpaged());
+        Pageable pageRequest = PaginationUtil.createPageable(pagination, sort);
 
-        Specification<CourseEntity> specification = filter
-                .map(CourseFilterSpecification::courseFilter)
-                .orElse(null);
+        Specification<CourseEntity> specification = CourseFilterSpecification.courseFilter(filter);
 
         if (pageRequest.isPaged()) {
             Page<CourseEntity> result = courseRepository.findAll(specification, pageRequest);

@@ -1,7 +1,7 @@
 package de.unistuttgart.iste.gits.courseservice.controller;
 
-import de.unistuttgart.iste.gits.courseservice.dto.*;
 import de.unistuttgart.iste.gits.courseservice.service.ChapterService;
+import de.unistuttgart.iste.gits.generated.dto.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;

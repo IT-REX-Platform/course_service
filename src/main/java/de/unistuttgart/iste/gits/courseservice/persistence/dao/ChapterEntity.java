@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.UUID;
 
 @Entity(name = "Chapter")
@@ -38,8 +37,5 @@ public class ChapterEntity {
 
     @ManyToOne
     private CourseEntity course;
-
-    @ElementCollection
-    private List<UUID> contentIds;
 
 }
