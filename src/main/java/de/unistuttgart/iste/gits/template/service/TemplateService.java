@@ -1,6 +1,6 @@
 package de.unistuttgart.iste.gits.template.service;
 
-import de.unistuttgart.iste.gits.template.dto.TemplateDto;
+import de.unistuttgart.iste.gits.generated.dto.TemplateDto;
 import de.unistuttgart.iste.gits.template.persistence.dao.TemplateEntity;
 import de.unistuttgart.iste.gits.template.persistence.mapper.TemplateMapper;
 import de.unistuttgart.iste.gits.template.persistence.repository.TemplateRepository;

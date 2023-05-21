@@ -1,6 +1,6 @@
 package de.unistuttgart.iste.gits.template.persistence.mapper;
 
-import de.unistuttgart.iste.gits.template.dto.TemplateDto;
+import de.unistuttgart.iste.gits.generated.dto.TemplateDto;
 import de.unistuttgart.iste.gits.template.persistence.dao.TemplateEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;

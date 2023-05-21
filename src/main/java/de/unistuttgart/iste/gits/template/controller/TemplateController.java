@@ -1,6 +1,6 @@
 package de.unistuttgart.iste.gits.template.controller;
 
-import de.unistuttgart.iste.gits.template.dto.TemplateDto;
+import de.unistuttgart.iste.gits.generated.dto.TemplateDto;
 import de.unistuttgart.iste.gits.template.service.TemplateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
