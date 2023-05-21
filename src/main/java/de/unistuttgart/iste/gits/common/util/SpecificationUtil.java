@@ -59,8 +59,7 @@ public class SpecificationUtil {
             return alwaysTrue();
         }
 
-        return Specification.<T>where(equalTo(field, dateTimeFilterDto.getEquals()))
-                .and(lessThan(field, dateTimeFilterDto.getBefore()))
+        return Specification.<T>where(lessThan(field, dateTimeFilterDto.getBefore()))
                 .and(greaterThan(field, dateTimeFilterDto.getAfter()));
     }
 

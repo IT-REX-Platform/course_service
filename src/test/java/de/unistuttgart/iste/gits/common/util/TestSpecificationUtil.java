@@ -100,14 +100,12 @@ public class TestSpecificationUtil {
         var after = LocalDate.of(2022, 1, 1).atStartOfDay().atOffset(ZoneOffset.UTC);
         var before = LocalDate.of(2023, 1, 1).atStartOfDay().atOffset(ZoneOffset.UTC);
         Specification<Object> specification = SpecificationUtil.dateTimeFilter("test", DateTimeFilterDto.builder()
-                .setEquals(equals)
                 .setAfter(after)
                 .setBefore(before)
                 .build());
 
         specification.toPredicate(root, criteriaQuery, criteriaBuilder);
 
-        verify(criteriaBuilder, times(1)).equal(any(), eq(equals));
         verify(criteriaBuilder, times(1)).greaterThan(any(), eq(after));
         verify(criteriaBuilder, times(1)).lessThan(any(), eq(before));
     }
