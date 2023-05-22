@@ -5,7 +5,7 @@ type Resource {
     """
     UUID of the resource.
     """
-    id: UUID!
+    resource_id: UUID!
     """
     A list of courses a resource is present in
     """
@@ -16,7 +16,7 @@ type courseIdAvailabilityMap {
     """
     Course ID
     """
-    id: UUID!
+    course_id: UUID!
     """
     If resource is available in course
     """

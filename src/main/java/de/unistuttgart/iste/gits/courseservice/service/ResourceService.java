@@ -29,6 +29,9 @@ public class ResourceService {
         for (UUID resourceId: resourceIds){
             resourceEntities = resourceRepository.findResourceEntitiesByResourceKeyResourceIdContainingOrderByResourceKeyResourceKeyAsc(resourceId);
 
+            if (resourceEntities == null || resourceEntities.isEmpty())
+                continue;
+
             courseEntities = courseRepository.findAllById(
                     resourceEntities.stream().map(
                     resource -> resource.getResourceKey().getCourseId()
@@ -41,7 +44,7 @@ public class ResourceService {
 
     private ResourceDto createResourceDTO(UUID resourceId, List<CourseEntity> courses){
         ResourceDto resourceDto = new ResourceDto();
-        resourceDto.setId(resourceId);
+        resourceDto.setResource_id(resourceId);
         OffsetDateTime currentTime = OffsetDateTime.now();
 
         resourceDto.setCourses(

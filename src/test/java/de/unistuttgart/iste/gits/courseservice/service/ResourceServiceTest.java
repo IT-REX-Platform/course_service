@@ -129,6 +129,6 @@ class ResourceServiceTest {
     }
 
     private ResourceDto.Builder dummyResourceDtoBuilder(UUID resourceId, List<CourseIdAvailabilityMapDto> courses){
-        return ResourceDto.builder().setId(resourceId).setCourses(courses);
+        return ResourceDto.builder().setResource_id(resourceId).setCourses(courses);
     }
 }
