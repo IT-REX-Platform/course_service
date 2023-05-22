@@ -13,7 +13,6 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +32,7 @@ public class ResourceService {
             courseEntities = courseRepository.findAllById(
                     resourceEntities.stream().map(
                     resource -> resource.getResourceKey().getCourseId()
-            ).collect(Collectors.toList())).stream().toList();
+            ).toList()).stream().toList();
 
             resultList.add(createResourceDTO(resourceId, courseEntities));
         }
@@ -47,8 +46,8 @@ public class ResourceService {
 
         resourceDto.setCourses(
                 courses.stream().map(
-                        course -> new CourseIdAvailabilityMapDto(course.getId(), isAvailable(course, currentTime))
-                ).collect(Collectors.toList())
+                        courseEntity -> new CourseIdAvailabilityMapDto(courseEntity.getId(), isAvailable(courseEntity, currentTime))
+                ).toList()
         );
 
         return resourceDto;
