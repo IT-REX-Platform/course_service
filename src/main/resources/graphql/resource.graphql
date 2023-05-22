@@ -1,0 +1,24 @@
+"""
+Resources are all types of content present in a course. Each resource can be available or unavailable in a course.
+"""
+type Resource {
+    """
+    UUID of the resource.
+    """
+    id: UUID!
+    """
+    A list of courses a resource is present in
+    """
+    courses: [courseIdAvailabilityMap!]!
+}
+
+type courseIdAvailabilityMap {
+    """
+    Course ID
+    """
+    id: UUID!
+    """
+    If resource is available in course
+    """
+    available: Boolean!
+}

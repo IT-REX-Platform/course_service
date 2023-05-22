@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity(name = "Course")
@@ -39,5 +40,8 @@ public class CourseEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId")
     @OrderBy("number ASC")
     private List<ChapterEntity> chapters;
+
+    @ManyToMany(cascade = CascadeType.REMOVE, mappedBy = "courseId")
+    private Set<ResourceEntity> resources;
 
 }
