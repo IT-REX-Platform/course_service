@@ -2,11 +2,20 @@ package de.unistuttgart.iste.gits.courseservice.persistence.dao;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.ManyToOne;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Embeddable
 public class ResourcePk implements Serializable {
 
@@ -15,15 +24,6 @@ public class ResourcePk implements Serializable {
 
     @Column(nullable = false)
     private UUID resourceId;
-
-    public ResourcePk() {
-
-    }
-
-    public ResourcePk(UUID courseId, UUID resourceId) {
-        this.courseId = courseId;
-        this.resourceId = resourceId;
-    }
 
     public UUID getCourseId() {
         return courseId;
