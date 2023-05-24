@@ -22,7 +22,7 @@ services:
     ports:
       - "1033:5432"
     volumes:
-      - coursedata:/var/lib/postgresql/testdata
+      - templatedata:/var/lib/postgresql/testdata
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
