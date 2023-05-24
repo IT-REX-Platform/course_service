@@ -4,7 +4,6 @@ import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.ResourceEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ResourceRepository;
-import de.unistuttgart.iste.gits.generated.dto.CourseIdAvailabilityMapDto;
 import de.unistuttgart.iste.gits.generated.dto.ResourceDto;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -44,10 +43,8 @@ class ResourceServiceTest {
         // expected: two courses have the same resource
         ResourceDto expectedDto = dummyResourceDtoBuilder(
                 resourceId,
-                List.of(
-                        new CourseIdAvailabilityMapDto(courseEntityList.get(0).getId(), false),
-                        new CourseIdAvailabilityMapDto(courseEntityList.get(1).getId(), true)
-                )
+                List.of(courseEntityList.get(1).getId()),
+                List.of(courseEntityList.get(0).getId())
         ).build();
 
         //mock repositories
@@ -82,11 +79,8 @@ class ResourceServiceTest {
         // expected: two courses share a resource.
         ResourceDto expectedDto = dummyResourceDtoBuilder(
                 resourceId,
-                List.of(
-                        // first has an expired/ faulty date and therefore should not be available
-                        new CourseIdAvailabilityMapDto(courseEntityList.get(0).getId(), false),
-                        new CourseIdAvailabilityMapDto(courseEntityList.get(1).getId(), true)
-                )
+                List.of(courseEntityList.get(1).getId()),
+                List.of(courseEntityList.get(0).getId())
         ).build();
 
         //mock repositories
@@ -128,7 +122,7 @@ class ResourceServiceTest {
         return ResourceEntity.builder().courseId(courseId).resourceId(resourceId);
     }
 
-    private ResourceDto.Builder dummyResourceDtoBuilder(UUID resourceId, List<CourseIdAvailabilityMapDto> courses){
-        return ResourceDto.builder().setResource_id(resourceId).setCourses(courses);
+    private ResourceDto.Builder dummyResourceDtoBuilder(UUID resourceId, List<UUID> available, List<UUID> unavailable){
+        return ResourceDto.builder().setId(resourceId).setAvailableCourses(available).setUnAvailableCourses(unavailable);
     }
 }

@@ -22,7 +22,7 @@ public class ResourceController {
     }
 
     @QueryMapping
-    public List<ResourceDto> courseIdsByResource(@Argument(name="ids") List<UUID> ids){
+    public List<ResourceDto> resourceById(@Argument(name="ids") List<UUID> ids){
         return resourceService.getCoursesByResourceId(ids);
     }
 }

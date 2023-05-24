@@ -4,7 +4,6 @@ import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.ResourceEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ResourceRepository;
-import de.unistuttgart.iste.gits.generated.dto.CourseIdAvailabilityMapDto;
 import de.unistuttgart.iste.gits.generated.dto.ResourceDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -63,15 +62,18 @@ public class ResourceService {
      * @return Resource DTO containing resource ID, List of Courses including the availability of the resource within the course
      */
     private ResourceDto createResourceDTO(UUID resourceId, List<CourseEntity> courses){
-        ResourceDto resourceDto = new ResourceDto();
-        resourceDto.setResource_id(resourceId);
         OffsetDateTime currentTime = OffsetDateTime.now();
+        ResourceDto resourceDto = ResourceDto.builder().setId(resourceId)
+                .setAvailableCourses(new ArrayList<>())
+                .setUnAvailableCourses(new ArrayList<>())
+                .build();
 
-        resourceDto.setCourses(
-                courses.stream().map(
-                        courseEntity -> new CourseIdAvailabilityMapDto(courseEntity.getId(), isAvailable(courseEntity, currentTime))
-                ).toList()
-        );
+        for (CourseEntity course: courses) {
+            if (isAvailable(course,currentTime))
+                resourceDto.getAvailableCourses().add(course.getId());
+            else
+                resourceDto.getUnAvailableCourses().add(course.getId());
+        }
 
         return resourceDto;
 

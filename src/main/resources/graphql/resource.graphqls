@@ -5,20 +5,13 @@ type Resource {
     """
     UUID of the resource.
     """
-    resource_id: UUID!
+    id: UUID!
     """
-    A list of courses a resource is present in, including its availability
+    A list of course IDs a resource is presently available in
     """
-    courses: [courseIdAvailabilityMap!]!
-}
-
-type courseIdAvailabilityMap {
+    availableCourses: [UUID!]!
     """
-    Course ID
+    A list of course IDs a resource is presently unavailable in
     """
-    course_id: UUID!
-    """
-    If resource is available in course
-    """
-    available: Boolean!
+    unAvailableCourses: [UUID!]!
 }

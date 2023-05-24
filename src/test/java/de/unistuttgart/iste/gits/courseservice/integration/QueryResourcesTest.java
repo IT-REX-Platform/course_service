@@ -4,7 +4,6 @@ import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.ResourceEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ResourceRepository;
-import de.unistuttgart.iste.gits.generated.dto.CourseIdAvailabilityMapDto;
 import de.unistuttgart.iste.gits.generated.dto.ResourceDto;
 import de.unistuttgart.iste.gits.util.GraphQlApiTest;
 import org.junit.jupiter.api.Test;
@@ -35,17 +34,15 @@ class QueryResourcesTest {
         //GraphQL query
         String query = """
                 query {
-                    courseIdsByResource(ids: ["%s"]) {
-                        resource_id
-                        courses {
-                            course_id
-                            available
-                        }
+                    resourceById(ids: ["%s"]) {
+                        id
+                        availableCourses
+                        unAvailableCourses
                     }
                 }""".formatted(UUID.randomUUID());
         tester.document(query)
                 .execute()
-                .path("courseIdsByResource")
+                .path("resourceById")
                 .entityList(ResourceDto.class)
                 .hasSize(0);
     }
@@ -76,27 +73,22 @@ class QueryResourcesTest {
         // expected: two courses share a resource.
         ResourceDto expectedDto = dummyResourceDtoBuilder(
                 resourceId,
-                List.of(
-                        // first has an expired/ faulty date and therefore should not be available
-                        new CourseIdAvailabilityMapDto(initialCourseData.get(0).getId(), true),
-                        new CourseIdAvailabilityMapDto(initialCourseData.get(1).getId(), false)
-                )
+                List.of(initialCourseData.get(0).getId()),
+                List.of(initialCourseData.get(1).getId())
         ).build();
 
         //GraphQL query
         String query = """
                 query {
-                    courseIdsByResource(ids: ["%s"]) {
-                        resource_id
-                        courses {
-                            course_id
-                            available
-                        }
+                    resourceById(ids: ["%s"]) {
+                        id
+                        availableCourses
+                        unAvailableCourses
                     }
                 }""".formatted(resourceId);
         tester.document(query)
                 .execute()
-                .path("courseIdsByResource")
+                .path("resourceById")
                 .entityList(ResourceDto.class)
                 .hasSize(1)
                 .contains(expectedDto);
@@ -118,7 +110,7 @@ class QueryResourcesTest {
         return ResourceEntity.builder().courseId(courseId).resourceId(resourceId);
     }
 
-    private ResourceDto.Builder dummyResourceDtoBuilder(UUID resourceId, List<CourseIdAvailabilityMapDto> courses){
-        return ResourceDto.builder().setResource_id(resourceId).setCourses(courses);
+    private ResourceDto.Builder dummyResourceDtoBuilder(UUID resourceId, List<UUID> available, List<UUID> unavailable){
+        return ResourceDto.builder().setId(resourceId).setAvailableCourses(available).setUnAvailableCourses(unavailable);
     }
 }
