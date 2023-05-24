@@ -41,7 +41,7 @@ public class CourseEntity {
     @OrderBy("number ASC")
     private List<ChapterEntity> chapters;
 
-    @ManyToMany(cascade = CascadeType.REMOVE, mappedBy = "courseId")
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "courseId")
     private Set<ResourceEntity> resources;
 
 }

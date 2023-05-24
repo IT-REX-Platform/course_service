@@ -7,7 +7,7 @@ type Resource {
     """
     resource_id: UUID!
     """
-    A list of courses a resource is present in
+    A list of courses a resource is present in, including its availability
     """
     courses: [courseIdAvailabilityMap!]!
 }

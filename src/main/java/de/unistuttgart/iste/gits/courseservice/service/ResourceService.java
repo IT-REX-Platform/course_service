@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * Service that takes care of all operations regarding resources of a course.
+ */
 @Service
 @RequiredArgsConstructor
 public class ResourceService {
@@ -21,27 +24,44 @@ public class ResourceService {
     private final ResourceRepository resourceRepository;
     private final CourseRepository courseRepository;
 
+    /**
+     * Method that returns a List of all courses, with the availability of that resource grouped by a resource.
+     * @param resourceIds List of resource IDs
+     * @return List of resource DTOs that contain a resource ID, List of Course IDs with their current availability
+     */
     public List<ResourceDto> getCoursesByResourceId(List<UUID> resourceIds){
         ArrayList<ResourceDto> resultList = new ArrayList<>();
+
+        //resources can be part of multiple courses for which each a resource Entities is present
         List<ResourceEntity> resourceEntities;
         List<CourseEntity> courseEntities;
 
         for (UUID resourceId: resourceIds){
-            resourceEntities = resourceRepository.findResourceEntitiesByResourceKeyResourceIdContainingOrderByResourceKeyResourceKeyAsc(resourceId);
+            //retrieve all resource entities for a resource ID
+            resourceEntities = resourceRepository.findResourceEntitiesByResourceIdOrderByCourseIdAsc(resourceId);
 
+            //skip if resource ID does not exist
             if (resourceEntities == null || resourceEntities.isEmpty())
                 continue;
 
+            // retrieve all courses. Uses a stream to collect course IDs from the resource Entities
+            // and in the end another stream to turn result into a list
             courseEntities = courseRepository.findAllById(
                     resourceEntities.stream().map(
-                    resource -> resource.getResourceKey().getCourseId()
-            ).toList()).stream().toList();
+                            ResourceEntity::getCourseId
+            ).toList());
 
             resultList.add(createResourceDTO(resourceId, courseEntities));
         }
         return resultList;
     }
 
+    /**
+     * Creates a compact Resource DTO from given information, including availability of resource within a course.
+     * @param resourceId resource ID of resource
+     * @param courses Courses that contain the resource
+     * @return Resource DTO containing resource ID, List of Courses including the availability of the resource within the course
+     */
     private ResourceDto createResourceDTO(UUID resourceId, List<CourseEntity> courses){
         ResourceDto resourceDto = new ResourceDto();
         resourceDto.setResource_id(resourceId);
@@ -57,10 +77,17 @@ public class ResourceService {
 
     }
 
+    /**
+     * Helper function to check if a resource is available in a course
+     * @param courseEntity a course Entity
+     * @param currentTime time stamp
+     * @return a resource's availability
+     */
     private boolean isAvailable(CourseEntity courseEntity, OffsetDateTime currentTime){
+        //1st check: course is published
         if (courseEntity.isPublished())
+            //2nd check: the course has already started but has not ended yet
             return courseEntity.getStartDate().isBefore(currentTime) && courseEntity.getEndDate().isAfter(currentTime);
-
 
         return false;
     }

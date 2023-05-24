@@ -19,6 +19,5 @@ public interface ResourceRepository extends JpaRepository<ResourceEntity, Resour
      * @param resourceId resource ID
      * @return a List of Resources for a resource ID
      */
-    List<ResourceEntity> findResourceEntitiesByResourceKeyResourceIdContainingOrderByResourceKeyResourceKeyAsc(UUID resourceId);
-
+    List<ResourceEntity> findResourceEntitiesByResourceIdOrderByCourseIdAsc(UUID resourceId);
 }

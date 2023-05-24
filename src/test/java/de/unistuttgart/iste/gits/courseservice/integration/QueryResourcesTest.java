@@ -2,7 +2,6 @@ package de.unistuttgart.iste.gits.courseservice.integration;
 
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.ResourceEntity;
-import de.unistuttgart.iste.gits.courseservice.persistence.dao.ResourcePk;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ResourceRepository;
 import de.unistuttgart.iste.gits.generated.dto.CourseIdAvailabilityMapDto;
@@ -26,8 +25,14 @@ class QueryResourcesTest {
     @Autowired
     private ResourceRepository resourceRepository;
 
+    /**
+     * Test to check if response when a resource doesn't exist in database
+     * @param tester GraphQlTester instance
+     */
     @Test
     void testResourceNotExisting(GraphQlTester tester){
+
+        //GraphQL query
         String query = """
                 query {
                     courseIdsByResource(ids: ["%s"]) {
@@ -45,6 +50,10 @@ class QueryResourcesTest {
                 .hasSize(0);
     }
 
+    /**
+     *
+     * @param tester
+     */
     @Test
     void testGetCourseIdsByResourceId(GraphQlTester tester){
 
@@ -74,6 +83,7 @@ class QueryResourcesTest {
                 )
         ).build();
 
+        //GraphQL query
         String query = """
                 query {
                     courseIdsByResource(ids: ["%s"]) {
@@ -92,6 +102,7 @@ class QueryResourcesTest {
                 .contains(expectedDto);
     }
 
+    // Builder functions for entities
     private CourseEntity.CourseEntityBuilder dummyCourseEntityBuilder(OffsetDateTime now, boolean published) {
         return CourseEntity.builder()
                 .id(UUID.randomUUID())
@@ -104,7 +115,7 @@ class QueryResourcesTest {
     }
 
     private ResourceEntity.ResourceEntityBuilder dummyResourceEntityBuilder(UUID courseId, UUID resourceId){
-        return ResourceEntity.builder().resourceKey(new ResourcePk(courseId, resourceId));
+        return ResourceEntity.builder().courseId(courseId).resourceId(resourceId);
     }
 
     private ResourceDto.Builder dummyResourceDtoBuilder(UUID resourceId, List<CourseIdAvailabilityMapDto> courses){
