@@ -1,10 +1,10 @@
 package de.unistuttgart.iste.gits.courseservice.service;
 
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
-import de.unistuttgart.iste.gits.courseservice.persistence.dao.ResourceEntity;
+import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseResourceAssociationEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ResourceRepository;
-import de.unistuttgart.iste.gits.generated.dto.ResourceDto;
+import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociationDto;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -12,7 +12,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -34,26 +34,32 @@ class ResourceServiceTest {
         CourseEntity courseEntity = dummyCourseEntityBuilder(OffsetDateTime.now(), false).build();
         CourseEntity anotherCourseEntity = dummyCourseEntityBuilder(OffsetDateTime.now(), true).build();
 
-        ResourceEntity resourceEntity = dummyResourceEntityBuilder(courseEntity.getId(), resourceId).build();
-        ResourceEntity anotherResourceEntity = dummyResourceEntityBuilder(anotherCourseEntity.getId(), resourceId).build();
+        CourseResourceAssociationEntity courseResourceAssociationEntity = CourseResourceAssociationEntity.builder()
+                .courseId(courseEntity.getId())
+                .resourceId(resourceId)
+                .build();
+        CourseResourceAssociationEntity anotherCourseResourceAssociationEntity = CourseResourceAssociationEntity.builder()
+                .courseId(anotherCourseEntity.getId())
+                .resourceId(resourceId)
+                .build();
 
-        List<ResourceEntity> resourceEntityList = List.of(resourceEntity, anotherResourceEntity);
+        List<CourseResourceAssociationEntity> courseResourceAssociationEntityList = List.of(courseResourceAssociationEntity, anotherCourseResourceAssociationEntity);
         List<CourseEntity> courseEntityList = List.of(courseEntity, anotherCourseEntity);
 
         // expected: two courses have the same resource
-        ResourceDto expectedDto = dummyResourceDtoBuilder(
-                resourceId,
-                List.of(courseEntityList.get(1).getId()),
-                List.of(courseEntityList.get(0).getId())
-        ).build();
+        CourseResourceAssociationDto expectedDto = CourseResourceAssociationDto.builder()
+                .setId(resourceId)
+                .setAvailableCourses(List.of(courseEntityList.get(1).getId()))
+                .setUnAvailableCourses(List.of(courseEntityList.get(0).getId()))
+                .build();
 
         //mock repositories
         when(resourceRepository.findResourceEntitiesByResourceIdOrderByCourseIdAsc(any(UUID.class)))
-                .thenReturn(resourceEntityList);
+                .thenReturn(courseResourceAssociationEntityList);
         when(courseRepository.findAllById(any(List.class))).thenReturn(courseEntityList);
 
         //run method under test
-        List<ResourceDto> actualResult = resourceService.getCoursesByResourceId(List.of(resourceId));
+        List<CourseResourceAssociationDto> actualResult = resourceService.getCoursesByResourceId(List.of(resourceId));
 
         //compare result
         assertEquals(expectedDto, actualResult.get(0));
@@ -70,26 +76,31 @@ class ResourceServiceTest {
         CourseEntity courseEntity = invalidDummyCourseEntityBuilder(OffsetDateTime.now(), true).build();
         CourseEntity anotherCourseEntity = dummyCourseEntityBuilder(OffsetDateTime.now(), true).build();
 
-        ResourceEntity resourceEntity = dummyResourceEntityBuilder(courseEntity.getId(), resourceId).build();
-        ResourceEntity anotherResourceEntity = dummyResourceEntityBuilder(anotherCourseEntity.getId(), resourceId).build();
-
-        List<ResourceEntity> resourceEntityList = List.of(resourceEntity, anotherResourceEntity);
+        CourseResourceAssociationEntity courseResourceAssociationEntity = CourseResourceAssociationEntity.builder()
+                .courseId(courseEntity.getId())
+                .resourceId(resourceId)
+                .build();
+        CourseResourceAssociationEntity anotherCourseResourceAssociationEntity = CourseResourceAssociationEntity.builder()
+                .courseId(anotherCourseEntity.getId())
+                .resourceId(resourceId)
+                .build();
+        List<CourseResourceAssociationEntity> courseResourceAssociationEntityList = List.of(courseResourceAssociationEntity, anotherCourseResourceAssociationEntity);
         List<CourseEntity> courseEntityList = List.of(courseEntity, anotherCourseEntity);
 
         // expected: two courses share a resource.
-        ResourceDto expectedDto = dummyResourceDtoBuilder(
-                resourceId,
-                List.of(courseEntityList.get(1).getId()),
-                List.of(courseEntityList.get(0).getId())
-        ).build();
+        CourseResourceAssociationDto expectedDto = CourseResourceAssociationDto.builder()
+                .setId(resourceId)
+                .setAvailableCourses(List.of(courseEntityList.get(1).getId()))
+                .setUnAvailableCourses(List.of(courseEntityList.get(0).getId()))
+                .build();
 
         //mock repositories
         when(resourceRepository.findResourceEntitiesByResourceIdOrderByCourseIdAsc(any(UUID.class)))
-                .thenReturn(resourceEntityList);
+                .thenReturn(courseResourceAssociationEntityList);
         when(courseRepository.findAllById(any(List.class))).thenReturn(courseEntityList);
 
         //run method under test
-        List<ResourceDto> actualResult = resourceService.getCoursesByResourceId(List.of(resourceId));
+        List<CourseResourceAssociationDto> actualResult = resourceService.getCoursesByResourceId(List.of(resourceId));
 
         //compare result
         assertEquals(expectedDto, actualResult.get(0));
@@ -118,11 +129,4 @@ class ResourceServiceTest {
 
     }
 
-    private ResourceEntity.ResourceEntityBuilder dummyResourceEntityBuilder(UUID courseId, UUID resourceId){
-        return ResourceEntity.builder().courseId(courseId).resourceId(resourceId);
-    }
-
-    private ResourceDto.Builder dummyResourceDtoBuilder(UUID resourceId, List<UUID> available, List<UUID> unavailable){
-        return ResourceDto.builder().setId(resourceId).setAvailableCourses(available).setUnAvailableCourses(unavailable);
-    }
 }

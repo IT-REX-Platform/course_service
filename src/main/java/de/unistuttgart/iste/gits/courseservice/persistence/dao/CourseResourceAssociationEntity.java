@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 
-@Entity(name = "Resource")
+@Entity(name = "CourseResourceAssociation")
 @IdClass(ResourcePk.class)
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ResourceEntity {
+public class CourseResourceAssociationEntity {
     @Id
     @Column(nullable = false)
     private UUID courseId;

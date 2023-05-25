@@ -42,6 +42,6 @@ public class CourseEntity {
     private List<ChapterEntity> chapters;
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "courseId")
-    private Set<ResourceEntity> resources;
+    private Set<CourseResourceAssociationEntity> resources;
 
 }

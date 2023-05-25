@@ -1,10 +1,10 @@
 package de.unistuttgart.iste.gits.courseservice.service;
 
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
-import de.unistuttgart.iste.gits.courseservice.persistence.dao.ResourceEntity;
+import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseResourceAssociationEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ResourceRepository;
-import de.unistuttgart.iste.gits.generated.dto.ResourceDto;
+import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociationDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,11 +28,11 @@ public class ResourceService {
      * @param resourceIds List of resource IDs
      * @return List of resource DTOs that contain a resource ID, List of Course IDs with their current availability
      */
-    public List<ResourceDto> getCoursesByResourceId(List<UUID> resourceIds){
-        ArrayList<ResourceDto> resultList = new ArrayList<>();
+    public List<CourseResourceAssociationDto> getCoursesByResourceId(List<UUID> resourceIds){
+        ArrayList<CourseResourceAssociationDto> resultList = new ArrayList<>();
 
         //resources can be part of multiple courses for which each a resource Entities is present
-        List<ResourceEntity> resourceEntities;
+        List<CourseResourceAssociationEntity> resourceEntities;
         List<CourseEntity> courseEntities;
 
         for (UUID resourceId: resourceIds){
@@ -47,7 +47,7 @@ public class ResourceService {
             // and in the end another stream to turn result into a list
             courseEntities = courseRepository.findAllById(
                     resourceEntities.stream().map(
-                            ResourceEntity::getCourseId
+                            CourseResourceAssociationEntity::getCourseId
             ).toList());
 
             resultList.add(createResourceDTO(resourceId, courseEntities));
@@ -61,13 +61,15 @@ public class ResourceService {
      * @param courses Courses that contain the resource
      * @return Resource DTO containing resource ID, List of Courses including the availability of the resource within the course
      */
-    private ResourceDto createResourceDTO(UUID resourceId, List<CourseEntity> courses){
+    private CourseResourceAssociationDto createResourceDTO(UUID resourceId, List<CourseEntity> courses){
+        //init
         OffsetDateTime currentTime = OffsetDateTime.now();
-        ResourceDto resourceDto = ResourceDto.builder().setId(resourceId)
+        CourseResourceAssociationDto resourceDto = CourseResourceAssociationDto.builder().setId(resourceId)
                 .setAvailableCourses(new ArrayList<>())
                 .setUnAvailableCourses(new ArrayList<>())
                 .build();
 
+        //add courses to available or unavailable list
         for (CourseEntity course: courses) {
             if (isAvailable(course,currentTime))
                 resourceDto.getAvailableCourses().add(course.getId());

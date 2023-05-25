@@ -1,6 +1,6 @@
 package de.unistuttgart.iste.gits.courseservice.persistence.repository;
 
-import de.unistuttgart.iste.gits.courseservice.persistence.dao.ResourceEntity;
+import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseResourceAssociationEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.ResourcePk;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -10,14 +10,14 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Repository for {@link ResourceEntity}.
+ * Repository for {@link CourseResourceAssociationEntity}.
  */
 @Repository
-public interface ResourceRepository extends JpaRepository<ResourceEntity, ResourcePk>, JpaSpecificationExecutor<ResourceEntity> {
+public interface ResourceRepository extends JpaRepository<CourseResourceAssociationEntity, ResourcePk>, JpaSpecificationExecutor<CourseResourceAssociationEntity> {
 
     /** Hibernate Query. ORDERED BY ResourceKey ASC
      * @param resourceId resource ID
      * @return a List of Resources for a resource ID
      */
-    List<ResourceEntity> findResourceEntitiesByResourceIdOrderByCourseIdAsc(UUID resourceId);
+    List<CourseResourceAssociationEntity> findResourceEntitiesByResourceIdOrderByCourseIdAsc(UUID resourceId);
 }

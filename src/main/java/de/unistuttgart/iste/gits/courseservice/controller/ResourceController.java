@@ -1,7 +1,7 @@
 package de.unistuttgart.iste.gits.courseservice.controller;
 
 import de.unistuttgart.iste.gits.courseservice.service.ResourceService;
-import de.unistuttgart.iste.gits.generated.dto.ResourceDto;
+import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociationDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -22,7 +22,7 @@ public class ResourceController {
     }
 
     @QueryMapping
-    public List<ResourceDto> resourceById(@Argument(name="ids") List<UUID> ids){
+    public List<CourseResourceAssociationDto> resourceById(@Argument(name="ids") List<UUID> ids){
         return resourceService.getCoursesByResourceId(ids);
     }
 }

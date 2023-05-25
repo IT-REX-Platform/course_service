@@ -1,10 +1,10 @@
 package de.unistuttgart.iste.gits.courseservice.integration;
 
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
-import de.unistuttgart.iste.gits.courseservice.persistence.dao.ResourceEntity;
+import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseResourceAssociationEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ResourceRepository;
-import de.unistuttgart.iste.gits.generated.dto.ResourceDto;
+import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociationDto;
 import de.unistuttgart.iste.gits.util.GraphQlApiTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ class QueryResourcesTest {
         tester.document(query)
                 .execute()
                 .path("resourceById")
-                .entityList(ResourceDto.class)
+                .entityList(CourseResourceAssociationDto.class)
                 .hasSize(0);
     }
 
@@ -65,17 +65,24 @@ class QueryResourcesTest {
                 .toList();
 
         //create a resource for each course in the database
-        List<ResourceEntity> initialResourceData = Stream.of(
-                dummyResourceEntityBuilder(initialCourseData.get(0).getId(), resourceId).build(),
-                dummyResourceEntityBuilder(initialCourseData.get(1).getId(), resourceId).build()
+        List<CourseResourceAssociationEntity> initialResourceData = Stream.of(
+                CourseResourceAssociationEntity.builder()
+                        .courseId(initialCourseData.get(0).getId())
+                        .resourceId(resourceId)
+                        .build(),
+                CourseResourceAssociationEntity.builder()
+                        .courseId(initialCourseData.get(1).getId())
+                        .resourceId(resourceId)
+                        .build()
         ).map(resourceRepository::save).toList();
 
         // expected: two courses share a resource.
-        ResourceDto expectedDto = dummyResourceDtoBuilder(
-                resourceId,
-                List.of(initialCourseData.get(0).getId()),
-                List.of(initialCourseData.get(1).getId())
-        ).build();
+        CourseResourceAssociationDto expectedDto = CourseResourceAssociationDto.builder()
+                .setId(resourceId)
+                .setAvailableCourses(List.of(initialCourseData.get(0).getId()))
+                .setUnAvailableCourses(List.of(initialCourseData.get(1).getId()))
+                .build();
+
 
         //GraphQL query
         String query = """
@@ -89,7 +96,7 @@ class QueryResourcesTest {
         tester.document(query)
                 .execute()
                 .path("resourceById")
-                .entityList(ResourceDto.class)
+                .entityList(CourseResourceAssociationDto.class)
                 .hasSize(1)
                 .contains(expectedDto);
     }
@@ -106,11 +113,4 @@ class QueryResourcesTest {
 
     }
 
-    private ResourceEntity.ResourceEntityBuilder dummyResourceEntityBuilder(UUID courseId, UUID resourceId){
-        return ResourceEntity.builder().courseId(courseId).resourceId(resourceId);
-    }
-
-    private ResourceDto.Builder dummyResourceDtoBuilder(UUID resourceId, List<UUID> available, List<UUID> unavailable){
-        return ResourceDto.builder().setId(resourceId).setAvailableCourses(available).setUnAvailableCourses(unavailable);
-    }
 }
