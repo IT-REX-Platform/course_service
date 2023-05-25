@@ -21,6 +21,11 @@ type Query {
     coursesById(ids: [UUID!]!): [Course!]!
 
     """
+    Returns a set of Resource Objects for the given resource ids, containing a list of all course IDs for a resource and its availability in the course.
+    """
+    resourceById(ids: [UUID!]!): [CourseResourceAssociation!]!
+
+    """
     Get the list of chapters for a course. Can be filtered, sorted and paginated.
     Throws an error if the course does not exist.
     The default sort order is by chapter number.
