@@ -1,11 +1,11 @@
 package de.unistuttgart.iste.gits.courseservice.integration;
 
+import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.generated.dto.ChapterDto;
-import de.unistuttgart.iste.gits.util.GraphQlApiTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
@@ -22,7 +22,7 @@ import static org.hamcrest.Matchers.is;
  * Tests for the `updateCourse` mutation.
  */
 @GraphQlApiTest
-public class MutationUpdateCourseTest {
+class MutationUpdateCourseTest {
 
     @Autowired
     private CourseRepository courseRepository;
@@ -36,7 +36,7 @@ public class MutationUpdateCourseTest {
      */
     @Test
     @Transactional
-    public void testUpdateCourseSuccessful(GraphQlTester tester) {
+    void testUpdateCourseSuccessful(GraphQlTester tester) {
         // create a course with a chapter in the database
         var initialData = courseRepository.save(CourseEntity.builder().title("Course 1")
                 .description("This is course 1")
@@ -109,7 +109,7 @@ public class MutationUpdateCourseTest {
      * Then an error is returned
      */
     @Test
-    public void testUpdateCourseNotExisting(GraphQlTester tester) {
+    void testUpdateCourseNotExisting(GraphQlTester tester) {
         UUID id = UUID.randomUUID();
         String query = String.format("""
                 mutation {
@@ -140,7 +140,7 @@ public class MutationUpdateCourseTest {
      * Then a validation error is returned
      */
     @Test
-    public void testErrorOnBlankTitle(GraphQlTester tester) {
+    void testErrorOnBlankTitle(GraphQlTester tester) {
         String query = """
                 mutation {
                     updateCourse(
@@ -171,7 +171,7 @@ public class MutationUpdateCourseTest {
      * Then a validation error is returned
      */
     @Test
-    public void testTooLongTitle(GraphQlTester tester) {
+    void testTooLongTitle(GraphQlTester tester) {
         String query = String.format("""
                 mutation {
                     updateCourse(
@@ -202,7 +202,7 @@ public class MutationUpdateCourseTest {
      * Then a validation error is returned
      */
     @Test
-    public void testTooLongDescription(GraphQlTester tester) {
+    void testTooLongDescription(GraphQlTester tester) {
         String query = String.format("""
                 mutation {
                     updateCourse(
@@ -233,7 +233,7 @@ public class MutationUpdateCourseTest {
      * Then a validation error is returned
      */
     @Test
-    public void testStartDateAfterEndDate(GraphQlTester tester) {
+    void testStartDateAfterEndDate(GraphQlTester tester) {
         String query = """
                 mutation {
                     updateCourse(

@@ -1,13 +1,13 @@
 package de.unistuttgart.iste.gits.courseservice.integration;
 
 
+import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.generated.dto.CourseDto;
 import de.unistuttgart.iste.gits.generated.dto.CourseFilterDto;
 import de.unistuttgart.iste.gits.generated.dto.SortDirectionDto;
 import de.unistuttgart.iste.gits.generated.dto.StringFilterDto;
-import de.unistuttgart.iste.gits.util.GraphQlApiTest;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import static java.util.Objects.requireNonNull;
  * Tests that the courses query works correctly.
  */
 @GraphQlApiTest
-public class QueryCoursesTest {
+class QueryCoursesTest {
 
     @Autowired
     private CourseRepository courseRepository;
@@ -37,7 +37,7 @@ public class QueryCoursesTest {
      * Then an empty list is returned and the pagination information is correct.
      */
     @Test
-    public void testGetCoursesEmpty(GraphQlTester tester) {
+    void testGetCoursesEmpty(GraphQlTester tester) {
         String query = """
                 query {
                     courses {
@@ -70,7 +70,7 @@ public class QueryCoursesTest {
      * Then the courses are returned and the pagination information is correct.
      */
     @Test
-    public void testGetAllCourses(GraphQlTester tester) {
+    void testGetAllCourses(GraphQlTester tester) {
         // create two courses in the database
         var initialData = Stream.of(
                         dummyCourseBuilder().title("Course 1").build(),
@@ -116,7 +116,7 @@ public class QueryCoursesTest {
      * Then the courses are returned and the pagination information is correct.
      */
     @Test
-    public void testGetAllCoursesWithPagination(GraphQlTester tester) {
+    void testGetAllCoursesWithPagination(GraphQlTester tester) {
         var data = Stream.of(
                         dummyCourseBuilder().title("Course 1").build(),
                         dummyCourseBuilder().title("Course 2").build(),
@@ -177,7 +177,7 @@ public class QueryCoursesTest {
      * HINT: Test multiple sort fields in the future
      */
     @Test
-    public void testGetAllCoursesWithSort(GraphQlTester tester) {
+    void testGetAllCoursesWithSort(GraphQlTester tester) {
         var data = Stream.of(
                         dummyCourseBuilder().description("A").build(),
                         dummyCourseBuilder().description("B").build(),
@@ -220,7 +220,7 @@ public class QueryCoursesTest {
      * HINT: Maybe test more filter fields in the future
      */
     @Test
-    public void testGetCoursesWithFilter(GraphQlTester tester) {
+    void testGetCoursesWithFilter(GraphQlTester tester) {
         var data = Stream.of(
                         dummyCourseBuilder().title("Course 1").description("A").build(),
                         dummyCourseBuilder().title("Course 2").description("B").build(),
@@ -291,7 +291,7 @@ public class QueryCoursesTest {
      * Then the course is returned
      */
     @Test
-    public void testGetByIds(GraphQlTester tester) {
+    void testGetByIds(GraphQlTester tester) {
         // create two courses in the database
         var initialData = Stream.of(
                         dummyCourseBuilder().title("Course 1").build(),
@@ -324,7 +324,7 @@ public class QueryCoursesTest {
      * Then an error is returned
      */
     @Test
-    public void testGetByIdsWithNotExistingId(GraphQlTester tester) {
+    void testGetByIdsWithNotExistingId(GraphQlTester tester) {
         String query = """
                 query {
                     coursesById(ids: ["%s"]) {

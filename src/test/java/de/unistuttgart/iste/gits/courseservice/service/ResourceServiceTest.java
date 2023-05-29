@@ -56,7 +56,7 @@ class ResourceServiceTest {
         //mock repositories
         when(resourceRepository.findResourceEntitiesByResourceIdOrderByCourseIdAsc(any(UUID.class)))
                 .thenReturn(courseResourceAssociationEntityList);
-        when(courseRepository.findAllById(any(List.class))).thenReturn(courseEntityList);
+        when(courseRepository.findAllById(any())).thenReturn(courseEntityList);
 
         //run method under test
         List<CourseResourceAssociationDto> actualResult = resourceService.getCoursesByResourceId(List.of(resourceId));
@@ -97,7 +97,7 @@ class ResourceServiceTest {
         //mock repositories
         when(resourceRepository.findResourceEntitiesByResourceIdOrderByCourseIdAsc(any(UUID.class)))
                 .thenReturn(courseResourceAssociationEntityList);
-        when(courseRepository.findAllById(any(List.class))).thenReturn(courseEntityList);
+        when(courseRepository.findAllById(any())).thenReturn(courseEntityList);
 
         //run method under test
         List<CourseResourceAssociationDto> actualResult = resourceService.getCoursesByResourceId(List.of(resourceId));

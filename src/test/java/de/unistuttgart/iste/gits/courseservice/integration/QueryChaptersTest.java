@@ -1,5 +1,6 @@
 package de.unistuttgart.iste.gits.courseservice.integration;
 
+import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ChapterRepository;
@@ -8,7 +9,6 @@ import de.unistuttgart.iste.gits.generated.dto.ChapterDto;
 import de.unistuttgart.iste.gits.generated.dto.ChapterFilterDto;
 import de.unistuttgart.iste.gits.generated.dto.SortDirectionDto;
 import de.unistuttgart.iste.gits.generated.dto.StringFilterDto;
-import de.unistuttgart.iste.gits.util.GraphQlApiTest;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import java.util.stream.Stream;
  * Test class for the chapters query.
  */
 @GraphQlApiTest
-public class QueryChaptersTest {
+class QueryChaptersTest {
 
     @Autowired
     private ChapterRepository chapterRepository;
@@ -37,7 +37,7 @@ public class QueryChaptersTest {
      * Then an empty list is returned and the pagination information is correct.
      */
     @Test
-    public void testGetChaptersEmpty(GraphQlTester tester) {
+    void testGetChaptersEmpty(GraphQlTester tester) {
         CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
 
         String query = String.format("""
@@ -72,7 +72,7 @@ public class QueryChaptersTest {
      * Then the chapters are returned and the pagination information is correct.
      */
     @Test
-    public void testGetAllChapters(GraphQlTester tester) {
+    void testGetAllChapters(GraphQlTester tester) {
         CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
         CourseEntity anotherCourse = courseRepository.save(dummyCourseBuilder().build());
         // create two chapters in the database
@@ -122,7 +122,7 @@ public class QueryChaptersTest {
      * Then the chapters are returned and the pagination information is correct.
      */
     @Test
-    public void testGetAllChaptersWithPagination(GraphQlTester tester) {
+    void testGetAllChaptersWithPagination(GraphQlTester tester) {
         CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
         var data = Stream.of(
                         dummyChapterBuilder().title("Chapter 1").courseId(course.getId()).build(),
@@ -186,7 +186,7 @@ public class QueryChaptersTest {
      * HINT: Test multiple sort fields in the future
      */
     @Test
-    public void testGetAllChaptersWithSort(GraphQlTester tester) {
+    void testGetAllChaptersWithSort(GraphQlTester tester) {
         CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
         var data = Stream.of(
                         dummyChapterBuilder().description("A").courseId(course.getId()).build(),
@@ -232,7 +232,7 @@ public class QueryChaptersTest {
      * HINT: Maybe test more filter fields in the future
      */
     @Test
-    public void testGetChaptersWithFilter(GraphQlTester tester) {
+    void testGetChaptersWithFilter(GraphQlTester tester) {
         CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
         var data = Stream.of(
                         dummyChapterBuilder().title("Chapter 1").description("A").courseId(course.getId()).build(),

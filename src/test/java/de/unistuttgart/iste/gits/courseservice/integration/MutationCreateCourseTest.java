@@ -1,8 +1,8 @@
 package de.unistuttgart.iste.gits.courseservice.integration;
 
+import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.util.GraphQlApiTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
@@ -17,7 +17,7 @@ import static org.hamcrest.Matchers.is;
  * Tests for the `createCourse` mutation.
  */
 @GraphQlApiTest
-public class MutationCreateCourseTest {
+class MutationCreateCourseTest {
 
     @Autowired
     private CourseRepository courseRepository;
@@ -31,7 +31,7 @@ public class MutationCreateCourseTest {
      * Then the course is created and returned
      */
     @Test
-    public void testCreateCourse(GraphQlTester tester) {
+    void testCreateCourse(GraphQlTester tester) {
         String query = """
                 mutation {
                     createCourse(
@@ -86,7 +86,7 @@ public class MutationCreateCourseTest {
      * Then a validation error is returned
      */
     @Test
-    public void testErrorOnBlankTitle(GraphQlTester tester) {
+    void testErrorOnBlankTitle(GraphQlTester tester) {
         String query = """
                 mutation {
                     createCourse(
@@ -116,7 +116,7 @@ public class MutationCreateCourseTest {
      * Then a validation error is returned
      */
     @Test
-    public void testTooLongTitle(GraphQlTester tester) {
+    void testTooLongTitle(GraphQlTester tester) {
         String query = String.format("""
                 mutation {
                     createCourse(
@@ -146,7 +146,7 @@ public class MutationCreateCourseTest {
      * Then a validation error is returned
      */
     @Test
-    public void testTooLongDescription(GraphQlTester tester) {
+    void testTooLongDescription(GraphQlTester tester) {
         String query = String.format("""
                 mutation {
                     createCourse(
@@ -176,7 +176,7 @@ public class MutationCreateCourseTest {
      * Then a validation error is returned
      */
     @Test
-    public void testStartDateAfterEndDate(GraphQlTester tester) {
+    void testStartDateAfterEndDate(GraphQlTester tester) {
         String query = """
                 mutation {
                     createCourse(

@@ -29,7 +29,7 @@ import static org.mockito.Mockito.*;
 /**
  * Unit tests for {@link ChapterService}.
  */
-public class ChapterServiceTest {
+class ChapterServiceTest {
 
     private final ChapterRepository chapterRepository = mock(ChapterRepository.class);
     private final CourseService courseService = mock(CourseService.class);
@@ -48,7 +48,7 @@ public class ChapterServiceTest {
      * Then a ChapterDto is returned with the correct values
      */
     @Test
-    public void testCreateChapterSuccessful() {
+    void testCreateChapterSuccessful() {
         // arrange test data
         CreateChapterInputDto testCreateChapterInput = dummyCreateChapterInputDtoBuilder().build();
         ChapterEntity expectedChapter = dummyChapterEntityBuilder().build();
@@ -82,7 +82,7 @@ public class ChapterServiceTest {
      * Then a ValidationException is thrown
      */
     @Test
-    public void testCreateChapterStartDateAfterEndDate() {
+    void testCreateChapterStartDateAfterEndDate() {
         // arrange test data
         CreateChapterInputDto testCreateChapterInput = dummyCreateChapterInputDtoBuilder()
                 .setStartDate(OffsetDateTime.now().plus(1, DAYS))
@@ -106,7 +106,7 @@ public class ChapterServiceTest {
      * Then a EntityNotFoundException is thrown
      */
     @Test
-    public void testCreateChapterCourseNotFound() {
+    void testCreateChapterCourseNotFound() {
         // arrange test data
         CreateChapterInputDto testCreateChapterInput = dummyCreateChapterInputDtoBuilder()
                 .setCourseId(UUID.randomUUID())
@@ -129,7 +129,7 @@ public class ChapterServiceTest {
      * Then a ChapterDto is returned with the correct values
      */
     @Test
-    public void testUpdateChapterSuccessful() {
+    void testUpdateChapterSuccessful() {
         // arrange test data
         ChapterEntity expectedChapter = dummyChapterEntityBuilder()
                 .description("new description")
@@ -172,7 +172,7 @@ public class ChapterServiceTest {
      * Then a ValidationException is thrown
      */
     @Test
-    public void testUpdateChapterStartDateAfterEndDate() {
+    void testUpdateChapterStartDateAfterEndDate() {
         // arrange test data
         ChapterEntity expectedChapter = dummyChapterEntityBuilder().build();
         UpdateChapterInputDto testUpdateChapterInput = dummyUpdateChapterInputDtoBuilder(expectedChapter.getId())
@@ -198,7 +198,7 @@ public class ChapterServiceTest {
      * Then the UUID is returned and the delete method of the repository is called
      */
     @Test
-    public void testDeleteChapterSuccessful() {
+    void testDeleteChapterSuccessful() {
         // arrange test data
         UUID testChapterId = UUID.randomUUID();
 
@@ -224,7 +224,7 @@ public class ChapterServiceTest {
      * Then a EntityNotFoundException is thrown
      */
     @Test
-    public void testDeleteChapterNotExisting() {
+    void testDeleteChapterNotExisting() {
         // arrange test data
         UUID testChapterId = UUID.randomUUID();
 

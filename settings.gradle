@@ -1,1 +1,10 @@
 rootProject.name = 'course_service'
+
+sourceControl {
+    gitRepository(uri('https://github.com/IT-REX-Platform/gits-common')) {
+        producesModule('de.unistuttgart.iste.gits:gits-common')
+    }
+    gitRepository(uri('https://github.com/IT-REX-Platform/gits-common-test')) {
+        producesModule('de.unistuttgart.iste.gits:gits-common-test')
+    }
+}
