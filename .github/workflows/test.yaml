@@ -52,5 +52,5 @@ jobs:
         with:
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: ghcr.io/it-rex-platform/gits-template-microservice:${{steps.vars.outputs.sha_short}}
+          tags: ghcr.io/it-rex-platform/course_service:${{steps.vars.outputs.sha_short}}
           push: true
