@@ -26,7 +26,7 @@ import static org.mockito.Mockito.*;
 /**
  * Unit test for {@link CourseService}.
  */
-public class CourseServiceTest {
+class CourseServiceTest {
 
     private final CourseRepository courseRepository = Mockito.mock(CourseRepository.class);
     private final CourseMapper courseMapper = new CourseMapper(new ModelMapper());
@@ -39,7 +39,7 @@ public class CourseServiceTest {
      * Then a CourseDto is returned and the CourseRepository is called
      */
     @Test
-    public void testCreateCourseSuccessful() {
+    void testCreateCourseSuccessful() {
         // arrange
         CreateCourseInputDto input = dummyCreateCourseInputDtoBuilder().build();
         CourseEntity expectedCourseEntity = dummyCourseEntityBuilder().build();
@@ -69,7 +69,7 @@ public class CourseServiceTest {
      * Then a ValidationException is thrown and the course is not saved
      */
     @Test
-    public void testCreateCourseStartDateAfterEndDate() {
+    void testCreateCourseStartDateAfterEndDate() {
         // arrange
         CreateCourseInputDto input = dummyCreateCourseInputDtoBuilder()
                 .setStartDate(OffsetDateTime.parse("2021-01-02T00:00:00Z"))
@@ -94,7 +94,7 @@ public class CourseServiceTest {
      * Then a CourseDto is returned and the CourseRepository is called
      */
     @Test
-    public void testUpdateCourseSuccessful() {
+    void testUpdateCourseSuccessful() {
         // arrange
         CourseEntity expectedCourseEntity = dummyCourseEntityBuilder()
                 .description("New description")
@@ -131,7 +131,7 @@ public class CourseServiceTest {
      * Then a ValidationException is thrown and the course is not saved
      */
     @Test
-    public void testUpdateCourseStartDateAfterEndDate() {
+    void testUpdateCourseStartDateAfterEndDate() {
         // arrange
         UpdateCourseInputDto input = dummyUpdateCourseInputDtoBuilder()
                 .setStartDate(OffsetDateTime.parse("2021-01-02T00:00:00Z"))
@@ -156,7 +156,7 @@ public class CourseServiceTest {
      * Then the CourseRepository is called and the id is returned
      */
     @Test
-    public void testDeleteCourseSuccessful() {
+    void testDeleteCourseSuccessful() {
         // arrange
         UUID id = UUID.randomUUID();
 
@@ -179,7 +179,7 @@ public class CourseServiceTest {
      * Then an EntityNotFoundException is thrown
      */
     @Test
-    public void testDeleteCourseNonExisting() {
+    void testDeleteCourseNonExisting() {
         // arrange
         UUID id = UUID.randomUUID();
 
@@ -198,7 +198,7 @@ public class CourseServiceTest {
      * Then no exception is thrown
      */
     @Test
-    public void testRequireCourseExisting() {
+    void testRequireCourseExisting() {
         // arrange
         UUID id = UUID.randomUUID();
 
@@ -218,7 +218,7 @@ public class CourseServiceTest {
      * Then an EntityNotFoundException is thrown
      */
     @Test
-    public void testRequireCourseExistingNonExisting() {
+    void testRequireCourseExistingNonExisting() {
         // arrange
         UUID id = UUID.randomUUID();
 

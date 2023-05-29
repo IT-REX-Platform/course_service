@@ -10,6 +10,10 @@ import static de.unistuttgart.iste.gits.common.util.SpecificationUtil.*;
 
 public class CourseFilterSpecification {
 
+    private CourseFilterSpecification() {
+        // Utility class
+    }
+
     public static Specification<CourseEntity> courseFilter(@Nullable CourseFilterDto filterDto) {
         if (filterDto == null) {
             return null;

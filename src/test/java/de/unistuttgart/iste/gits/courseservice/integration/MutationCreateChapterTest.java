@@ -1,10 +1,10 @@
 package de.unistuttgart.iste.gits.courseservice.integration;
 
+import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.generated.dto.ChapterDto;
-import de.unistuttgart.iste.gits.util.GraphQlApiTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
@@ -16,7 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 @GraphQlApiTest
-public class MutationCreateChapterTest {
+class MutationCreateChapterTest {
 
     @Autowired
     private CourseRepository courseRepository;
@@ -30,7 +30,7 @@ public class MutationCreateChapterTest {
      * Then the chapter is created and returned
      */
     @Test
-    public void testCreateChapter(GraphQlTester tester) {
+    void testCreateChapter(GraphQlTester tester) {
         var course = courseRepository.save(CourseEntity.builder()
                 .title("New Course")
                 .description("This is a new course")
@@ -87,7 +87,7 @@ public class MutationCreateChapterTest {
      * Then an error is returned
      */
     @Test
-    public void testCreateChapterCourseNotExisting(GraphQlTester tester) {
+    void testCreateChapterCourseNotExisting(GraphQlTester tester) {
         String query = """
                 mutation {
                     createChapter(
@@ -124,7 +124,7 @@ public class MutationCreateChapterTest {
      * Then a validation error is returned
      */
     @Test
-    public void testErrorOnBlankTitle(GraphQlTester tester) {
+    void testErrorOnBlankTitle(GraphQlTester tester) {
         String query = """
                 mutation {
                     createChapter(
@@ -155,7 +155,7 @@ public class MutationCreateChapterTest {
      * Then a validation error is returned
      */
     @Test
-    public void testTooLongTitle(GraphQlTester tester) {
+    void testTooLongTitle(GraphQlTester tester) {
         String query = String.format("""
                 mutation {
                     createChapter(
@@ -186,7 +186,7 @@ public class MutationCreateChapterTest {
      * Then a validation error is returned
      */
     @Test
-    public void testTooLongDescription(GraphQlTester tester) {
+    void testTooLongDescription(GraphQlTester tester) {
         String query = String.format("""
                 mutation {
                     createChapter(
@@ -217,7 +217,7 @@ public class MutationCreateChapterTest {
      * Then a validation error is returned
      */
     @Test
-    public void testStartDateAfterEndDate(GraphQlTester tester) {
+    void testStartDateAfterEndDate(GraphQlTester tester) {
         String query = """
                 mutation {
                     createChapter(

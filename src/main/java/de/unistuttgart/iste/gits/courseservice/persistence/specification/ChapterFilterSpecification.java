@@ -12,6 +12,10 @@ import static de.unistuttgart.iste.gits.common.util.SpecificationUtil.*;
 
 public class ChapterFilterSpecification {
 
+    private ChapterFilterSpecification() {
+        // Utility class
+    }
+
     public static Specification<ChapterEntity> courseIdEquals(UUID courseId) {
         return SpecificationUtil.equalTo("courseId", courseId);
     }

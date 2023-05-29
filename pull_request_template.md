@@ -10,15 +10,20 @@ Please describe the test strategy you followed.
 - [ ] automated acceptance test
 - [ ] manual, exploratory test
 
-In case of manual test, please document the test well including a set of user instructions and prerequisites. Each including an action, it's result, and where appropriate a screenshot.
+In case of manual test, please document the test well including a set of user instructions and prerequisites. Each
+including an action, it's result, and where appropriate a screenshot.
+In case of automated tests, the test coverage should be reasonably high, especially on Service classes and other classes
+with complex logic.
     
 ## Checklist before requesting a review
 - [ ] My code follows the [coding guidelines](https://github.com/IT-REX-Platform/wiki/blob/main/dev-manuals/backend/coding-guidelines.md) of this project
 - [ ] I have performed a self-review of my code
 - [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] My code fulfilles all acceptance criteria
+- [ ] My code fulfills all acceptance criteria
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes
+- [ ] The test coverage (line and branch) is reasonably high, especially on Service classes and other classes with
+  complex logic
 - [ ] I have made corresponding changes to the documentation
 - [ ] I have added explanation of architectural decision and rationales to [wiki/adr](https://github.com/IT-REX-Platform/wiki/tree/main/adr)
 - [ ] I have updated the changes in the ticket description

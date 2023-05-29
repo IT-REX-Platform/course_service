@@ -1,11 +1,11 @@
 package de.unistuttgart.iste.gits.courseservice.integration;
 
+import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.dao.CourseResourceAssociationEntity;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.courseservice.persistence.repository.ResourceRepository;
 import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociationDto;
-import de.unistuttgart.iste.gits.util.GraphQlApiTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
@@ -47,10 +47,6 @@ class QueryResourcesTest {
                 .hasSize(0);
     }
 
-    /**
-     *
-     * @param tester
-     */
     @Test
     void testGetCourseIdsByResourceId(GraphQlTester tester){
 

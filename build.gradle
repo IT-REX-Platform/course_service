@@ -3,6 +3,7 @@ plugins {
 	id 'org.springframework.boot' version '3.0.6'
 	id 'io.spring.dependency-management' version '1.1.0'
 	id "io.github.kobylynskyi.graphql.codegen" version "5.7.2"
+    id 'com.adarshr.test-logger' version '3.2.0'
 }
 
 group = 'de.unistuttgart.iste.gits'
@@ -48,6 +49,12 @@ repositories {
 }
 
 dependencies {
+    implementation('de.unistuttgart.iste.gits:gits-common') {
+        version {
+            branch = 'main'
+        }
+    }
+    implementation 'com.google.code.findbugs:jsr305:3.0.2' // removes a gradle warning about an unknown annotation
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-graphql'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -60,6 +67,11 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
+    testImplementation('de.unistuttgart.iste.gits:gits-common-test') {
+        version {
+            branch = 'main'
+        }
+    }
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework:spring-webflux'
     testImplementation 'org.springframework.graphql:spring-graphql-test'
