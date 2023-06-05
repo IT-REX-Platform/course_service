@@ -44,5 +44,7 @@ services:
       - database
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/templatedatabase
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
 volumes:
   templatedata:
