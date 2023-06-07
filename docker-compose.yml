@@ -1,5 +1,5 @@
 services:
-  database:
+  database-template:
     image: postgres:alpine
     restart: always
     network_mode: bridge
@@ -22,12 +22,12 @@ services:
     ports:
       - "1033:5432"
     volumes:
-      - templatedata:/var/lib/postgresql/testdata
+      - testdata:/var/lib/postgresql/testdata
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=test_data
-  app:
+  app-template:
     build: .
     restart: always
     network_mode: bridge
@@ -36,15 +36,37 @@ services:
       - 1000
       - 1001
     ports:
-      - 1000:1000
-      - 1001:1001
+      - "1000:1000"
+      - "1001:1001"
     depends_on:
-      - database
-    links:
-      - database
+      - database-template
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/templatedatabase
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
+  dapr-template:
+    image: "daprio/daprd"
+    command: [
+      "./daprd",
+      "--app-id", "template_service",
+      "--app-port", "1001",
+      "--dapr-http-port", "1000",
+      "--resources-path", "./components"
+    ]
+    volumes:
+      - "./components/:/components" # Mount our components folder for the runtime to use. The mounted location must match the --resources-path argument.
+    depends_on:
+      - app-template
+      - redis
+    network_mode: "service:app-template"
+  redis:
+    image: "redis:alpine"
+    expose:
+      - "6379"
 volumes:
   templatedata:
+  testdata:
+networks:
+  default:
+    name: dapr-network
+    external: true
