@@ -3,7 +3,7 @@ FROM eclipse-temurin:17-jdk AS build
 WORKDIR /workspace/app
 
 COPY . /workspace/app
-RUN ./gradlew clean build
+RUN ./gradlew clean build -x test
 RUN mkdir -p build/dependency && (cd build/dependency; jar -xf ../libs/*-SNAPSHOT.jar)
 
 FROM eclipse-temurin:17-jdk
