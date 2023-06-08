@@ -1,3 +1,5 @@
+version: "3"
+
 services:
   database-course:
     image: postgres:alpine
@@ -16,33 +18,57 @@ services:
   testDb:
     image: postgres:alpine
     restart: always
-    network_mode: bridge
     expose:
       - 1033
     ports:
       - "1033:5432"
     volumes:
-      - coursedata:/var/lib/postgresql/testdata
+      - testdata:/var/lib/postgresql/testdata
     environment:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=test_data
   app-course:
-    build: .
+    build:
+      context: ./../course_service
+      dockerfile: Dockerfile
     restart: always
-    network_mode: bridge
     container_name: course_service
     expose:
       - 2000
       - 2001
     ports:
-      - 2000:2000
-      - 2001:2001
+      - "2000:2000"
+      - "2001:2001"
     depends_on:
-      - database-course
-    links:
       - database-course
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://database-course:5432/course_service
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+  dapr-course:
+    image: "daprio/daprd"
+    command: [
+      "./daprd",
+      "--app-id", "course_service",
+      "--app-port", "2001",
+      "--dapr-http-port", "2000",
+      "--resources-path", "./components"
+    ]
+    volumes:
+      - "./components/:/components" # Mount our components folder for the runtime to use. The mounted location must match the --resources-path argument.
+    depends_on:
+      - app-course
+      - redis
+    network_mode: "service:app-course"
+  redis:
+    image: "redis:alpine"
+    expose:
+      - "6379"
 volumes:
   coursedata:
+  testdata:
+networks:
+  default:
+    name: dapr-network
+    external: true

@@ -12,24 +12,24 @@ sourceCompatibility = '17'
 
 // Automatically generate DTOs from GraphQL schema:
 graphqlCodegen {
-    // all config options:
-    // https://github.com/kobylynskyi/graphql-java-codegen/blob/main/docs/codegen-options.md
-    outputDir = new File("$buildDir/generated")
-    packageName = "de.unistuttgart.iste.gits.generated.dto"
-    modelNameSuffix = "Dto"
-    generatedAnnotation = "jakarta.annotation.Generated"
-    modelValidationAnnotation = "jakarta.validation.constraints.NotNull"
-    generateApis = false // set to false as the generator does not support spring boot graphQL
-    customTypesMapping = [
-            "DateTime" : "java.time.OffsetDateTime",
-            "Date"     : "java.time.LocalDate",
-            "Time"     : "java.time.OffsetTime",
-            "LocalTime": "java.time.LocalTime",
+	// all config options:
+	// https://github.com/kobylynskyi/graphql-java-codegen/blob/main/docs/codegen-options.md
+	outputDir = new File("$buildDir/generated")
+	packageName = "de.unistuttgart.iste.gits.generated.dto"
+	modelNameSuffix = "Dto"
+	generatedAnnotation = "jakarta.annotation.Generated"
+	modelValidationAnnotation = "jakarta.validation.constraints.NotNull"
+	generateApis = false // set to false as the generator does not support spring boot graphQL
+	customTypesMapping = [
+			"DateTime" : "java.time.OffsetDateTime",
+			"Date"     : "java.time.LocalDate",
+			"Time"     : "java.time.OffsetTime",
+			"LocalTime": "java.time.LocalTime",
 			"UUID"     : "java.util.UUID",
-            "Url"      : "java.net.URL",
-    ]
-    generateEqualsAndHashCode = true
-    generateToString = true
+			"Url"      : "java.net.URL",
+	]
+	generateEqualsAndHashCode = true
+	generateToString = true
 }
 
 // Automatically generate GraphQL code on project build:
