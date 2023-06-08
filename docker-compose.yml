@@ -4,7 +4,6 @@ services:
   database-course:
     image: postgres:alpine
     restart: always
-    network_mode: bridge
     expose:
       - 2032
     ports:
