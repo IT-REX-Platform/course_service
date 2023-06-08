@@ -1,0 +1,37 @@
+package de.unistuttgart.iste.gits.course_service.persistence.mapper;
+
+import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
+import de.unistuttgart.iste.gits.generated.dto.*;
+import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
+
+import java.util.stream.Stream;
+
+@Component
+@RequiredArgsConstructor
+public class ChapterMapper {
+
+    private final ModelMapper modelMapper;
+
+    public ChapterDto entityToDto(ChapterEntity chapterEntity) {
+        return modelMapper.map(chapterEntity, ChapterDto.class);
+    }
+
+    public ChapterEntity dtoToEntity(CreateChapterInputDto chapterInputDto) {
+        ChapterEntity entity = modelMapper.map(chapterInputDto, ChapterEntity.class);
+        entity.setCourseId(chapterInputDto.getCourseId());
+        return entity;
+    }
+
+    public ChapterEntity dtoToEntity(UpdateChapterInputDto input) {
+        return modelMapper.map(input, ChapterEntity.class);
+    }
+
+    public ChapterPayloadDto createChapterPayloadDto(Stream<ChapterEntity> chapterEntities, PaginationInfoDto paginationInfoDto) {
+        return ChapterPayloadDto.builder()
+                .setElements(chapterEntities.map(this::entityToDto).toList())
+                .setPagination(paginationInfoDto)
+                .build();
+    }
+}
