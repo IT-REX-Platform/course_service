@@ -1,3 +1,5 @@
+version: "3"
+
 services:
   database-template:
     image: postgres:alpine
@@ -16,7 +18,6 @@ services:
   testDb:
     image: postgres:alpine
     restart: always
-    network_mode: bridge
     expose:
       - 1033
     ports:
@@ -28,9 +29,10 @@ services:
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=test_data
   app-template:
-    build: .
+    build:
+      context: ./../template-microservice # necessary because otherwise docker-compose overrides the context path when merging multiple docker-compose.yml files
+      dockerfile: Dockerfile
     restart: always
-    network_mode: bridge
     container_name: template_microservice
     expose:
       - 1000
@@ -41,7 +43,7 @@ services:
     depends_on:
       - database-template
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://database:5432/templatedatabase
+      SPRING_DATASOURCE_URL: jdbc:postgresql://database-template:5432/templatedatabase
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
   dapr-template:
