@@ -5,10 +5,12 @@ on: push
 jobs:
   build:
     runs-on: ubuntu-latest
-    steps:
+    steps:        
       - uses: actions/checkout@v3
       - name: Build the docker image
         run: docker-compose build
+      - name: create the network
+        run: docker network create -d bridge dapr-network
 
       - name: up postgresql container runs
         run: docker-compose up -d
