@@ -1,6 +1,6 @@
 package de.unistuttgart.iste.gits.template.controller;
 
-import de.unistuttgart.iste.gits.generated.dto.TemplateDto;
+import de.unistuttgart.iste.gits.generated.dto.Template;
 import de.unistuttgart.iste.gits.template.service.TemplateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ public class TemplateController {
     private final TemplateService templateService;
 
     @QueryMapping
-    public List<TemplateDto> templates() {
+    public List<Template> templates() {
         log.info("Request for all templates");
 
         return templateService.getAllTemplates();
