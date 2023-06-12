@@ -16,23 +16,23 @@ public class CourseMapper {
         this.modelMapper = modelMapper;
     }
 
-    public CourseDto entityToDto(CourseEntity courseEntity) {
-        return modelMapper.map(courseEntity, CourseDto.class);
+    public Course entityToDto(CourseEntity courseEntity) {
+        return modelMapper.map(courseEntity, Course.class);
     }
 
-    public CourseEntity dtoToEntity(CreateCourseInputDto courseInputDTO) {
+    public CourseEntity dtoToEntity(CreateCourseInput courseInputDTO) {
         return modelMapper.map(courseInputDTO, CourseEntity.class);
     }
 
-    public CourseEntity dtoToEntity(UpdateCourseInputDto input) {
+    public CourseEntity dtoToEntity(UpdateCourseInput input) {
         return modelMapper.map(input, CourseEntity.class);
     }
 
-    public CoursePayloadDto createPayloadDto(Stream<CourseEntity> courseEntities,
-                                             PaginationInfoDto paginationInfoDto) {
-        return CoursePayloadDto.builder()
+    public CoursePayload createPayload(Stream<CourseEntity> courseEntities,
+                                       PaginationInfo paginationInfo) {
+        return CoursePayload.builder()
                 .setElements(courseEntities.map(this::entityToDto).toList())
-                .setPagination(paginationInfoDto)
+                .setPagination(paginationInfo)
                 .build();
     }
 }

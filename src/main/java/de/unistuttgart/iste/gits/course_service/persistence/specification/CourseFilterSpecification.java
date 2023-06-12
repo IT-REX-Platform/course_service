@@ -1,7 +1,7 @@
 package de.unistuttgart.iste.gits.course_service.persistence.specification;
 
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
-import de.unistuttgart.iste.gits.generated.dto.CourseFilterDto;
+import de.unistuttgart.iste.gits.generated.dto.CourseFilter;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.Nullable;
 
@@ -14,20 +14,20 @@ public class CourseFilterSpecification {
         // Utility class
     }
 
-    public static Specification<CourseEntity> courseFilter(@Nullable CourseFilterDto filterDto) {
-        if (filterDto == null) {
+    public static Specification<CourseEntity> courseFilter(@Nullable CourseFilter filter) {
+        if (filter == null) {
             return null;
         }
         return Specification.allOf(
-                        stringFilter("title", filterDto.getTitle()),
-                        stringFilter("description", filterDto.getDescription()),
-                        dateTimeFilter("startDate", filterDto.getStartDate()),
-                        dateTimeFilter("endDate", filterDto.getEndDate()),
-                        booleanFilter("published", filterDto.getPublished()),
-                        and(filterDto.getAnd(), CourseFilterSpecification::courseFilter),
-                        not(filterDto.getNot(), CourseFilterSpecification::courseFilter))
+                        stringFilter("title", filter.getTitle()),
+                        stringFilter("description", filter.getDescription()),
+                        dateTimeFilter("startDate", filter.getStartDate()),
+                        dateTimeFilter("endDate", filter.getEndDate()),
+                        booleanFilter("published", filter.getPublished()),
+                        and(filter.getAnd(), CourseFilterSpecification::courseFilter),
+                        not(filter.getNot(), CourseFilterSpecification::courseFilter))
                 .or(
-                        or(filterDto.getOr(), CourseFilterSpecification::courseFilter));
+                        or(filter.getOr(), CourseFilterSpecification::courseFilter));
     }
 
 }

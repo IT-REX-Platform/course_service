@@ -5,10 +5,10 @@ import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.generated.dto.ChapterDto;
-import de.unistuttgart.iste.gits.generated.dto.ChapterFilterDto;
-import de.unistuttgart.iste.gits.generated.dto.SortDirectionDto;
-import de.unistuttgart.iste.gits.generated.dto.StringFilterDto;
+import de.unistuttgart.iste.gits.generated.dto.Chapter;
+import de.unistuttgart.iste.gits.generated.dto.ChapterFilter;
+import de.unistuttgart.iste.gits.generated.dto.SortDirection;
+import de.unistuttgart.iste.gits.generated.dto.StringFilter;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +58,7 @@ class QueryChaptersTest {
 
         tester.document(query)
                 .execute()
-                .path("chapters.elements").entityList(ChapterDto.class).hasSize(0)
+                .path("chapters.elements").entityList(Chapter.class).hasSize(0)
                 .path("chapters.pagination.totalElements").entity(Integer.class).isEqualTo(0)
                 .path("chapters.pagination.totalPages").entity(Integer.class).isEqualTo(1)
                 .path("chapters.pagination.page").entity(Integer.class).isEqualTo(0)
@@ -107,7 +107,7 @@ class QueryChaptersTest {
 
         tester.document(query)
                 .execute()
-                .path("chapters.elements").entityList(ChapterDto.class).hasSize(2)
+                .path("chapters.elements").entityList(Chapter.class).hasSize(2)
                 .contains(entitiesToDtos(initialData))
                 .path("chapters.pagination.totalElements").entity(Integer.class).isEqualTo(2)
                 .path("chapters.pagination.totalPages").entity(Integer.class).isEqualTo(1)
@@ -157,7 +157,7 @@ class QueryChaptersTest {
                 .variable("page", 0)
                 .variable("courseId", course.getId())
                 .execute()
-                .path("chapters.elements").entityList(ChapterDto.class).hasSize(2)
+                .path("chapters.elements").entityList(Chapter.class).hasSize(2)
                 .contains(entitiesToDtos(data.subList(0, 2)))
                 .path("chapters.pagination.totalElements").entity(Integer.class).isEqualTo(4)
                 .path("chapters.pagination.totalPages").entity(Integer.class).isEqualTo(2)
@@ -169,7 +169,7 @@ class QueryChaptersTest {
                 .variable("page", 1)
                 .variable("courseId", course.getId())
                 .execute()
-                .path("chapters.elements").entityList(ChapterDto.class).hasSize(2)
+                .path("chapters.elements").entityList(Chapter.class).hasSize(2)
                 .contains(entitiesToDtos(data.subList(2, 4)))
                 .path("chapters.pagination.totalElements").entity(Integer.class).isEqualTo(4)
                 .path("chapters.pagination.totalPages").entity(Integer.class).isEqualTo(2)
@@ -211,17 +211,17 @@ class QueryChaptersTest {
                 }""";
 
         tester.document(query)
-                .variable("sortDirection", SortDirectionDto.ASC)
+                .variable("sortDirection", SortDirection.ASC)
                 .variable("courseId", data.get(0).getCourseId())
                 .execute()
-                .path("chapters.elements").entityList(ChapterDto.class).hasSize(4)
+                .path("chapters.elements").entityList(Chapter.class).hasSize(4)
                 .contains(entitiesToDtos(data));
 
         tester.document(query)
-                .variable("sortDirection", SortDirectionDto.DESC)
+                .variable("sortDirection", SortDirection.DESC)
                 .variable("courseId", data.get(0).getCourseId())
                 .execute()
-                .path("chapters.elements").entityList(ChapterDto.class).hasSize(4)
+                .path("chapters.elements").entityList(Chapter.class).hasSize(4)
                 .contains(entitiesToDtos(List.of(data.get(3), data.get(2), data.get(1), data.get(0))));
     }
 
@@ -259,45 +259,45 @@ class QueryChaptersTest {
         // filter for title contains "Chapter"
         tester.document(query)
                 .variable("courseId", data.get(0).getCourseId())
-                .variable("filter", ChapterFilterDto.builder()
-                        .setTitle(StringFilterDto.builder()
+                .variable("filter", ChapterFilter.builder()
+                        .setTitle(StringFilter.builder()
                                 .setContains("Chapter")
                                 .build())
                         .build())
                 .execute()
-                .path("chapters.elements").entityList(ChapterDto.class).hasSize(4)
+                .path("chapters.elements").entityList(Chapter.class).hasSize(4)
                 .contains(entitiesToDtos(data));
 
         // filter for title contains "Chapter 1"
         tester.document(query)
                 .variable("courseId", data.get(0).getCourseId())
                 .variable("filter",
-                        ChapterFilterDto.builder()
-                                .setTitle(StringFilterDto.builder()
+                        ChapterFilter.builder()
+                                .setTitle(StringFilter.builder()
                                         .setContains("Chapter 1")
                                         .build())
                                 .build())
                 .execute()
-                .path("chapters.elements").entityList(ChapterDto.class).hasSize(1)
+                .path("chapters.elements").entityList(Chapter.class).hasSize(1)
                 .contains(entitiesToDtos(List.of(data.get(0))));
 
         // filter for description contains "A" or "B"
         tester.document(query)
                 .variable("courseId", data.get(0).getCourseId())
                 .variable("filter",
-                        ChapterFilterDto.builder()
-                                .setDescription(StringFilterDto.builder()
+                        ChapterFilter.builder()
+                                .setDescription(StringFilter.builder()
                                         .setContains("A")
                                         .build())
                                 .setOr(List.of(
-                                        ChapterFilterDto.builder()
-                                                .setDescription(StringFilterDto.builder()
+                                        ChapterFilter.builder()
+                                                .setDescription(StringFilter.builder()
                                                         .setContains("B")
                                                         .build())
                                                 .build()))
                                 .build())
                 .execute()
-                .path("chapters.elements").entityList(ChapterDto.class).hasSize(2)
+                .path("chapters.elements").entityList(Chapter.class).hasSize(2)
                 .contains(entitiesToDtos(data.subList(0, 2)));
     }
 
@@ -319,13 +319,13 @@ class QueryChaptersTest {
                 .endDate(OffsetDateTime.parse("2021-01-01T00:00:00.000Z"));
     }
 
-    private ChapterDto entityToDto(ChapterEntity entity) {
-        var result = modelMapper.map(entity, ChapterDto.class);
+    private Chapter entityToDto(ChapterEntity entity) {
+        var result = modelMapper.map(entity, Chapter.class);
         result.setCourse(null); // we don't check the course here
         return result;
     }
 
-    private ChapterDto[] entitiesToDtos(List<ChapterEntity> entities) {
-        return entities.stream().map(this::entityToDto).toArray(ChapterDto[]::new);
+    private Chapter[] entitiesToDtos(List<ChapterEntity> entities) {
+        return entities.stream().map(this::entityToDto).toArray(Chapter[]::new);
     }
 }

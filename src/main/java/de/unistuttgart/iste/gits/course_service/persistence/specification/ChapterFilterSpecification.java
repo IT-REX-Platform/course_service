@@ -2,7 +2,7 @@ package de.unistuttgart.iste.gits.course_service.persistence.specification;
 
 import de.unistuttgart.iste.gits.common.util.SpecificationUtil;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
-import de.unistuttgart.iste.gits.generated.dto.ChapterFilterDto;
+import de.unistuttgart.iste.gits.generated.dto.ChapterFilter;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.Nullable;
 
@@ -20,21 +20,21 @@ public class ChapterFilterSpecification {
         return SpecificationUtil.equalTo("courseId", courseId);
     }
 
-    public static Specification<ChapterEntity> chapterFilter(@Nullable ChapterFilterDto filterDto) {
-        if (filterDto == null) {
+    public static Specification<ChapterEntity> chapterFilter(@Nullable ChapterFilter filter) {
+        if (filter == null) {
             return null;
         }
 
         return Specification.allOf(
-                        stringFilter("title", filterDto.getTitle()),
-                        stringFilter("description", filterDto.getDescription()),
-                        dateTimeFilter("startDate", filterDto.getStartDate()),
-                        dateTimeFilter("endDate", filterDto.getEndDate()),
-                        intFilter("number", filterDto.getNumber()),
-                        and(filterDto.getAnd(), ChapterFilterSpecification::chapterFilter),
-                        not(filterDto.getNot(), ChapterFilterSpecification::chapterFilter))
+                        stringFilter("title", filter.getTitle()),
+                        stringFilter("description", filter.getDescription()),
+                        dateTimeFilter("startDate", filter.getStartDate()),
+                        dateTimeFilter("endDate", filter.getEndDate()),
+                        intFilter("number", filter.getNumber()),
+                        and(filter.getAnd(), ChapterFilterSpecification::chapterFilter),
+                        not(filter.getNot(), ChapterFilterSpecification::chapterFilter))
                 .or(
-                        or(filterDto.getOr(), ChapterFilterSpecification::chapterFilter));
+                        or(filter.getOr(), ChapterFilterSpecification::chapterFilter));
     }
 
 }

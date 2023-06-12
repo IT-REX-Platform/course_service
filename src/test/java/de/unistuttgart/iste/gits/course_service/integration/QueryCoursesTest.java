@@ -4,10 +4,10 @@ package de.unistuttgart.iste.gits.course_service.integration;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.generated.dto.CourseDto;
-import de.unistuttgart.iste.gits.generated.dto.CourseFilterDto;
-import de.unistuttgart.iste.gits.generated.dto.SortDirectionDto;
-import de.unistuttgart.iste.gits.generated.dto.StringFilterDto;
+import de.unistuttgart.iste.gits.generated.dto.Course;
+import de.unistuttgart.iste.gits.generated.dto.CourseFilter;
+import de.unistuttgart.iste.gits.generated.dto.SortDirection;
+import de.unistuttgart.iste.gits.generated.dto.StringFilter;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +56,7 @@ class QueryCoursesTest {
 
         tester.document(query)
                 .execute()
-                .path("courses.elements").entityList(CourseDto.class).hasSize(0)
+                .path("courses.elements").entityList(Course.class).hasSize(0)
                 .path("courses.pagination.totalElements").entity(Integer.class).isEqualTo(0)
                 .path("courses.pagination.totalPages").entity(Integer.class).isEqualTo(1)
                 .path("courses.pagination.page").entity(Integer.class).isEqualTo(0)
@@ -101,7 +101,7 @@ class QueryCoursesTest {
 
         tester.document(query)
                 .execute()
-                .path("courses.elements").entityList(CourseDto.class).hasSize(2)
+                .path("courses.elements").entityList(Course.class).hasSize(2)
                 .contains(entitiesToDtos(initialData))
                 .path("courses.pagination.totalElements").entity(Integer.class).isEqualTo(2)
                 .path("courses.pagination.totalPages").entity(Integer.class).isEqualTo(1)
@@ -149,7 +149,7 @@ class QueryCoursesTest {
         tester.document(query)
                 .variable("page", 0)
                 .execute()
-                .path("courses.elements").entityList(CourseDto.class).hasSize(2)
+                .path("courses.elements").entityList(Course.class).hasSize(2)
                 .contains(entitiesToDtos(data.subList(0, 2)))
                 .path("courses.pagination.totalElements").entity(Integer.class).isEqualTo(4)
                 .path("courses.pagination.totalPages").entity(Integer.class).isEqualTo(2)
@@ -160,7 +160,7 @@ class QueryCoursesTest {
         tester.document(query)
                 .variable("page", 1)
                 .execute()
-                .path("courses.elements").entityList(CourseDto.class).hasSize(2)
+                .path("courses.elements").entityList(Course.class).hasSize(2)
                 .contains(entitiesToDtos(data.subList(2, 4)))
                 .path("courses.pagination.totalElements").entity(Integer.class).isEqualTo(4)
                 .path("courses.pagination.totalPages").entity(Integer.class).isEqualTo(2)
@@ -201,15 +201,15 @@ class QueryCoursesTest {
                 }""";
 
         tester.document(query)
-                .variable("sortDirection", SortDirectionDto.ASC)
+                .variable("sortDirection", SortDirection.ASC)
                 .execute()
-                .path("courses.elements").entityList(CourseDto.class).hasSize(4)
+                .path("courses.elements").entityList(Course.class).hasSize(4)
                 .contains(entitiesToDtos(data));
 
         tester.document(query)
-                .variable("sortDirection", SortDirectionDto.DESC)
+                .variable("sortDirection", SortDirection.DESC)
                 .execute()
-                .path("courses.elements").entityList(CourseDto.class).hasSize(4)
+                .path("courses.elements").entityList(Course.class).hasSize(4)
                 .contains(entitiesToDtos(List.of(data.get(3), data.get(2), data.get(1), data.get(0))));
     }
 
@@ -245,43 +245,43 @@ class QueryCoursesTest {
 
         // filter for title contains "Course"
         tester.document(query)
-                .variable("filter", CourseFilterDto.builder()
-                        .setTitle(StringFilterDto.builder()
+                .variable("filter", CourseFilter.builder()
+                        .setTitle(StringFilter.builder()
                                 .setContains("Course")
                                 .build())
                         .build())
                 .execute()
-                .path("courses.elements").entityList(CourseDto.class).hasSize(4)
+                .path("courses.elements").entityList(Course.class).hasSize(4)
                 .contains(entitiesToDtos(data));
 
         // filter for title contains "Course 1"
         tester.document(query)
                 .variable("filter",
-                        CourseFilterDto.builder()
-                                .setTitle(StringFilterDto.builder()
+                        CourseFilter.builder()
+                                .setTitle(StringFilter.builder()
                                         .setContains("Course 1")
                                         .build())
                                 .build())
                 .execute()
-                .path("courses.elements").entityList(CourseDto.class).hasSize(1)
+                .path("courses.elements").entityList(Course.class).hasSize(1)
                 .contains(entitiesToDtos(List.of(data.get(0))));
 
         // filter for description contains "A" or "B"
         tester.document(query)
                 .variable("filter",
-                        CourseFilterDto.builder()
-                                .setDescription(StringFilterDto.builder()
+                        CourseFilter.builder()
+                                .setDescription(StringFilter.builder()
                                         .setContains("A")
                                         .build())
                                 .setOr(List.of(
-                                        CourseFilterDto.builder()
-                                                .setDescription(StringFilterDto.builder()
+                                        CourseFilter.builder()
+                                                .setDescription(StringFilter.builder()
                                                         .setContains("B")
                                                         .build())
                                                 .build()))
                                 .build())
                 .execute()
-                .path("courses.elements").entityList(CourseDto.class).hasSize(2)
+                .path("courses.elements").entityList(Course.class).hasSize(2)
                 .contains(entitiesToDtos(data.subList(0, 2)));
     }
 
@@ -313,7 +313,7 @@ class QueryCoursesTest {
 
         tester.document(query)
                 .execute()
-                .path("coursesById").entityList(CourseDto.class)
+                .path("coursesById").entityList(Course.class)
                 .hasSize(1)
                 .contains(entityToDto(initialData.get(1)));
     }
@@ -353,11 +353,11 @@ class QueryCoursesTest {
                 .endDate(OffsetDateTime.parse("2021-01-01T00:00:00.000Z"));
     }
 
-    private CourseDto entityToDto(CourseEntity entity) {
-        return modelMapper.map(entity, CourseDto.class);
+    private Course entityToDto(CourseEntity entity) {
+        return modelMapper.map(entity, Course.class);
     }
 
-    private CourseDto[] entitiesToDtos(List<CourseEntity> entities) {
-        return entities.stream().map(this::entityToDto).toArray(CourseDto[]::new);
+    private Course[] entitiesToDtos(List<CourseEntity> entities) {
+        return entities.stream().map(this::entityToDto).toArray(Course[]::new);
     }
 }

@@ -5,7 +5,7 @@ import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseResourceAssociationEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ResourceRepository;
-import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociationDto;
+import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociation;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
@@ -43,7 +43,7 @@ class QueryResourcesTest {
         tester.document(query)
                 .execute()
                 .path("resourceById")
-                .entityList(CourseResourceAssociationDto.class)
+                .entityList(CourseResourceAssociation.class)
                 .hasSize(0);
     }
 
@@ -73,7 +73,7 @@ class QueryResourcesTest {
         ).map(resourceRepository::save).toList();
 
         // expected: two courses share a resource.
-        CourseResourceAssociationDto expectedDto = CourseResourceAssociationDto.builder()
+        CourseResourceAssociation expected = CourseResourceAssociation.builder()
                 .setId(resourceId)
                 .setAvailableCourses(List.of(initialCourseData.get(0).getId()))
                 .setUnAvailableCourses(List.of(initialCourseData.get(1).getId()))
@@ -92,9 +92,9 @@ class QueryResourcesTest {
         tester.document(query)
                 .execute()
                 .path("resourceById")
-                .entityList(CourseResourceAssociationDto.class)
+                .entityList(CourseResourceAssociation.class)
                 .hasSize(1)
-                .contains(expectedDto);
+                .contains(expected);
     }
 
     // Builder functions for entities

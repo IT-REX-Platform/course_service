@@ -1,7 +1,7 @@
 package de.unistuttgart.iste.gits.course_service.persistence.validation;
 
-import de.unistuttgart.iste.gits.generated.dto.CreateCourseInputDto;
-import de.unistuttgart.iste.gits.generated.dto.UpdateCourseInputDto;
+import de.unistuttgart.iste.gits.generated.dto.CreateCourseInput;
+import de.unistuttgart.iste.gits.generated.dto.UpdateCourseInput;
 import jakarta.validation.ValidationException;
 import org.springframework.stereotype.Component;
 
@@ -11,13 +11,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class CourseValidator {
 
-    public void validateCreateCourseInputDto(CreateCourseInputDto input) {
+    public void validateCreateCourseInput(CreateCourseInput input) {
         if (input.getStartDate().isAfter(input.getEndDate())) {
             throw new ValidationException("Start date must be before end date");
         }
     }
 
-    public void validateUpdateCourseInputDto(UpdateCourseInputDto input) {
+    public void validateUpdateCourseInput(UpdateCourseInput input) {
         if (input.getStartDate().isAfter(input.getEndDate())) {
             throw new ValidationException("Start date must be before end date");
         }

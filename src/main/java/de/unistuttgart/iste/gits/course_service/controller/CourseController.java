@@ -23,27 +23,27 @@ public class CourseController {
     }
 
     @QueryMapping
-    public CoursePayloadDto courses(
-            @Argument(name = "filter") @Nullable CourseFilterDto filter,
+    public CoursePayload courses(
+            @Argument(name = "filter") @Nullable CourseFilter filter,
             @Argument(name = "sortBy") List<String> sortBy,
-            @Argument(name = "sortDirection") List<SortDirectionDto> sortDirection,
-            @Argument(name = "pagination") @Nullable PaginationDto pagination
+            @Argument(name = "sortDirection") List<SortDirection> sortDirection,
+            @Argument(name = "pagination") @Nullable Pagination pagination
     ) {
         return courseService.getCourses(filter, sortBy, sortDirection, pagination);
     }
 
     @QueryMapping
-    public List<CourseDto> coursesById(@Argument(name = "ids") List<UUID> ids) {
+    public List<Course> coursesById(@Argument(name = "ids") List<UUID> ids) {
         return courseService.getCoursesByIds(ids);
     }
 
     @MutationMapping
-    public CourseDto createCourse(@Argument(name = "input") CreateCourseInputDto input) {
+    public Course createCourse(@Argument(name = "input") CreateCourseInput input) {
         return courseService.createCourse(input);
     }
 
     @MutationMapping
-    public CourseDto updateCourse(@Argument(name = "input") UpdateCourseInputDto input) {
+    public Course updateCourse(@Argument(name = "input") UpdateCourseInput input) {
         return courseService.updateCourse(input);
     }
 
