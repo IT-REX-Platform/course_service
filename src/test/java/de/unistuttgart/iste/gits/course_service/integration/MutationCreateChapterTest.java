@@ -4,7 +4,7 @@ import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.generated.dto.ChapterDto;
+import de.unistuttgart.iste.gits.generated.dto.Chapter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
@@ -63,7 +63,7 @@ class MutationCreateChapterTest {
         tester.document(query)
                 .execute()
                 .path("createChapter")
-                .entity(ChapterDto.class)
+                .entity(Chapter.class)
                 .satisfies(chapter -> {
                     assertThat(chapter.getTitle(), is("New Chapter"));
                     assertThat(chapter.getDescription(), is("This is a new chapter"));

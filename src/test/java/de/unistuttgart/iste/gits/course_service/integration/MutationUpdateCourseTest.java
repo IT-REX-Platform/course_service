@@ -5,7 +5,7 @@ import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.generated.dto.ChapterDto;
+import de.unistuttgart.iste.gits.generated.dto.Chapter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
@@ -87,7 +87,7 @@ class MutationUpdateCourseTest {
                 .path("updateCourse.startDate").entity(String.class).isEqualTo("2000-01-01T00:00:00.000Z")
                 .path("updateCourse.endDate").entity(String.class).isEqualTo("2001-01-01T00:00:00.000Z")
                 .path("updateCourse.published").entity(Boolean.class).isEqualTo(false)
-                .path("updateCourse.chapters.elements").entityList(ChapterDto.class).hasSize(1);
+                .path("updateCourse.chapters.elements").entityList(Chapter.class).hasSize(1);
 
         // check that the course was updated in the database
         var updatedCourse = courseRepository.findById(initialData.getId()).orElseThrow();

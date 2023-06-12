@@ -4,9 +4,9 @@ import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.mapper.ChapterMapper;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.validation.ChapterValidator;
-import de.unistuttgart.iste.gits.generated.dto.ChapterDto;
-import de.unistuttgart.iste.gits.generated.dto.CreateChapterInputDto;
-import de.unistuttgart.iste.gits.generated.dto.UpdateChapterInputDto;
+import de.unistuttgart.iste.gits.generated.dto.Chapter;
+import de.unistuttgart.iste.gits.generated.dto.CreateChapterInput;
+import de.unistuttgart.iste.gits.generated.dto.UpdateChapterInput;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -43,14 +43,14 @@ class ChapterServiceTest {
             chapterValidator);
 
     /**
-     * Given a valid CreateChapterInputDto
+     * Given a valid CreateChapterInput
      * When createChapter is called
-     * Then a ChapterDto is returned with the correct values
+     * Then a Chapter is returned with the correct values
      */
     @Test
     void testCreateChapterSuccessful() {
         // arrange test data
-        CreateChapterInputDto testCreateChapterInput = dummyCreateChapterInputDtoBuilder().build();
+        CreateChapterInput testCreateChapterInput = dummyCreateChapterInputBuilder().build();
         ChapterEntity expectedChapter = dummyChapterEntityBuilder().build();
 
         // mock repository and service
@@ -59,7 +59,7 @@ class ChapterServiceTest {
                 .thenReturn(expectedChapter);
 
         // act
-        ChapterDto createdChapter = chapterService.createChapter(testCreateChapterInput);
+        Chapter createdChapter = chapterService.createChapter(testCreateChapterInput);
 
         // assert
         assertThat(createdChapter.getId(), is(expectedChapter.getId()));
@@ -71,20 +71,20 @@ class ChapterServiceTest {
 
         // verify that the repository and validator were called
         verify(chapterValidator)
-                .validateCreateChapterInputDto(testCreateChapterInput);
+                .validateCreateChapterInput(testCreateChapterInput);
         verify(chapterRepository, times(1))
                 .save(any(ChapterEntity.class));
     }
 
     /**
-     * Given a CreateChapterInputDto with startDate > endDate
+     * Given a CreateChapterInput with startDate > endDate
      * When createChapter is called
      * Then a ValidationException is thrown
      */
     @Test
     void testCreateChapterStartDateAfterEndDate() {
         // arrange test data
-        CreateChapterInputDto testCreateChapterInput = dummyCreateChapterInputDtoBuilder()
+        CreateChapterInput testCreateChapterInput = dummyCreateChapterInputBuilder()
                 .setStartDate(OffsetDateTime.now().plus(1, DAYS))
                 .setEndDate(OffsetDateTime.now())
                 .build();
@@ -101,14 +101,14 @@ class ChapterServiceTest {
     }
 
     /**
-     * Given a CreateChapterInputDto with a non-existing courseId
+     * Given a CreateChapterInput with a non-existing courseId
      * When createChapter is called
      * Then a EntityNotFoundException is thrown
      */
     @Test
     void testCreateChapterCourseNotFound() {
         // arrange test data
-        CreateChapterInputDto testCreateChapterInput = dummyCreateChapterInputDtoBuilder()
+        CreateChapterInput testCreateChapterInput = dummyCreateChapterInputBuilder()
                 .setCourseId(UUID.randomUUID())
                 .build();
 
@@ -124,9 +124,9 @@ class ChapterServiceTest {
     }
 
     /**
-     * Given a valid UpdateChapterInputDto
+     * Given a valid UpdateChapterInput
      * When updateChapter is called
-     * Then a ChapterDto is returned with the correct values
+     * Then a Chapter is returned with the correct values
      */
     @Test
     void testUpdateChapterSuccessful() {
@@ -135,7 +135,7 @@ class ChapterServiceTest {
                 .description("new description")
                 .courseId(UUID.randomUUID())
                 .build();
-        UpdateChapterInputDto testUpdateChapterInput = dummyUpdateChapterInputDtoBuilder(expectedChapter.getId())
+        UpdateChapterInput testUpdateChapterInput = dummyUpdateChapterInputBuilder(expectedChapter.getId())
                 .setDescription("new description")
                 .build();
 
@@ -148,7 +148,7 @@ class ChapterServiceTest {
                 .thenReturn(Optional.of(expectedChapter));
 
         // act
-        ChapterDto updatedChapter = chapterService.updateChapter(testUpdateChapterInput);
+        Chapter updatedChapter = chapterService.updateChapter(testUpdateChapterInput);
 
         // assert
         assertThat(updatedChapter.getId(), is(expectedChapter.getId()));
@@ -161,13 +161,13 @@ class ChapterServiceTest {
 
         // verify that the repository and validator were called
         verify(chapterValidator)
-                .validateUpdateChapterInputDto(testUpdateChapterInput);
+                .validateUpdateChapterInput(testUpdateChapterInput);
         verify(chapterRepository, times(1))
                 .save(any(ChapterEntity.class));
     }
 
     /**
-     * Given a valid UpdateChapterInputDto with startDate > endDate
+     * Given a valid UpdateChapterInput with startDate > endDate
      * When updateChapter is called
      * Then a ValidationException is thrown
      */
@@ -175,7 +175,7 @@ class ChapterServiceTest {
     void testUpdateChapterStartDateAfterEndDate() {
         // arrange test data
         ChapterEntity expectedChapter = dummyChapterEntityBuilder().build();
-        UpdateChapterInputDto testUpdateChapterInput = dummyUpdateChapterInputDtoBuilder(expectedChapter.getId())
+        UpdateChapterInput testUpdateChapterInput = dummyUpdateChapterInputBuilder(expectedChapter.getId())
                 .setStartDate(OffsetDateTime.now().plus(1, DAYS))
                 .setEndDate(OffsetDateTime.now())
                 .build();
@@ -236,8 +236,8 @@ class ChapterServiceTest {
         assertThrows(EntityNotFoundException.class, () -> chapterService.deleteChapter(testChapterId));
     }
 
-    private static UpdateChapterInputDto.Builder dummyUpdateChapterInputDtoBuilder(UUID uuid) {
-        return UpdateChapterInputDto.builder()
+    private static UpdateChapterInput.Builder dummyUpdateChapterInputBuilder(UUID uuid) {
+        return UpdateChapterInput.builder()
                 .setId(uuid)
                 .setTitle("testTitle")
                 .setDescription("testDescription")
@@ -246,8 +246,8 @@ class ChapterServiceTest {
                 .setNumber(1);
     }
 
-    private static CreateChapterInputDto.Builder dummyCreateChapterInputDtoBuilder() {
-        return CreateChapterInputDto.builder()
+    private static CreateChapterInput.Builder dummyCreateChapterInputBuilder() {
+        return CreateChapterInput.builder()
                 .setTitle("testTitle")
                 .setDescription("testDescription")
                 .setStartDate(LocalDate.of(2021, 1, 1).atStartOfDay().atOffset(ZoneOffset.UTC))

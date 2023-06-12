@@ -35,13 +35,13 @@ public class CourseService {
     /**
      * Creates a course.
      *
-     * @param courseInputDto The data of the course to create.
+     * @param courseInput The data of the course to create.
      * @return The created course.
      */
-    public CourseDto createCourse(CreateCourseInputDto courseInputDto) {
-        courseValidator.validateCreateCourseInputDto(courseInputDto);
+    public Course createCourse(CreateCourseInput courseInput) {
+        courseValidator.validateCreateCourseInput(courseInput);
 
-        CourseEntity courseEntity = courseRepository.save(courseMapper.dtoToEntity(courseInputDto));
+        CourseEntity courseEntity = courseRepository.save(courseMapper.dtoToEntity(courseInput));
 
         return courseMapper.entityToDto(courseEntity);
     }
@@ -52,8 +52,8 @@ public class CourseService {
      * @param input The data of the course to update.
      * @return The updated course.
      */
-    public CourseDto updateCourse(UpdateCourseInputDto input) {
-        courseValidator.validateUpdateCourseInputDto(input);
+    public Course updateCourse(UpdateCourseInput input) {
+        courseValidator.validateUpdateCourseInput(input);
         requireCourseExisting(input.getId());
 
         CourseEntity updatedCourseEntity = courseRepository.save(courseMapper.dtoToEntity(input));
@@ -81,8 +81,8 @@ public class CourseService {
      * @return A list of courses with the given ids, preserving the order of the ids.
      * @throws EntityNotFoundException If a course with at least one of the given ids does not exist.
      */
-    public List<CourseDto> getCoursesByIds(List<UUID> ids) {
-        var result = new ArrayList<CourseDto>(ids.size());
+    public List<Course> getCoursesByIds(List<UUID> ids) {
+        var result = new ArrayList<Course>(ids.size());
         var missingIds = new ArrayList<UUID>();
 
         for (var id : ids) {
@@ -122,10 +122,10 @@ public class CourseService {
      * @param pagination    optional pagination
      * @return a list of all courses
      */
-    public CoursePayloadDto getCourses(CourseFilterDto filter,
-                                       List<String> sortBy,
-                                       List<SortDirectionDto> sortDirection,
-                                       PaginationDto pagination) {
+    public CoursePayload getCourses(CourseFilter filter,
+                                    List<String> sortBy,
+                                    List<SortDirection> sortDirection,
+                                    Pagination pagination) {
 
         Sort sort = SortUtil.createSort(sortBy, sortDirection);
         Pageable pageRequest = PaginationUtil.createPageable(pagination, sort);
@@ -134,19 +134,19 @@ public class CourseService {
 
         if (pageRequest.isPaged()) {
             Page<CourseEntity> result = courseRepository.findAll(specification, pageRequest);
-            return createCoursePayloadDtoPaged(result);
+            return createCoursePayloadPaged(result);
         }
 
         List<CourseEntity> result = courseRepository.findAll(specification, sort);
-        return createCoursePayloadDtoUnpaged(result);
+        return createCoursePayloadUnpaged(result);
     }
 
-    private CoursePayloadDto createCoursePayloadDtoPaged(Page<CourseEntity> result) {
-        return courseMapper.createPayloadDto(result.stream(), PaginationUtil.createPaginationInfoDto(result));
+    private CoursePayload createCoursePayloadPaged(Page<CourseEntity> result) {
+        return courseMapper.createPayload(result.stream(), PaginationUtil.createPaginationInfo(result));
     }
 
-    private CoursePayloadDto createCoursePayloadDtoUnpaged(List<CourseEntity> result) {
-        return courseMapper.createPayloadDto(result.stream(), PaginationUtil.unpagedPaginationInfoDto(result.size()));
+    private CoursePayload createCoursePayloadUnpaged(List<CourseEntity> result) {
+        return courseMapper.createPayload(result.stream(), PaginationUtil.unpagedPaginationInfo(result.size()));
     }
 
 }

@@ -42,8 +42,8 @@ public class ChapterService {
      * @return The created chapter.
      * @throws EntityNotFoundException If the course with the given id does not exist.
      */
-    public ChapterDto createChapter(CreateChapterInputDto chapterData) {
-        chapterValidator.validateCreateChapterInputDto(chapterData);
+    public Chapter createChapter(CreateChapterInput chapterData) {
+        chapterValidator.validateCreateChapterInput(chapterData);
         courseService.requireCourseExisting(chapterData.getCourseId());
 
         ChapterEntity chapterEntity = chapterMapper.dtoToEntity(chapterData);
@@ -58,8 +58,8 @@ public class ChapterService {
      * @param chapterData The data of the chapter to update.
      * @return The updated chapter.
      */
-    public ChapterDto updateChapter(UpdateChapterInputDto chapterData) {
-        chapterValidator.validateUpdateChapterInputDto(chapterData);
+    public Chapter updateChapter(UpdateChapterInput chapterData) {
+        chapterValidator.validateUpdateChapterInput(chapterData);
         requireChapterExisting(chapterData.getId());
 
         UUID courseID = chapterRepository.findById(chapterData.getId())
@@ -99,11 +99,11 @@ public class ChapterService {
         }
     }
 
-    public ChapterPayloadDto getChapters(UUID courseId,
-                                         @Nullable ChapterFilterDto filter,
-                                         List<String> sortBy,
-                                         List<SortDirectionDto> sortDirection,
-                                         @Nullable PaginationDto pagination) {
+    public ChapterPayload getChapters(UUID courseId,
+                                      @Nullable ChapterFilter filter,
+                                      List<String> sortBy,
+                                      List<SortDirection> sortDirection,
+                                      @Nullable Pagination pagination) {
         courseService.requireCourseExisting(courseId);
 
         Sort sort = SortUtil.createSort(sortBy, sortDirection);
@@ -114,20 +114,20 @@ public class ChapterService {
 
         if (pageRequest.isPaged()) {
             Page<ChapterEntity> result = chapterRepository.findAll(specification, pageRequest);
-            return createChapterPayloadDtoPaged(result);
+            return createChapterPayloadPaged(result);
         }
 
         List<ChapterEntity> result = chapterRepository.findAll(specification, sort);
-        return createChapterPayloadDtoUnpaged(result);
+        return createChapterPayloadUnpaged(result);
     }
 
-    private ChapterPayloadDto createChapterPayloadDtoPaged(Page<ChapterEntity> chapters) {
-        return chapterMapper.createChapterPayloadDto(chapters.stream(),
-                PaginationUtil.createPaginationInfoDto(chapters));
+    private ChapterPayload createChapterPayloadPaged(Page<ChapterEntity> chapters) {
+        return chapterMapper.createChapterPayload(chapters.stream(),
+                PaginationUtil.createPaginationInfo(chapters));
     }
 
-    private ChapterPayloadDto createChapterPayloadDtoUnpaged(List<ChapterEntity> chapters) {
-        return chapterMapper.createChapterPayloadDto(chapters.stream(),
-                PaginationUtil.unpagedPaginationInfoDto(chapters.size()));
+    private ChapterPayload createChapterPayloadUnpaged(List<ChapterEntity> chapters) {
+        return chapterMapper.createChapterPayload(chapters.stream(),
+                PaginationUtil.unpagedPaginationInfo(chapters.size()));
     }
 }

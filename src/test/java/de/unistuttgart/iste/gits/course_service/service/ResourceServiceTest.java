@@ -4,7 +4,7 @@ import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseResourceAssociationEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ResourceRepository;
-import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociationDto;
+import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociation;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -47,7 +47,7 @@ class ResourceServiceTest {
         List<CourseEntity> courseEntityList = List.of(courseEntity, anotherCourseEntity);
 
         // expected: two courses have the same resource
-        CourseResourceAssociationDto expectedDto = CourseResourceAssociationDto.builder()
+        CourseResourceAssociation expected = CourseResourceAssociation.builder()
                 .setId(resourceId)
                 .setAvailableCourses(List.of(courseEntityList.get(1).getId()))
                 .setUnAvailableCourses(List.of(courseEntityList.get(0).getId()))
@@ -59,10 +59,10 @@ class ResourceServiceTest {
         when(courseRepository.findAllById(any())).thenReturn(courseEntityList);
 
         //run method under test
-        List<CourseResourceAssociationDto> actualResult = resourceService.getCoursesByResourceId(List.of(resourceId));
+        List<CourseResourceAssociation> actualResult = resourceService.getCoursesByResourceId(List.of(resourceId));
 
         //compare result
-        assertEquals(expectedDto, actualResult.get(0));
+        assertEquals(expected, actualResult.get(0));
     }
 
     /**
@@ -88,7 +88,7 @@ class ResourceServiceTest {
         List<CourseEntity> courseEntityList = List.of(courseEntity, anotherCourseEntity);
 
         // expected: two courses share a resource.
-        CourseResourceAssociationDto expectedDto = CourseResourceAssociationDto.builder()
+        CourseResourceAssociation expected = CourseResourceAssociation.builder()
                 .setId(resourceId)
                 .setAvailableCourses(List.of(courseEntityList.get(1).getId()))
                 .setUnAvailableCourses(List.of(courseEntityList.get(0).getId()))
@@ -100,10 +100,10 @@ class ResourceServiceTest {
         when(courseRepository.findAllById(any())).thenReturn(courseEntityList);
 
         //run method under test
-        List<CourseResourceAssociationDto> actualResult = resourceService.getCoursesByResourceId(List.of(resourceId));
+        List<CourseResourceAssociation> actualResult = resourceService.getCoursesByResourceId(List.of(resourceId));
 
         //compare result
-        assertEquals(expectedDto, actualResult.get(0));
+        assertEquals(expected, actualResult.get(0));
     }
 
     // Builder methods used for creating entities

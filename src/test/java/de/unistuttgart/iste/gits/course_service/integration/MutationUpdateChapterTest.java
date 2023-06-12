@@ -5,7 +5,7 @@ import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.generated.dto.ChapterDto;
+import de.unistuttgart.iste.gits.generated.dto.Chapter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
@@ -39,7 +39,7 @@ class MutationUpdateChapterTest {
                 .endDate(OffsetDateTime.parse("2021-01-01T00:00:00.000Z"))
                 .published(false)
                 .build());
-        var chapter = chapterRepository.save(ChapterEntity.builder()
+        var chapterEntity = chapterRepository.save(ChapterEntity.builder()
                 .courseId(course.getId())
                 .title("Old Chapter")
                 .description("This is an old chapter")
@@ -67,18 +67,18 @@ class MutationUpdateChapterTest {
                         endDate
                         number
                     }
-                }""".formatted(chapter.getId());
+                }""".formatted(chapterEntity.getId());
 
         tester.document(query)
                 .execute()
                 .path("updateChapter")
-                .entity(ChapterDto.class)
-                .satisfies(chapterDto -> {
-                    assertThat(chapterDto.getTitle(), is("New Chapter"));
-                    assertThat(chapterDto.getDescription(), is("This is a new chapter"));
-                    assertThat(chapterDto.getStartDate(), is(OffsetDateTime.parse("2020-01-01T00:00:00.000Z")));
-                    assertThat(chapterDto.getEndDate(), is(OffsetDateTime.parse("2021-01-01T00:00:00.000Z")));
-                    assertThat(chapterDto.getNumber(), is(1));
+                .entity(Chapter.class)
+                .satisfies(chapter -> {
+                    assertThat(chapter.getTitle(), is("New Chapter"));
+                    assertThat(chapter.getDescription(), is("This is a new chapter"));
+                    assertThat(chapter.getStartDate(), is(OffsetDateTime.parse("2020-01-01T00:00:00.000Z")));
+                    assertThat(chapter.getEndDate(), is(OffsetDateTime.parse("2021-01-01T00:00:00.000Z")));
+                    assertThat(chapter.getNumber(), is(1));
                 });
 
         assertThat(chapterRepository.count(), is(1L));

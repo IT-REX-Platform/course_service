@@ -25,12 +25,12 @@ public class ChapterController {
 
 
     @MutationMapping
-    public ChapterDto createChapter(@Argument("input") CreateChapterInputDto input) {
+    public Chapter createChapter(@Argument("input") CreateChapterInput input) {
         return chapterService.createChapter(input);
     }
 
     @MutationMapping
-    public ChapterDto updateChapter(@Argument("input") UpdateChapterInputDto input) {
+    public Chapter updateChapter(@Argument("input") UpdateChapterInput input) {
         return chapterService.updateChapter(input);
     }
 
@@ -40,20 +40,20 @@ public class ChapterController {
     }
 
     @QueryMapping
-    public ChapterPayloadDto chapters(@Argument("courseId") UUID courseId,
-                                      @Argument("filter") @Nullable ChapterFilterDto filter,
-                                      @Argument("sortBy") List<String> sortBy,
-                                      @Argument("sortDirection") List<SortDirectionDto> sortDirection,
-                                      @Argument("pagination") @Nullable PaginationDto pagination) {
+    public ChapterPayload chapters(@Argument("courseId") UUID courseId,
+                                   @Argument("filter") @Nullable ChapterFilter filter,
+                                   @Argument("sortBy") List<String> sortBy,
+                                   @Argument("sortDirection") List<SortDirection> sortDirection,
+                                   @Argument("pagination") @Nullable Pagination pagination) {
         return chapterService.getChapters(courseId, filter, sortBy, sortDirection, pagination);
     }
 
     @SchemaMapping(typeName = "Course", field = "chapters")
-    public ChapterPayloadDto chapters(CourseDto courseDto,
-                                      @Argument("filter") @Nullable ChapterFilterDto filter,
-                                      @Argument("sortBy") List<String> sortBy,
-                                      @Argument("sortDirection") List<SortDirectionDto> sortDirection,
-                                      @Argument("pagination") @Nullable PaginationDto pagination) {
-        return chapterService.getChapters(courseDto.getId(), filter, sortBy, sortDirection, pagination);
+    public ChapterPayload chapters(Course course,
+                                   @Argument("filter") @Nullable ChapterFilter filter,
+                                   @Argument("sortBy") List<String> sortBy,
+                                   @Argument("sortDirection") List<SortDirection> sortDirection,
+                                   @Argument("pagination") @Nullable Pagination pagination) {
+        return chapterService.getChapters(course.getId(), filter, sortBy, sortDirection, pagination);
     }
 }

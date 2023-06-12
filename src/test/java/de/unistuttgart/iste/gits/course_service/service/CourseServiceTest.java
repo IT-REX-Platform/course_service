@@ -4,9 +4,9 @@ import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.mapper.CourseMapper;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.validation.CourseValidator;
-import de.unistuttgart.iste.gits.generated.dto.CourseDto;
-import de.unistuttgart.iste.gits.generated.dto.CreateCourseInputDto;
-import de.unistuttgart.iste.gits.generated.dto.UpdateCourseInputDto;
+import de.unistuttgart.iste.gits.generated.dto.Course;
+import de.unistuttgart.iste.gits.generated.dto.CreateCourseInput;
+import de.unistuttgart.iste.gits.generated.dto.UpdateCourseInput;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -34,14 +34,14 @@ class CourseServiceTest {
     private final CourseService courseService = new CourseService(courseRepository, courseMapper, courseValidator);
 
     /**
-     * Given a valid CreateCourseInputDto
+     * Given a valid CreateCourseInput
      * When createCourse is called
-     * Then a CourseDto is returned and the CourseRepository is called
+     * Then a Course is returned and the CourseRepository is called
      */
     @Test
     void testCreateCourseSuccessful() {
         // arrange
-        CreateCourseInputDto input = dummyCreateCourseInputDtoBuilder().build();
+        CreateCourseInput input = dummyCreateCourseInputBuilder().build();
         CourseEntity expectedCourseEntity = dummyCourseEntityBuilder().build();
 
         // mock repository
@@ -49,29 +49,29 @@ class CourseServiceTest {
                 .thenReturn(expectedCourseEntity);
 
         // act
-        CourseDto actualCourseDto = courseService.createCourse(input);
+        Course actualCourse = courseService.createCourse(input);
 
         // assert
-        assertThat(actualCourseDto.getId(), is(expectedCourseEntity.getId()));
-        assertThat(actualCourseDto.getTitle(), is(expectedCourseEntity.getTitle()));
-        assertThat(actualCourseDto.getDescription(), is(expectedCourseEntity.getDescription()));
-        assertThat(actualCourseDto.getStartDate(), is(expectedCourseEntity.getStartDate()));
-        assertThat(actualCourseDto.getEndDate(), is(expectedCourseEntity.getEndDate()));
+        assertThat(actualCourse.getId(), is(expectedCourseEntity.getId()));
+        assertThat(actualCourse.getTitle(), is(expectedCourseEntity.getTitle()));
+        assertThat(actualCourse.getDescription(), is(expectedCourseEntity.getDescription()));
+        assertThat(actualCourse.getStartDate(), is(expectedCourseEntity.getStartDate()));
+        assertThat(actualCourse.getEndDate(), is(expectedCourseEntity.getEndDate()));
 
         // verify
-        verify(courseValidator).validateCreateCourseInputDto(input);
+        verify(courseValidator).validateCreateCourseInput(input);
         verify(courseRepository, times(1)).save(any(CourseEntity.class));
     }
 
     /**
-     * Given a CreateCourseInputDto with a startDate after the endDate
+     * Given a CreateCourseInput with a startDate after the endDate
      * When createCourse is called
      * Then a ValidationException is thrown and the course is not saved
      */
     @Test
     void testCreateCourseStartDateAfterEndDate() {
         // arrange
-        CreateCourseInputDto input = dummyCreateCourseInputDtoBuilder()
+        CreateCourseInput input = dummyCreateCourseInputBuilder()
                 .setStartDate(OffsetDateTime.parse("2021-01-02T00:00:00Z"))
                 .setEndDate(OffsetDateTime.parse("2021-01-01T00:00:00Z"))
                 .build();
@@ -89,9 +89,9 @@ class CourseServiceTest {
     }
 
     /**
-     * Given a valid UpdateCourseInputDto
+     * Given a valid UpdateCourseInput
      * When updateCourse is called
-     * Then a CourseDto is returned and the CourseRepository is called
+     * Then a Course is returned and the CourseRepository is called
      */
     @Test
     void testUpdateCourseSuccessful() {
@@ -99,7 +99,7 @@ class CourseServiceTest {
         CourseEntity expectedCourseEntity = dummyCourseEntityBuilder()
                 .description("New description")
                 .build();
-        UpdateCourseInputDto input = dummyUpdateCourseInputDtoBuilder()
+        UpdateCourseInput input = dummyUpdateCourseInputBuilder()
                 .setId(expectedCourseEntity.getId())
                 .setDescription("New description")
                 .build();
@@ -111,29 +111,29 @@ class CourseServiceTest {
                 .when(courseRepository).existsById(any(UUID.class));
 
         // act
-        CourseDto actualCourseDto = courseService.updateCourse(input);
+        Course actualCourse = courseService.updateCourse(input);
 
         // assert
-        assertThat(actualCourseDto.getId(), is(expectedCourseEntity.getId()));
-        assertThat(actualCourseDto.getTitle(), is(expectedCourseEntity.getTitle()));
-        assertThat(actualCourseDto.getDescription(), is(expectedCourseEntity.getDescription()));
-        assertThat(actualCourseDto.getStartDate(), is(expectedCourseEntity.getStartDate()));
-        assertThat(actualCourseDto.getEndDate(), is(expectedCourseEntity.getEndDate()));
+        assertThat(actualCourse.getId(), is(expectedCourseEntity.getId()));
+        assertThat(actualCourse.getTitle(), is(expectedCourseEntity.getTitle()));
+        assertThat(actualCourse.getDescription(), is(expectedCourseEntity.getDescription()));
+        assertThat(actualCourse.getStartDate(), is(expectedCourseEntity.getStartDate()));
+        assertThat(actualCourse.getEndDate(), is(expectedCourseEntity.getEndDate()));
 
         // verify
-        verify(courseValidator).validateUpdateCourseInputDto(input);
+        verify(courseValidator).validateUpdateCourseInput(input);
         verify(courseRepository, times(1)).save(any(CourseEntity.class));
     }
 
     /**
-     * Given an UpdateCourseInputDto with a startDate after the endDate
+     * Given an UpdateCourseInput with a startDate after the endDate
      * When updateCourse is called
      * Then a ValidationException is thrown and the course is not saved
      */
     @Test
     void testUpdateCourseStartDateAfterEndDate() {
         // arrange
-        UpdateCourseInputDto input = dummyUpdateCourseInputDtoBuilder()
+        UpdateCourseInput input = dummyUpdateCourseInputBuilder()
                 .setStartDate(OffsetDateTime.parse("2021-01-02T00:00:00Z"))
                 .setEndDate(OffsetDateTime.parse("2021-01-01T00:00:00Z"))
                 .build();
@@ -232,8 +232,8 @@ class CourseServiceTest {
         verify(courseRepository).existsById(id);
     }
 
-    private CreateCourseInputDto.Builder dummyCreateCourseInputDtoBuilder() {
-        return CreateCourseInputDto.builder()
+    private CreateCourseInput.Builder dummyCreateCourseInputBuilder() {
+        return CreateCourseInput.builder()
                 .setTitle("title")
                 .setDescription("description")
                 .setStartDate(OffsetDateTime.parse("2021-01-01T00:00:00Z"))
@@ -249,8 +249,8 @@ class CourseServiceTest {
                 .endDate(OffsetDateTime.parse("2021-01-01T00:00:00Z"));
     }
 
-    private UpdateCourseInputDto.Builder dummyUpdateCourseInputDtoBuilder() {
-        return UpdateCourseInputDto.builder()
+    private UpdateCourseInput.Builder dummyUpdateCourseInputBuilder() {
+        return UpdateCourseInput.builder()
                 .setTitle("title")
                 .setDescription("description")
                 .setStartDate(OffsetDateTime.parse("2021-01-01T00:00:00Z"))
