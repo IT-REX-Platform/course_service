@@ -22,7 +22,7 @@ if (jacocoEnabled.toBoolean()) {
 
 sonarqube {
   properties {
-    property("sonar.projectKey", "IT-REX-Platform_content_service")
+    property("sonar.projectKey", "IT-REX-Platform_template-microservice")
     property("sonar.organization", "it-rex-platform")
     property("sonar.host.url", "https://sonarcloud.io")
   }
