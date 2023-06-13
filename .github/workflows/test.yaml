@@ -7,6 +7,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:        
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - name: Build the docker image
         run: docker-compose build
       - name: create the network
@@ -36,9 +38,10 @@ jobs:
           SPRING_DATASOURCE_URL: ${{ secrets.SPRING_DATASOURCE_URL }}
           SPRING_DATASOURCE_USERNAME: ${{ secrets.SPRING_DATASOURCE_USERNAME }}
           SPRING_DATASOURCE_PASSWORD: ${{ secrets.SPRING_DATASOURCE_PASSWORD }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          arguments: cleanTest test
+          arguments: cleanTest test jacocoTestReport sonar
 
   docker-build:
     runs-on: ubuntu-latest
