@@ -94,11 +94,11 @@ After cloning the repository, you need to do the following steps:
 
 
 After creating a new service you need to do the following:
-- [ ] Add the following to the repository secrets on Github
+- [ ] Add the following to the service repository secrets on Github
   - [ ] SPRING_DATASOURCE_URL  
   - [ ] SPRING_DATASOURCE_USERNAME
   - [ ] SPRING_DATASOURCE_PASSWORD
-- [ ] Add SONAR_TOKEN to the repository secrets on Github, this requires you to have admin permissions on sonarcloud 
+- [ ] Add SONAR_TOKEN to the service repository secrets on Github, this requires you to have admin permissions on sonarcloud 
 
 ### Pull new changes from this template
 
