@@ -92,6 +92,11 @@ After cloning the repository, you need to do the following steps:
 - [ ] Create a new database
 <!-- TODO there probably more TODOs -->
 
+
+After creating a new service you need to do the following:
+- [ ] Add SPRING_DATASOURCE_URL, SPRING_DATASOURCE_USERNAME, SPRING_DATASOURCE_PASSWORD to the repository secrets on Github
+- [ ] Add SONAR_TOKEN to the repository secrets on Github, this requires you to have admin permissions on sonarcloud 
+
 ### Pull new changes from this template
 
 If this template changes and you want to pull the changes to the actual microservice, you can run the following commands:
@@ -121,3 +126,5 @@ For further reference, please consider the following sections:
 * [Spring for GraphQL](https://docs.spring.io/spring-boot/docs/3.0.6/reference/html/web.html#web.graphql)
 * [Spring Data JPA](https://docs.spring.io/spring-boot/docs/3.0.6/reference/htmlsingle/#data.sql.jpa-and-spring-data)
 * [Validation](https://docs.spring.io/spring-boot/docs/3.0.6/reference/htmlsingle/#io.validation)
+* [Generating Sonarqube Token](https://docs.sonarqube.org/latest/user-guide/user-account/generating-and-using-tokens/)
+* [Adding secrets on Github](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
