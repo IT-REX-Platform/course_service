@@ -382,7 +382,7 @@ class MutationCreateChapterTest {
      * Then a validation error is returned
      */
     @Test
-    void testSuggestedEndDateBeforeEndDate(GraphQlTester tester) {
+    void testSuggestedEndDateAfterEndDate(GraphQlTester tester) {
         String query = """
                 mutation {
                     createChapter(
