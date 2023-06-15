@@ -242,4 +242,171 @@ class MutationCreateChapterTest {
                                          && responseError.getMessage()
                                                  .toLowerCase().contains("start date must be before end date"));
     }
+
+    /**
+     * Given a CreateChapterInput where the suggested start date is after the end date
+     * When the createChapter mutation is executed
+     * Then a validation error is returned
+     */
+    @Test
+    void testSuggestedStartDateAfterEndDate(GraphQlTester tester) {
+        String query = """
+                mutation {
+                    createChapter(
+                        input: {
+                            courseId: "00000000-0000-0000-0000-000000000000"
+                            title: "New Chapter"
+                            description: "This is a new chapter"
+                            startDate: "2021-01-01T00:00:00.000Z"
+                            endDate: "2021-01-02T00:00:00.000Z"
+                            suggestedStartDate: "2021-01-03T00:00:00.000Z"
+                            number: 1
+                        }
+                    ) {
+                        id
+                        title
+                    }
+                }""";
+
+        tester.document(query)
+                .execute()
+                .errors()
+                .expect(responseError -> responseError.getMessage() != null
+                        && responseError.getMessage()
+                        .toLowerCase().contains("suggested start date must be before end date"));
+    }
+
+    /**
+     * Given a CreateChapterInput where the suggested start date is after the suggested end date
+     * When the createChapter mutation is executed
+     * Then a validation error is returned
+     */
+    @Test
+    void testSuggestedStartDateAfterSuggestedEndDate(GraphQlTester tester) {
+        String query = """
+                mutation {
+                    createChapter(
+                        input: {
+                            courseId: "00000000-0000-0000-0000-000000000000"
+                            title: "New Chapter"
+                            description: "This is a new chapter"
+                            startDate: "2020-01-01T00:00:00.000Z"
+                            endDate: "2021-02-02T00:00:00.000Z"
+                            suggestedStartDate: "2021-01-03T00:00:00.000Z"
+                            suggestedEndDate: "2020-12-01T00:00:00.000Z"
+                            number: 1
+                        }
+                    ) {
+                        id
+                        title
+                    }
+                }""";
+
+        tester.document(query)
+                .execute()
+                .errors()
+                .expect(responseError -> responseError.getMessage() != null
+                        && responseError.getMessage()
+                        .toLowerCase().contains("suggested start date must be before suggested end date"));
+    }
+
+    /**
+     * Given a CreateChapterInput where the suggested start date is before the start date
+     * When the createChapter mutation is executed
+     * Then a validation error is returned
+     */
+    @Test
+    void testSuggestedStartDateBeforeStartDate(GraphQlTester tester) {
+        String query = """
+                mutation {
+                    createChapter(
+                        input: {
+                            courseId: "00000000-0000-0000-0000-000000000000"
+                            title: "New Chapter"
+                            description: "This is a new chapter"
+                            startDate: "2021-01-01T00:00:00.000Z"
+                            endDate: "2021-02-02T00:00:00.000Z"
+                            suggestedStartDate: "2020-01-03T00:00:00.000Z"
+                            number: 1
+                        }
+                    ) {
+                        id
+                        title
+                    }
+                }""";
+
+        tester.document(query)
+                .execute()
+                .errors()
+                .expect(responseError -> responseError.getMessage() != null
+                        && responseError.getMessage()
+                        .toLowerCase().contains("suggested start date must be after start date"));
+    }
+
+    /**
+     * Given a CreateChapterInput where the suggested end date is before the start date
+     * When the createChapter mutation is executed
+     * Then a validation error is returned
+     */
+    @Test
+    void testSuggestedEndDateBeforeStartDate(GraphQlTester tester) {
+        String query = """
+                mutation {
+                    createChapter(
+                        input: {
+                            courseId: "00000000-0000-0000-0000-000000000000"
+                            title: "New Chapter"
+                            description: "This is a new chapter"
+                            startDate: "2021-01-01T00:00:00.000Z"
+                            endDate: "2021-02-02T00:00:00.000Z"
+                            suggestedEndDate: "2020-01-03T00:00:00.000Z"
+                            number: 1
+                        }
+                    ) {
+                        id
+                        title
+                    }
+                }""";
+
+        tester.document(query)
+                .execute()
+                .errors()
+                .expect(responseError -> responseError.getMessage() != null
+                        && responseError.getMessage()
+                        .toLowerCase().contains("suggested end date must be after start date"));
+    }
+
+    /**
+     * Given a CreateChapterInput where the suggested end date is after the end date
+     * When the createChapter mutation is executed
+     * Then a validation error is returned
+     */
+    @Test
+    void testSuggestedEndDateAfterEndDate(GraphQlTester tester) {
+        String query = """
+                mutation {
+                    createChapter(
+                        input: {
+                            courseId: "00000000-0000-0000-0000-000000000000"
+                            title: "New Chapter"
+                            description: "This is a new chapter"
+                            startDate: "2021-01-01T00:00:00.000Z"
+                            endDate: "2021-01-02T00:00:00.000Z"
+                            suggestedEndDate: "2021-01-03T00:00:00.000Z"
+                            number: 1
+                        }
+                    ) {
+                        id
+                        title
+                    }
+                }""";
+
+        tester.document(query)
+                .execute()
+                .errors()
+                .expect(responseError -> responseError.getMessage() != null
+                        && responseError.getMessage()
+                        .toLowerCase().contains("suggested end date must be before end date"));
+    }
+
 }
