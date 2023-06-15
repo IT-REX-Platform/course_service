@@ -38,6 +38,12 @@ public class ChapterEntity {
     @Column(nullable = false)
     private OffsetDateTime endDate;
 
+    @Column
+    private OffsetDateTime suggestedStartDate;
+
+    @Column
+    private OffsetDateTime suggestedEndDate;
+
     @Column(nullable = false, name = "course_id")
     private UUID courseId;
 

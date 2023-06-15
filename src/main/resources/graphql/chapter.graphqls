@@ -27,6 +27,16 @@ type Chapter {
     """
     endDate: DateTime!
     """
+    Suggested Start date to start the chapter, ISO 8601 format.
+    Must be after Start Date and before the End dates.
+    """
+    suggestedStartDate: DateTime!
+    """
+    Suggested End date of the chapter, ISO 8601 format.
+    Must be after the Start Dates and before the End dates.
+    """
+    suggestedEndDate: DateTime!
+    """
     The course the chapter belongs to.
     """
     course: Course!
@@ -59,6 +69,16 @@ input CreateChapterInput {
     Must be after the start date.
     """
     endDate: DateTime!
+    """
+    Suggested Start date to start the chapter, ISO 8601 format.
+    Must be after Start Date and before the End dates.
+    """
+    suggestedStartDate: DateTime
+    """
+    Suggested End date of the chapter, ISO 8601 format.
+    Must be after the Start Dates and before the End dates.
+    """
+    suggestedEndDate: DateTime
     """
     ID of the course the chapter belongs to.
     Must be a UUID of an existing course.
@@ -97,6 +117,16 @@ input UpdateChapterInput {
     Must be after the start date.
     """
     endDate: DateTime!
+    """
+    Suggested Start date to start the chapter, ISO 8601 format.
+    Must be after Start Date and before the End dates.
+    """
+    suggestedStartDate: DateTime
+    """
+    Suggested End date of the chapter, ISO 8601 format.
+    Must be after the Start Dates and before the End dates.
+    """
+    suggestedEndDate: DateTime
 }
 
 input ChapterFilter {
@@ -105,6 +135,8 @@ input ChapterFilter {
     number: IntFilter
     startDate: DateTimeFilter
     endDate: DateTimeFilter
+    suggestedStartDate: DateTimeFilter
+    suggestedEndDate: DateTimeFilter
 
     and: [ChapterFilter!]
     or: [ChapterFilter!]

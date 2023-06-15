@@ -30,6 +30,8 @@ public class ChapterFilterSpecification {
                         stringFilter("description", filter.getDescription()),
                         dateTimeFilter("startDate", filter.getStartDate()),
                         dateTimeFilter("endDate", filter.getEndDate()),
+                        dateTimeFilter("suggestedStartDate", filter.getSuggestedStartDate()),
+                        dateTimeFilter("suggestedEndDate", filter.getSuggestedEndDate()),
                         intFilter("number", filter.getNumber()),
                         and(filter.getAnd(), ChapterFilterSpecification::chapterFilter),
                         not(filter.getNot(), ChapterFilterSpecification::chapterFilter))
