@@ -30,12 +30,12 @@ type Chapter {
     Suggested Start date to start the chapter, ISO 8601 format.
     Must be after Start Date and before the End dates.
     """
-    suggestedStartDate: DateTime!
+    suggestedStartDate: DateTime
     """
     Suggested End date of the chapter, ISO 8601 format.
     Must be after the Start Dates and before the End dates.
     """
-    suggestedEndDate: DateTime!
+    suggestedEndDate: DateTime
     """
     The course the chapter belongs to.
     """
