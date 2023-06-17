@@ -100,4 +100,4 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-tasks.withType(Test) { testLogging.showStandardStreams = true }
+tasks.withType(Test).configureEach { testLogging.showStandardStreams = true }
