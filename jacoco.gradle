@@ -1,0 +1,16 @@
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+test {
+    finalizedBy jacocoTestReport
+}
+
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled true
+        html.outputLocation = layout.buildDirectory.dir('jacocoHtml')
+    }
+}

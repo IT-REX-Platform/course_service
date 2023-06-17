@@ -83,6 +83,7 @@ After cloning the repository, you need to do the following steps:
 - [ ] Setup the gradle files correctly. This means
   - [ ] Change the project name in the `settings.gradle` file
   - [ ] Change the package name in the `build.gradle` file (there is a TODO comment)
+  - [ ] Change the sonar project key in the `build.gradle` file (should be IT-REX-Platform_repository_name)
   - [ ] Add/Remove dependencies in the `build.gradle` file
 - [ ] Rename the package in the `src/main/java` folder to  a more suitable name (should be the same as the package name in the `build.gradle` file)
 - [ ] Remove the package-info.java files in the `src/main/java` folder (or update with the microservice specific information)
@@ -91,6 +92,15 @@ After cloning the repository, you need to do the following steps:
 - [ ] Define the GraphQL schema in the `src/main/resources/schema.graphqls` file
 - [ ] Create a new database
 <!-- TODO there probably more TODOs -->
+
+
+After creating a new service you need to do the following:
+- [ ] Add the following to the service repository secrets on Github
+  - [ ] SPRING_DATASOURCE_URL  
+  - [ ] SPRING_DATASOURCE_USERNAME
+  - [ ] SPRING_DATASOURCE_PASSWORD
+- [ ] Add the repository to sonarcloud, follow the instructions for extra configuration, unselect automatic analysis and choose github actions, only the first step needs to be completed
+- [ ] Add SONAR_TOKEN to the service repository secrets on Github (this requires you to have admin permissions on sonarcloud) 
 
 ### Pull new changes from this template
 
@@ -121,3 +131,5 @@ For further reference, please consider the following sections:
 * [Spring for GraphQL](https://docs.spring.io/spring-boot/docs/3.0.6/reference/html/web.html#web.graphql)
 * [Spring Data JPA](https://docs.spring.io/spring-boot/docs/3.0.6/reference/htmlsingle/#data.sql.jpa-and-spring-data)
 * [Validation](https://docs.spring.io/spring-boot/docs/3.0.6/reference/htmlsingle/#io.validation)
+* [Generating Sonarqube Token](https://docs.sonarqube.org/latest/user-guide/user-account/generating-and-using-tokens/)
+* [Adding secrets on Github](https://docs.github.com/en/actions/security-guides/encrypted-secrets)

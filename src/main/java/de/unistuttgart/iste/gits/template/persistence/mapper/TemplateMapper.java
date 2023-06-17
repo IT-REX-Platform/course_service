@@ -1,6 +1,6 @@
 package de.unistuttgart.iste.gits.template.persistence.mapper;
 
-import de.unistuttgart.iste.gits.generated.dto.TemplateDto;
+import de.unistuttgart.iste.gits.generated.dto.Template;
 import de.unistuttgart.iste.gits.template.persistence.dao.TemplateEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -12,13 +12,13 @@ public class TemplateMapper {
 
     private final ModelMapper modelMapper;
 
-    public TemplateDto entityToDto(TemplateEntity templateEntity) {
+    public Template entityToDto(TemplateEntity templateEntity) {
         // add specific mapping here if needed
-        return modelMapper.map(templateEntity, TemplateDto.class);
+        return modelMapper.map(templateEntity, Template.class);
     }
 
-    public TemplateEntity dtoToEntity(TemplateDto templateDto) {
+    public TemplateEntity dtoToEntity(Template template) {
         // add specific mapping here if needed
-        return modelMapper.map(templateDto, TemplateEntity.class);
+        return modelMapper.map(template, TemplateEntity.class);
     }
 }
