@@ -3,7 +3,7 @@ name: Testing CI pipeline
 on: push
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
