@@ -15,19 +15,6 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=templatedatabase
-  testDb:
-    image: postgres:alpine
-    restart: always
-    expose:
-      - 1033
-    ports:
-      - "1033:5432"
-    volumes:
-      - testdata:/var/lib/postgresql/testdata
-    environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=test_data
   app-template:
     build:
       context: ./../template-microservice # necessary because otherwise docker-compose overrides the context path when merging multiple docker-compose.yml files
