@@ -14,19 +14,6 @@ services:
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
       - POSTGRES_DB=course_service
-  testDb:
-    image: postgres:alpine
-    restart: always
-    expose:
-      - 1033
-    ports:
-      - "1033:5432"
-    volumes:
-      - testdata:/var/lib/postgresql/testdata
-    environment:
-      - POSTGRES_USER=root
-      - POSTGRES_PASSWORD=root
-      - POSTGRES_DB=test_data
   app-course:
     build:
       context: ./../course_service
