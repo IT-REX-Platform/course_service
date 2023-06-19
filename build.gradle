@@ -1,10 +1,10 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.0.6'
-	id 'io.spring.dependency-management' version '1.1.0'
-	id "io.github.kobylynskyi.graphql.codegen" version "5.7.2"
-	id "org.sonarqube" version "4.0.0.2929"
-	id "jacoco"
+    id 'java'
+    id 'org.springframework.boot' version '3.0.6'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id "io.github.kobylynskyi.graphql.codegen" version "5.7.2"
+    id "org.sonarqube" version "4.0.0.2929"
+    id "jacoco"
     id 'com.adarshr.test-logger' version '3.2.0'
 }
 
@@ -16,38 +16,38 @@ def jacocoEnabled = System.properties.getProperty("jacocoEnabled") ?: "true"
 
 // Apply JaCoCo settings only if jacaco is enable
 if (jacocoEnabled.toBoolean()) {
-	project.logger.lifecycle('Applying jacoco settings from jacoco.gradle')
-	apply from: rootProject.file("jacoco.gradle")
+    project.logger.lifecycle('Applying jacoco settings from jacoco.gradle')
+    apply from: rootProject.file("jacoco.gradle")
 }
 
 sonarqube {
-  properties {
-    property("sonar.projectKey", "IT-REX-Platform_course_service")
-    property("sonar.organization", "it-rex-platform")
-    property("sonar.host.url", "https://sonarcloud.io")
-  }
+    properties {
+        property("sonar.projectKey", "IT-REX-Platform_course_service")
+        property("sonar.organization", "it-rex-platform")
+        property("sonar.host.url", "https://sonarcloud.io")
+    }
 
 }
 
 // Automatically generate DTOs from GraphQL schema:
 graphqlCodegen {
-	// all config options:
-	// https://github.com/kobylynskyi/graphql-java-codegen/blob/main/docs/codegen-options.md
-	outputDir = new File("$buildDir/generated")
-	packageName = "de.unistuttgart.iste.gits.generated.dto"
-	generatedAnnotation = "jakarta.annotation.Generated"
-	modelValidationAnnotation = "jakarta.validation.constraints.NotNull"
-	generateApis = false // set to false as the generator does not support spring boot graphQL
-	customTypesMapping = [
-			"DateTime" : "java.time.OffsetDateTime",
-			"Date"     : "java.time.LocalDate",
-			"Time"     : "java.time.OffsetTime",
-			"LocalTime": "java.time.LocalTime",
-			"UUID"     : "java.util.UUID",
-			"Url"      : "java.net.URL",
-	]
-	generateEqualsAndHashCode = true
-	generateToString = true
+    // all config options:
+    // https://github.com/kobylynskyi/graphql-java-codegen/blob/main/docs/codegen-options.md
+    outputDir = new File("$buildDir/generated")
+    packageName = "de.unistuttgart.iste.gits.generated.dto"
+    generatedAnnotation = "jakarta.annotation.Generated"
+    modelValidationAnnotation = "jakarta.validation.constraints.NotNull"
+    generateApis = false // set to false as the generator does not support spring boot graphQL
+    customTypesMapping = [
+            "DateTime" : "java.time.OffsetDateTime",
+            "Date"     : "java.time.LocalDate",
+            "Time"     : "java.time.OffsetTime",
+            "LocalTime": "java.time.LocalTime",
+            "UUID"     : "java.util.UUID",
+            "Url"      : "java.net.URL",
+    ]
+    generateEqualsAndHashCode = true
+    generateToString = true
 }
 
 // Automatically generate GraphQL code on project build:
@@ -95,8 +95,8 @@ dependencies {
     testImplementation 'org.springframework.graphql:spring-graphql-test'
     testImplementation "org.mockito:mockito-core:3.+"
     testImplementation 'org.hamcrest:hamcrest:2.+'
-	testImplementation "org.testcontainers:postgresql:1.18.3"
-	testImplementation "org.testcontainers:junit-jupiter:1.18.3"
+    testImplementation "org.testcontainers:postgresql:1.18.3"
+    testImplementation "org.testcontainers:junit-jupiter:1.18.3"
 }
 
 tasks.named('test') {
