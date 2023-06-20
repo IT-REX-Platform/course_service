@@ -8,15 +8,11 @@ import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseResourceAs
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ResourceRepository;
-import de.unistuttgart.iste.gits.generated.dto.Course;
 import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociation;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
