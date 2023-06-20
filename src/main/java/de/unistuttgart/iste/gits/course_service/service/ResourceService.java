@@ -1,7 +1,11 @@
 package de.unistuttgart.iste.gits.course_service.service;
 
+import de.unistuttgart.iste.gits.common.dapr.CourseAssociationDTO;
+import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseResourceAssociationEntity;
+import de.unistuttgart.iste.gits.course_service.persistence.dao.ResourcePk;
+import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ResourceRepository;
 import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociation;
@@ -22,6 +26,7 @@ public class ResourceService {
 
     private final ResourceRepository resourceRepository;
     private final CourseRepository courseRepository;
+    private final ChapterRepository chapterRepository;
 
     /**
      * Method that returns a List of all courses, with the availability of that resource grouped by a resource.
@@ -96,5 +101,44 @@ public class ResourceService {
             return courseEntity.getStartDate().isBefore(currentTime) && courseEntity.getEndDate().isAfter(currentTime);
 
         return false;
+    }
+
+    /**
+     * Creates & Deletes Course-Resource Associations depending on input data
+     * @param dto Association description including CRUD Operation to be performed on Association
+     */
+    public void updateResourceAssociations(CourseAssociationDTO dto){
+
+        // completeness check of input
+        if (dto.getResourceId() == null || dto.getChapterId() == null || dto.getOperation() == null){
+            throw new NullPointerException("incomplete message received: all fields of a message must be non-null");
+        }
+
+        // retrieve the course Entity by the Chapter ID
+        ChapterEntity chapterEntity = chapterRepository.findById(dto.getChapterId()).orElseThrow();
+
+        CourseEntity courseEntity = courseRepository.findCourseEntityByChaptersContaining(chapterEntity).orElseThrow();
+
+
+        ResourcePk primary =  ResourcePk.builder().resourceId(dto.getResourceId()).courseId(courseEntity.getId()).build();
+
+        switch (dto.getOperation()){
+            case CREATE:
+                if (!resourceRepository.existsById(primary)){
+                    resourceRepository.save(CourseResourceAssociationEntity.builder()
+                            .resourceId(dto.getResourceId())
+                            .courseId(courseEntity.getId())
+                            .build());
+                }
+                break;
+            case DELETE:
+                if (resourceRepository.existsById(primary)) {
+                    resourceRepository.deleteById(primary);
+                }
+                break;
+            default:
+                // do nothing
+        }
+
     }
 }

@@ -23,6 +23,7 @@ public class ResourceController {
 
     @QueryMapping
     public List<CourseResourceAssociation> resourceById(@Argument(name = "ids") List<UUID> ids) {
+        log.info("received topic message");
         return resourceService.getCoursesByResourceId(ids);
     }
 }
