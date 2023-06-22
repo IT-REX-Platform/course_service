@@ -1,5 +1,6 @@
 package de.unistuttgart.iste.gits.course_service.integration;
 
+import de.unistuttgart.iste.gits.common.testutil.GitsPostgresSqlContainer;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
@@ -13,6 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -23,6 +26,9 @@ import java.util.stream.Stream;
  */
 @GraphQlApiTest
 class QueryChaptersTest {
+
+    @Container
+    public static PostgreSQLContainer<GitsPostgresSqlContainer> postgreSQLContainer = GitsPostgresSqlContainer.getInstance();
 
     @Autowired
     private ChapterRepository chapterRepository;
