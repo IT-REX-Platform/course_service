@@ -122,7 +122,7 @@ class ResourceServiceTest {
 
         courseEntity.setChapters(List.of(chapterEntity));
 
-        CourseAssociationDTO dto = CourseAssociationDTO.builder().chapterId(chapterEntity.getId()).resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
+        CourseAssociationDTO dto = CourseAssociationDTO.builder().chapterIds(List.of(chapterEntity.getId())).resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
 
 
         //mock repositories
@@ -140,12 +140,12 @@ class ResourceServiceTest {
         //init
         UUID chapterId = UUID.randomUUID();
         ChapterEntity chapterEntity = dummyChapterEntityBuilder(chapterId).build();
-        CourseAssociationDTO missingDbCourseEntity = CourseAssociationDTO.builder().chapterId(chapterId).resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
-        CourseAssociationDTO missingDbChapterEntity = CourseAssociationDTO.builder().chapterId(UUID.randomUUID()).resourceId(UUID.randomUUID()).operation(CrudOperation.DELETE).build();
+        CourseAssociationDTO missingDbCourseEntity = CourseAssociationDTO.builder().chapterIds(List.of(chapterId)).resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
+        CourseAssociationDTO missingDbChapterEntity = CourseAssociationDTO.builder().chapterIds(List.of(UUID.randomUUID())).resourceId(UUID.randomUUID()).operation(CrudOperation.DELETE).build();
 
         CourseAssociationDTO missingChapter = CourseAssociationDTO.builder().resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
-        CourseAssociationDTO missingResource = CourseAssociationDTO.builder().chapterId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
-        CourseAssociationDTO missingOperator = CourseAssociationDTO.builder().chapterId(UUID.randomUUID()).resourceId(UUID.randomUUID()).build();
+        CourseAssociationDTO missingResource = CourseAssociationDTO.builder().chapterIds(List.of(UUID.randomUUID())).operation(CrudOperation.CREATE).build();
+        CourseAssociationDTO missingOperator = CourseAssociationDTO.builder().chapterIds(List.of(UUID.randomUUID())).resourceId(UUID.randomUUID()).build();
 
         // mock repository
         when(chapterRepository.findById(chapterId))
@@ -153,8 +153,8 @@ class ResourceServiceTest {
 
         // act and assert
         // case: chapter or course does not exist
-        assertThrows(NoSuchElementException.class, () -> resourceService.updateResourceAssociations(missingDbChapterEntity));
-        assertThrows(NoSuchElementException.class, () -> resourceService.updateResourceAssociations(missingDbCourseEntity));
+        assertDoesNotThrow(() -> resourceService.updateResourceAssociations(missingDbChapterEntity));
+        assertDoesNotThrow(() -> resourceService.updateResourceAssociations(missingDbCourseEntity));
 
         // case: incomplete DTO
         assertThrows(NullPointerException.class, () -> resourceService.updateResourceAssociations(missingChapter));
