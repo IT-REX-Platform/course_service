@@ -1,7 +1,12 @@
 package de.unistuttgart.iste.gits.course_service.service;
 
+import de.unistuttgart.iste.gits.common.dapr.CourseAssociationDTO;
+import de.unistuttgart.iste.gits.common.dapr.CrudOperation;
+import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseResourceAssociationEntity;
+import de.unistuttgart.iste.gits.course_service.persistence.dao.ResourcePk;
+import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ResourceRepository;
 import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociation;
@@ -22,6 +27,7 @@ public class ResourceService {
 
     private final ResourceRepository resourceRepository;
     private final CourseRepository courseRepository;
+    private final ChapterRepository chapterRepository;
 
     /**
      * Method that returns a List of all courses, with the availability of that resource grouped by a resource.
@@ -96,5 +102,73 @@ public class ResourceService {
             return courseEntity.getStartDate().isBefore(currentTime) && courseEntity.getEndDate().isAfter(currentTime);
 
         return false;
+    }
+
+    /**
+     * Creates & Deletes Course-Resource Associations depending on input data
+     * @param dto Association description including CRUD Operation to be performed on Association
+     */
+    public void updateResourceAssociations(CourseAssociationDTO dto){
+
+        List<CourseResourceAssociationEntity> currentAssociations;
+        List<CourseResourceAssociationEntity> dtoAssociations = new ArrayList<>();
+
+        // completeness check of input
+        if (dto.getResourceId() == null || dto.getChapterIds() == null || dto.getOperation() == null){
+            throw new NullPointerException("incomplete message received: all fields of a message must be non-null");
+        }
+
+        for (UUID chapterId: dto.getChapterIds()) {
+            ChapterEntity chapterEntity;
+            CourseEntity courseEntity;
+
+            try {
+                // retrieve the course Entity by the Chapter ID
+                chapterEntity = chapterRepository.findById(chapterId).orElseThrow();
+
+                courseEntity = courseRepository.findCourseEntityByChaptersContaining(chapterEntity).orElseThrow();
+            }catch (Exception e){
+                continue;
+            }
+
+            ResourcePk primary =  ResourcePk.builder().resourceId(dto.getResourceId()).courseId(courseEntity.getId()).build();
+
+            switch (dto.getOperation()){
+                case CREATE:
+                    if (!resourceRepository.existsById(primary)){
+                        resourceRepository.save(CourseResourceAssociationEntity.builder()
+                                .resourceId(dto.getResourceId())
+                                .courseId(courseEntity.getId())
+                                .build());
+                    }
+                    break;
+                case UPDATE:
+                    CourseResourceAssociationEntity entity = CourseResourceAssociationEntity.builder()
+                            .resourceId(dto.getResourceId())
+                            .courseId(courseEntity.getId())
+                            .build();
+                    // skip adding if already entity exists in database
+                    if (!resourceRepository.existsById(primary)){
+                        resourceRepository.save(entity);
+                    }
+                    dtoAssociations.add(entity);
+                    break;
+                case DELETE:
+                    if (resourceRepository.existsById(primary)) {
+                        resourceRepository.deleteById(primary);
+                    }
+                    break;
+                default:
+                    // do nothing
+            }
+
+            // in UPDATES multiple associations can be added or removed. here we remove all outdated associations
+            if (dto.getOperation().equals(CrudOperation.UPDATE)){
+                currentAssociations = resourceRepository.findResourceEntitiesByResourceIdOrderByCourseIdAsc(dto.getResourceId());
+                // remove resource associations that are not part of the updated associations
+                currentAssociations.stream().filter(entity -> !dtoAssociations.contains(entity)).forEach(resourceRepository::delete);
+            }
+
+        }
     }
 }

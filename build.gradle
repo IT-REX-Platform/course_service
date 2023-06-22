@@ -80,6 +80,8 @@ dependencies {
     implementation 'org.modelmapper:modelmapper:3.+'
     implementation 'com.graphql-java:graphql-java-extended-scalars:20.0'
     implementation 'com.graphql-java:graphql-java-extended-validation:20.0'
+    implementation 'io.dapr:dapr-sdk:1.9.0' // Dapr's core SDK with all features, except Actors.
+    implementation 'io.dapr:dapr-sdk-springboot:1.9.0' // Dapr's SDK integration with SpringBoot
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'org.postgresql:postgresql'
