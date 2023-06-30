@@ -1,7 +1,7 @@
 package de.unistuttgart.iste.gits.course_service.service;
 
-import de.unistuttgart.iste.gits.common.dapr.CourseAssociationDTO;
-import de.unistuttgart.iste.gits.common.dapr.CrudOperation;
+import de.unistuttgart.iste.gits.common.event.CourseAssociationEvent;
+import de.unistuttgart.iste.gits.common.event.CrudOperation;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseResourceAssociationEntity;
@@ -122,7 +122,7 @@ class ResourceServiceTest {
 
         courseEntity.setChapters(List.of(chapterEntity));
 
-        CourseAssociationDTO dto = CourseAssociationDTO.builder().chapterIds(List.of(chapterEntity.getId())).resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
+        CourseAssociationEvent dto = CourseAssociationEvent.builder().chapterIds(List.of(chapterEntity.getId())).resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
 
 
         //mock repositories
@@ -140,12 +140,12 @@ class ResourceServiceTest {
         //init
         UUID chapterId = UUID.randomUUID();
         ChapterEntity chapterEntity = dummyChapterEntityBuilder(chapterId).build();
-        CourseAssociationDTO missingDbCourseEntity = CourseAssociationDTO.builder().chapterIds(List.of(chapterId)).resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
-        CourseAssociationDTO missingDbChapterEntity = CourseAssociationDTO.builder().chapterIds(List.of(UUID.randomUUID())).resourceId(UUID.randomUUID()).operation(CrudOperation.DELETE).build();
+        CourseAssociationEvent missingDbCourseEntity = CourseAssociationEvent.builder().chapterIds(List.of(chapterId)).resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
+        CourseAssociationEvent missingDbChapterEntity = CourseAssociationEvent.builder().chapterIds(List.of(UUID.randomUUID())).resourceId(UUID.randomUUID()).operation(CrudOperation.DELETE).build();
 
-        CourseAssociationDTO missingChapter = CourseAssociationDTO.builder().resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
-        CourseAssociationDTO missingResource = CourseAssociationDTO.builder().chapterIds(List.of(UUID.randomUUID())).operation(CrudOperation.CREATE).build();
-        CourseAssociationDTO missingOperator = CourseAssociationDTO.builder().chapterIds(List.of(UUID.randomUUID())).resourceId(UUID.randomUUID()).build();
+        CourseAssociationEvent missingChapter = CourseAssociationEvent.builder().resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
+        CourseAssociationEvent missingResource = CourseAssociationEvent.builder().chapterIds(List.of(UUID.randomUUID())).operation(CrudOperation.CREATE).build();
+        CourseAssociationEvent missingOperator = CourseAssociationEvent.builder().chapterIds(List.of(UUID.randomUUID())).resourceId(UUID.randomUUID()).build();
 
         // mock repository
         when(chapterRepository.findById(chapterId))

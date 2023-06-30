@@ -1,6 +1,6 @@
 package de.unistuttgart.iste.gits.course_service.controller;
 
-import de.unistuttgart.iste.gits.common.dapr.CourseAssociationDTO;
+import de.unistuttgart.iste.gits.common.event.CourseAssociationEvent;
 import de.unistuttgart.iste.gits.course_service.service.ResourceService;
 import io.dapr.Topic;
 import io.dapr.client.domain.CloudEvent;
@@ -28,7 +28,7 @@ public class SubscriptionController {
 
     @Topic(name = "resource-association", pubsubName = "gits")
     @PostMapping(path = "/course-service/resource-association-pubsub")
-    public Mono<Void> updateAssociation(@RequestBody(required = false) CloudEvent<CourseAssociationDTO> cloudEvent, @RequestHeader Map<String, String> headers){
+    public Mono<Void> updateAssociation(@RequestBody(required = false) CloudEvent<CourseAssociationEvent> cloudEvent, @RequestHeader Map<String, String> headers){
 
             return Mono.fromRunnable( () -> resourceService.updateResourceAssociations(cloudEvent.getData()));
     }
