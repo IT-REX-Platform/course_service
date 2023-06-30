@@ -1,7 +1,7 @@
 package de.unistuttgart.iste.gits.course_service.service;
 
-import de.unistuttgart.iste.gits.common.dapr.CourseAssociationDTO;
-import de.unistuttgart.iste.gits.common.dapr.CrudOperation;
+import de.unistuttgart.iste.gits.common.event.CourseAssociationEvent;
+import de.unistuttgart.iste.gits.common.event.CrudOperation;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseResourceAssociationEntity;
@@ -108,7 +108,7 @@ public class ResourceService {
      * Creates & Deletes Course-Resource Associations depending on input data
      * @param dto Association description including CRUD Operation to be performed on Association
      */
-    public void updateResourceAssociations(CourseAssociationDTO dto){
+    public void updateResourceAssociations(CourseAssociationEvent dto){
 
         List<CourseResourceAssociationEntity> currentAssociations;
         List<CourseResourceAssociationEntity> dtoAssociations = new ArrayList<>();
