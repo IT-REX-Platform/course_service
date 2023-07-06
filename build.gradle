@@ -46,6 +46,9 @@ graphqlCodegen {
             "UUID"     : "java.util.UUID",
             "Url"      : "java.net.URL",
     ]
+    graphqlSchemas {
+        rootDir = new File("$projectDir/src/main/resources/graphql/service")
+    }
     generateEqualsAndHashCode = true
     generateToString = true
 }
