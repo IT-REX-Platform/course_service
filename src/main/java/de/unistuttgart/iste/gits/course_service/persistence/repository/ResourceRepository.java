@@ -15,9 +15,9 @@ import java.util.UUID;
 @Repository
 public interface ResourceRepository extends JpaRepository<CourseResourceAssociationEntity, ResourcePk>, JpaSpecificationExecutor<CourseResourceAssociationEntity> {
 
-    /** Hibernate Query. ORDERED BY ResourceKey ASC
+    /** Hibernate Query. ORDERED BY Course ID ASC
      * @param resourceId resource ID
      * @return a List of Resources for a resource ID
      */
-    List<CourseResourceAssociationEntity> findResourceEntitiesByResourceIdOrderByCourseIdAsc(UUID resourceId);
+    List<CourseResourceAssociationEntity> findCourseResourceAssociationEntitiesByResourceIdOrderByCourseIdAsc(UUID resourceId);
 }

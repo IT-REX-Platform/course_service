@@ -1,5 +1,8 @@
 package de.unistuttgart.iste.gits.course_service.service;
 
+import de.unistuttgart.iste.gits.common.event.CrudOperation;
+import de.unistuttgart.iste.gits.course_service.dapr.TopicPublisher;
+import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.mapper.CourseMapper;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
@@ -14,6 +17,7 @@ import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -31,7 +35,8 @@ class CourseServiceTest {
     private final CourseRepository courseRepository = Mockito.mock(CourseRepository.class);
     private final CourseMapper courseMapper = new CourseMapper(new ModelMapper());
     private final CourseValidator courseValidator = Mockito.spy(CourseValidator.class);
-    private final CourseService courseService = new CourseService(courseRepository, courseMapper, courseValidator);
+    private final TopicPublisher topicPublisher = Mockito.mock(TopicPublisher.class);
+    private final CourseService courseService = new CourseService(courseRepository, courseMapper, courseValidator, topicPublisher);
 
     /**
      * Given a valid CreateCourseInput
@@ -158,19 +163,29 @@ class CourseServiceTest {
     @Test
     void testDeleteCourseSuccessful() {
         // arrange
-        UUID id = UUID.randomUUID();
+        CourseEntity entity = dummyCourseEntityBuilder().build();
+
+
 
         // mock repository
-        doReturn(true).when(courseRepository).existsById(id);
+        doReturn(true).when(courseRepository).existsById(entity.getId());
+        when(courseRepository.getReferenceById(entity.getId())).thenReturn(entity);
+        entity.setChapters(List.of(dummyChapterBuilder(entity.getId()), dummyChapterBuilder(entity.getId())));
 
         // act
-        UUID actualId = courseService.deleteCourse(id);
+        UUID actualId = courseService.deleteCourse(entity.getId());
 
         // assert
-        assertThat(actualId, is(id));
+        assertThat(actualId, is(entity.getId()));
 
         // verify
-        verify(courseRepository).deleteById(id);
+        verify(courseRepository).delete(entity);
+        verify(topicPublisher).notifyCourseChanges(entity.getId(), CrudOperation.DELETE);
+        verify(topicPublisher).notifyChapterChanges(entity.getChapters()
+                .stream()
+                .map(ChapterEntity::getId)
+                .toList(), CrudOperation.DELETE);
+
     }
 
     /**
@@ -255,5 +270,19 @@ class CourseServiceTest {
                 .setDescription("description")
                 .setStartDate(OffsetDateTime.parse("2021-01-01T00:00:00Z"))
                 .setEndDate(OffsetDateTime.parse("2021-01-01T00:00:00Z"));
+    }
+
+    private ChapterEntity dummyChapterBuilder(UUID courseId){
+        return ChapterEntity.builder()
+                .id(UUID.randomUUID())
+                .courseId(courseId)
+                .description("TestChapter")
+                .title("Test")
+                .number(1)
+                .startDate(OffsetDateTime.now())
+                .endDate(OffsetDateTime.now())
+                .suggestedStartDate(OffsetDateTime.now())
+                .suggestedEndDate(OffsetDateTime.now())
+                .build();
     }
 }

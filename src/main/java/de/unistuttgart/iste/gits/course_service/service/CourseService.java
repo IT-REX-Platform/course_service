@@ -1,7 +1,10 @@
 package de.unistuttgart.iste.gits.course_service.service;
 
+import de.unistuttgart.iste.gits.common.event.CrudOperation;
 import de.unistuttgart.iste.gits.common.util.PaginationUtil;
 import de.unistuttgart.iste.gits.common.util.SortUtil;
+import de.unistuttgart.iste.gits.course_service.dapr.TopicPublisher;
+import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.mapper.CourseMapper;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
@@ -31,6 +34,7 @@ public class CourseService {
     private final CourseRepository courseRepository;
     private final CourseMapper courseMapper;
     private final CourseValidator courseValidator;
+    private final TopicPublisher topicPublisher;
 
     /**
      * Creates a course.
@@ -70,7 +74,18 @@ public class CourseService {
      */
     public UUID deleteCourse(UUID uuid) {
         requireCourseExisting(uuid);
-        courseRepository.deleteById(uuid);
+
+        //collect chapters that would be deleted with the course due to cascading deletion
+        CourseEntity entity = courseRepository.getReferenceById(uuid);
+        List<UUID> chapterIds = entity.getChapters().stream().map(ChapterEntity::getId).toList();
+
+        //delete course and any chapters
+        courseRepository.delete(entity);
+
+        //publish changes
+        topicPublisher.notifyCourseChanges(uuid, CrudOperation.DELETE);
+        topicPublisher.notifyChapterChanges(chapterIds, CrudOperation.DELETE);
+
         return uuid;
     }
 

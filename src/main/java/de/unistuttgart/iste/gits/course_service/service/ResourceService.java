@@ -11,16 +11,19 @@ import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRep
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ResourceRepository;
 import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociation;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 /**
  * Service that takes care of all operations regarding resources of a course.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ResourceService {
@@ -44,7 +47,7 @@ public class ResourceService {
 
         for (UUID resourceId : resourceIds) {
             //retrieve all resource entities for a resource ID
-            resourceEntities = resourceRepository.findResourceEntitiesByResourceIdOrderByCourseIdAsc(resourceId);
+            resourceEntities = resourceRepository.findCourseResourceAssociationEntitiesByResourceIdOrderByCourseIdAsc(resourceId);
 
             //skip if resource ID does not exist
             if (resourceEntities == null || resourceEntities.isEmpty())
@@ -55,7 +58,7 @@ public class ResourceService {
             courseEntities = courseRepository.findAllById(
                     resourceEntities.stream().map(
                             CourseResourceAssociationEntity::getCourseId
-            ).toList());
+                    ).toList());
 
             resultList.add(createResourceDTO(resourceId, courseEntities));
         }
@@ -91,11 +94,12 @@ public class ResourceService {
 
     /**
      * Helper function to check if a resource is available in a course
+     *
      * @param courseEntity a course Entity
-     * @param currentTime time stamp
+     * @param currentTime  time stamp
      * @return a resource's availability
      */
-    private boolean isAvailable(CourseEntity courseEntity, OffsetDateTime currentTime){
+    private boolean isAvailable(CourseEntity courseEntity, OffsetDateTime currentTime) {
         //1st check: course is published
         if (courseEntity.isPublished())
             //2nd check: the course has already started but has not ended yet
@@ -106,69 +110,99 @@ public class ResourceService {
 
     /**
      * Creates & Deletes Course-Resource Associations depending on input data
+     *
      * @param dto Association description including CRUD Operation to be performed on Association
      */
-    public void updateResourceAssociations(CourseAssociationEvent dto){
+    public void updateResourceAssociations(CourseAssociationEvent dto) {
 
         List<CourseResourceAssociationEntity> currentAssociations;
         List<CourseResourceAssociationEntity> dtoAssociations = new ArrayList<>();
 
         // completeness check of input
-        if (dto.getResourceId() == null || dto.getChapterIds() == null || dto.getOperation() == null){
+        if (dto.getResourceId() == null || dto.getChapterIds() == null || dto.getOperation() == null) {
             throw new NullPointerException("incomplete message received: all fields of a message must be non-null");
         }
 
-        for (UUID chapterId: dto.getChapterIds()) {
-            ChapterEntity chapterEntity;
-            CourseEntity courseEntity;
+        // perform operation for each Chapter ID
+        for (UUID chapterId : dto.getChapterIds()) {
 
+            CourseResourceAssociationEntity resourceAssociationEntity;
+
+            ResourcePk primary = ResourcePk.builder()
+                    .resourceId(dto.getResourceId())
+                    .chapterId(chapterId)
+                    .build();
             try {
-                // retrieve the course Entity by the Chapter ID
-                chapterEntity = chapterRepository.findById(chapterId).orElseThrow();
+                resourceAssociationEntity = performCrudOperation(primary, dto.getOperation());
 
-                courseEntity = courseRepository.findCourseEntityByChaptersContaining(chapterEntity).orElseThrow();
-            }catch (Exception e){
-                continue;
-            }
-
-            ResourcePk primary =  ResourcePk.builder().resourceId(dto.getResourceId()).courseId(courseEntity.getId()).build();
-
-            switch (dto.getOperation()){
-                case CREATE:
-                    if (!resourceRepository.existsById(primary)){
-                        resourceRepository.save(CourseResourceAssociationEntity.builder()
-                                .resourceId(dto.getResourceId())
-                                .courseId(courseEntity.getId())
-                                .build());
-                    }
-                    break;
-                case UPDATE:
-                    CourseResourceAssociationEntity entity = CourseResourceAssociationEntity.builder()
-                            .resourceId(dto.getResourceId())
-                            .courseId(courseEntity.getId())
-                            .build();
-                    // skip adding if already entity exists in database
-                    if (!resourceRepository.existsById(primary)){
-                        resourceRepository.save(entity);
-                    }
-                    dtoAssociations.add(entity);
-                    break;
-                case DELETE:
-                    if (resourceRepository.existsById(primary)) {
-                        resourceRepository.deleteById(primary);
-                    }
-                    break;
-                default:
-                    // do nothing
-            }
-
-            // in UPDATES multiple associations can be added or removed. here we remove all outdated associations
-            if (dto.getOperation().equals(CrudOperation.UPDATE)){
-                currentAssociations = resourceRepository.findResourceEntitiesByResourceIdOrderByCourseIdAsc(dto.getResourceId());
-                // remove resource associations that are not part of the updated associations
-                currentAssociations.stream().filter(entity -> !dtoAssociations.contains(entity)).forEach(resourceRepository::delete);
+                if (resourceAssociationEntity != null) {
+                    dtoAssociations.add(resourceAssociationEntity);
+                }
+            } catch (NoSuchElementException e) {
+                log.error(e.getMessage());
             }
 
         }
+        // in UPDATES multiple associations can be added or removed. here we remove all outdated associations
+        if (dto.getOperation().equals(CrudOperation.UPDATE)) {
+            currentAssociations = resourceRepository.findCourseResourceAssociationEntitiesByResourceIdOrderByCourseIdAsc(dto.getResourceId());
+            // remove resource associations that are not part of the updated associations
+            currentAssociations.stream().filter(entity -> !dtoAssociations.contains(entity)).forEach(resourceRepository::delete);
+        }
+    }
+
+    /**
+     * performs CREATE, UPDATE, and DELETE operations on CourseResourceAssociations.
+     *
+     * @param primary   Primary key for CourseResourceAssociations
+     * @param operation type of Operation performed
+     * @return a CourseResourceAssociations in case of an UPDATE operation. default is null
+     * @throws NoSuchElementException
+     */
+    private CourseResourceAssociationEntity performCrudOperation(ResourcePk primary, CrudOperation operation) throws NoSuchElementException {
+
+        switch (operation) {
+            case CREATE:
+                if (!resourceRepository.existsById(primary)) {
+                    CourseResourceAssociationEntity entity = CourseResourceAssociationEntity.builder()
+                            .resourceId(primary.getResourceId())
+                            .chapterId(primary.getChapterId())
+                            .courseId(getCourseFromChapterId(primary.getChapterId()))
+                            .build();
+
+                    resourceRepository.save(entity);
+
+                }
+                return null;
+            case UPDATE:
+                CourseResourceAssociationEntity entity = CourseResourceAssociationEntity.builder()
+                        .resourceId(primary.getResourceId())
+                        .chapterId(primary.getChapterId())
+                        .courseId(getCourseFromChapterId(primary.getChapterId()))
+                        .build();
+
+                resourceRepository.save(entity);
+                return entity;
+            case DELETE:
+                if (resourceRepository.existsById(primary)) {
+                    resourceRepository.deleteById(primary);
+                }
+                return null;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * retrieves the course ID for a given Chapter ID
+     *
+     * @param chapterId Chapter of a course
+     * @return course ID
+     * @throws NoSuchElementException if no entity exists for either course or chapter ID
+     */
+    private UUID getCourseFromChapterId(UUID chapterId) throws NoSuchElementException {
+        ChapterEntity chapter = chapterRepository.findById(chapterId).orElseThrow();
+        CourseEntity course = courseRepository.findCourseEntityByChaptersContaining(chapter).orElseThrow();
+        return course.getId();
     }
 }

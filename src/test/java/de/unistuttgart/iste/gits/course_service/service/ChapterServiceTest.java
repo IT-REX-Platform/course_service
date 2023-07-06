@@ -1,5 +1,7 @@
 package de.unistuttgart.iste.gits.course_service.service;
 
+import de.unistuttgart.iste.gits.common.event.CrudOperation;
+import de.unistuttgart.iste.gits.course_service.dapr.TopicPublisher;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.mapper.ChapterMapper;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
@@ -15,6 +17,7 @@ import org.modelmapper.ModelMapper;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,11 +39,14 @@ class ChapterServiceTest {
     private final ChapterMapper chapterMapper = new ChapterMapper(new ModelMapper());
     private final ChapterValidator chapterValidator = spy(new ChapterValidator());
 
+    private final TopicPublisher topicPublisher = mock(TopicPublisher.class);
+
     private final ChapterService chapterService = new ChapterService(
             chapterMapper,
             chapterRepository,
             courseService,
-            chapterValidator);
+            chapterValidator,
+            topicPublisher);
 
     /**
      * Given a valid CreateChapterInput
@@ -216,6 +222,9 @@ class ChapterServiceTest {
 
         // verify that the repository was called
         verify(chapterRepository).deleteById(testChapterId);
+
+        //verify notification method was called
+        verify(topicPublisher).notifyChapterChanges(List.of(testChapterId), CrudOperation.DELETE);
     }
 
     /**
@@ -234,6 +243,9 @@ class ChapterServiceTest {
 
         // act
         assertThrows(EntityNotFoundException.class, () -> chapterService.deleteChapter(testChapterId));
+
+        //verify notification method was NOT called
+        verify(topicPublisher, never()).notifyChapterChanges(List.of(testChapterId), CrudOperation.DELETE);
     }
 
     private static UpdateChapterInput.Builder dummyUpdateChapterInputBuilder(UUID uuid) {

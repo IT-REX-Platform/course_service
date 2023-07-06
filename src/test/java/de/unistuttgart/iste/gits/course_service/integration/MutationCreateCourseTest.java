@@ -4,9 +4,11 @@ import de.unistuttgart.iste.gits.common.testutil.GitsPostgresSqlContainer;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
+import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
@@ -19,6 +21,7 @@ import static org.hamcrest.Matchers.is;
 /**
  * Tests for the `createCourse` mutation.
  */
+@ContextConfiguration(classes = MockTopicPublisherConfiguration.class)
 @GraphQlApiTest
 class MutationCreateCourseTest {
 

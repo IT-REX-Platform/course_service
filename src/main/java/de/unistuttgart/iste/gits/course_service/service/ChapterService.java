@@ -1,7 +1,9 @@
 package de.unistuttgart.iste.gits.course_service.service;
 
+import de.unistuttgart.iste.gits.common.event.CrudOperation;
 import de.unistuttgart.iste.gits.common.util.PaginationUtil;
 import de.unistuttgart.iste.gits.common.util.SortUtil;
+import de.unistuttgart.iste.gits.course_service.dapr.TopicPublisher;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.mapper.ChapterMapper;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
@@ -34,6 +36,7 @@ public class ChapterService {
     private final ChapterRepository chapterRepository;
     private final CourseService courseService;
     private final ChapterValidator chapterValidator;
+    private final TopicPublisher topicPublisher;
 
     /**
      * Creates a chapter.
@@ -84,6 +87,10 @@ public class ChapterService {
         requireChapterExisting(uuid);
 
         chapterRepository.deleteById(uuid);
+
+        //notify other chapter-dependent services of chapter deletion
+        topicPublisher.notifyChapterChanges(List.of(uuid), CrudOperation.DELETE);
+
         return uuid;
     }
 
