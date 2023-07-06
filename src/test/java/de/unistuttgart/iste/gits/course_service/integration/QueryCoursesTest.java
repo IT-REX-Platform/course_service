@@ -5,6 +5,7 @@ import de.unistuttgart.iste.gits.common.testutil.GitsPostgresSqlContainer;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
+import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
 import de.unistuttgart.iste.gits.generated.dto.Course;
 import de.unistuttgart.iste.gits.generated.dto.CourseFilter;
 import de.unistuttgart.iste.gits.generated.dto.SortDirection;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
@@ -26,6 +28,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Tests that the courses query works correctly.
  */
+@ContextConfiguration(classes = MockTopicPublisherConfiguration.class)
 @GraphQlApiTest
 class QueryCoursesTest {
 
