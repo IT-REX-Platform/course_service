@@ -16,12 +16,15 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CourseResourceAssociationEntity {
-    @Id
-    @Column(nullable = false)
-    private UUID courseId;
 
     @Id
     @Column(nullable = false)
     private UUID resourceId;
+
+    @Id
+    @Column(nullable = false)
+    private UUID chapterId;
+
+    private UUID courseId;
 
 }

@@ -14,7 +14,6 @@ import org.mockito.Mockito;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -62,7 +61,7 @@ class ResourceServiceTest {
                 .build();
 
         //mock repositories
-        when(resourceRepository.findResourceEntitiesByResourceIdOrderByCourseIdAsc(any(UUID.class)))
+        when(resourceRepository.findCourseResourceAssociationEntitiesByResourceIdOrderByCourseIdAsc(any(UUID.class)))
                 .thenReturn(courseResourceAssociationEntityList);
         when(courseRepository.findAllById(any())).thenReturn(courseEntityList);
 
@@ -103,7 +102,7 @@ class ResourceServiceTest {
                 .build();
 
         //mock repositories
-        when(resourceRepository.findResourceEntitiesByResourceIdOrderByCourseIdAsc(any(UUID.class)))
+        when(resourceRepository.findCourseResourceAssociationEntitiesByResourceIdOrderByCourseIdAsc(any(UUID.class)))
                 .thenReturn(courseResourceAssociationEntityList);
         when(courseRepository.findAllById(any())).thenReturn(courseEntityList);
 
