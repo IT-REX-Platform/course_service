@@ -67,11 +67,7 @@ repositories {
 }
 
 dependencies {
-	implementation('de.unistuttgart.iste.gits:gits-common') {
-		version {
-			branch = 'main'
-		}
-	}
+	implementation 'de.unistuttgart.iste.gits:gits-common:0.1.0'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-graphql'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -84,11 +80,7 @@ dependencies {
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation('de.unistuttgart.iste.gits:gits-common-test') {
-		version {
-			branch = 'main'
-		}
-	}
+	testImplementation 'de.unistuttgart.iste.gits:gits-common-test:0.1.0'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework:spring-webflux'
 	testImplementation 'org.springframework.graphql:spring-graphql-test'
