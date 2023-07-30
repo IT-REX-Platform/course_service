@@ -42,7 +42,7 @@ services:
       "--resources-path", "./components"
     ]
     volumes:
-      - "./../course_service/components/:/components" # Mount our components folder for the runtime to use. The mounted location must match the --resources-path argument.
+      - "./components/:/components" # Mount our components folder for the runtime to use. The mounted location must match the --resources-path argument.
     depends_on:
       - app-course
       - redis
