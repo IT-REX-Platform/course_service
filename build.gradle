@@ -70,7 +70,7 @@ repositories {
 }
 
 dependencies {
-    implementation'de.unistuttgart.iste.gits:gits-common:0.1.0'
+    implementation 'de.unistuttgart.iste.gits:gits-common:0.1.1'
     implementation 'com.google.code.findbugs:jsr305:3.0.2' // removes a gradle warning about an unknown annotation
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-graphql'
@@ -86,7 +86,7 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation'de.unistuttgart.iste.gits:gits-common-test:0.1.0'
+    testImplementation 'de.unistuttgart.iste.gits:gits-common-test:0.1.0'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework:spring-webflux'
     testImplementation 'org.springframework.graphql:spring-graphql-test'
