@@ -56,4 +56,9 @@ public class ChapterController {
                                    @Argument("pagination") @Nullable Pagination pagination) {
         return chapterService.getChapters(course.getId(), filter, sortBy, sortDirection, pagination);
     }
+
+    @QueryMapping
+    public List<Chapter> chaptersById(@Argument List<UUID> ids) {
+        return chapterService.getChaptersByIds(ids);
+    }
 }

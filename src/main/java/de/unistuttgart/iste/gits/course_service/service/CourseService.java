@@ -163,5 +163,4 @@ public class CourseService {
     private CoursePayload createCoursePayloadUnpaged(List<CourseEntity> result) {
         return courseMapper.createPayload(result.stream(), PaginationUtil.unpagedPaginationInfo(result.size()));
     }
-
 }
