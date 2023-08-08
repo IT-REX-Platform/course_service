@@ -310,7 +310,7 @@ class QueryCoursesTest {
 
         String query = """
                 query {
-                    coursesById(ids: ["%s"]) {
+                    coursesByIds(ids: ["%s"]) {
                         id
                         title
                         description
@@ -322,7 +322,7 @@ class QueryCoursesTest {
 
         tester.document(query)
                 .execute()
-                .path("coursesById").entityList(Course.class)
+                .path("coursesByIds").entityList(Course.class)
                 .hasSize(1)
                 .contains(entityToDto(initialData.get(1)));
     }
@@ -336,7 +336,7 @@ class QueryCoursesTest {
     void testGetByIdsWithNotExistingId(GraphQlTester tester) {
         String query = """
                 query {
-                    coursesById(ids: ["%s"]) {
+                    coursesByIds(ids: ["%s"]) {
                         id
                         title
                         description
