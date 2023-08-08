@@ -58,7 +58,7 @@ public class ChapterController {
     }
 
     @QueryMapping
-    public List<Chapter> chaptersById(@Argument List<UUID> ids) {
+    public List<Chapter> chaptersByIds(@Argument List<UUID> ids) {
         return chapterService.getChaptersByIds(ids);
     }
 }
