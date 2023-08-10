@@ -48,6 +48,15 @@ class ChapterServiceTest {
             chapterValidator,
             topicPublisher);
 
+    @Test
+    void testGetChaptersByIdsMissingChapter() {
+        UUID wrongUUID = UUID.randomUUID();
+
+        assertThrows(EntityNotFoundException.class, () -> {
+            chapterService.getChaptersByIds(List.of(wrongUUID));
+        });
+    }
+
     /**
      * Given a valid CreateChapterInput
      * When createChapter is called
