@@ -21,6 +21,7 @@ import org.testcontainers.junit.jupiter.Container;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 /**
@@ -73,6 +74,35 @@ class QueryChaptersTest {
                 .path("chapters.pagination.page").entity(Integer.class).isEqualTo(0)
                 .path("chapters.pagination.size").entity(Integer.class).isEqualTo(0)
                 .path("chapters.pagination.hasNext").entity(Boolean.class).isEqualTo(false);
+    }
+
+    @Test
+    void testGetChaptersByIds(GraphQlTester tester) {
+        UUID courseId = UUID.randomUUID();
+        List<ChapterEntity> expectedChapters = Stream.of(
+                        dummyChapterBuilder().title("Chapter 1").courseId(courseId).build(),
+                        dummyChapterBuilder().title("Chapter 2").courseId(courseId).build())
+                .map(chapterRepository::save)
+                .toList();
+
+        String query = """
+                query($chapterIds: [UUID!]!) {
+                    chaptersByIds(ids: $chapterIds) {
+                        id
+                        title
+                        description
+                        startDate
+                        endDate
+                        number
+                    }
+                }
+                """;
+
+        tester.document(query)
+                .variable("chapterIds", List.of(expectedChapters.get(0).getId(), expectedChapters.get(1).getId()))
+                .execute()
+                .path("chaptersByIds").entityList(Chapter.class).hasSize(2)
+                .contains(entitiesToDtos(expectedChapters));
     }
 
     /**

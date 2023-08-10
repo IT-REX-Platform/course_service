@@ -33,7 +33,7 @@ public class CourseController {
     }
 
     @QueryMapping
-    public List<Course> coursesById(@Argument(name = "ids") List<UUID> ids) {
+    public List<Course> coursesByIds(@Argument(name = "ids") List<UUID> ids) {
         return courseService.getCoursesByIds(ids);
     }
 

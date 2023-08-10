@@ -18,8 +18,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static de.unistuttgart.iste.gits.course_service.persistence.specification.ChapterFilterSpecification.chapterFilter;
 import static de.unistuttgart.iste.gits.course_service.persistence.specification.ChapterFilterSpecification.courseIdEquals;
@@ -37,6 +39,31 @@ public class ChapterService {
     private final CourseService courseService;
     private final ChapterValidator chapterValidator;
     private final TopicPublisher topicPublisher;
+
+    /**
+     * Gets all chapters with the given ids.
+     * @param ids The ids of the chapters to get.
+     * @return The chapters with the given ids in order of the given ids.
+     * @throws EntityNotFoundException If at least one of the chapters could not be found.
+     */
+    public List<Chapter> getChaptersByIds(List<UUID> ids) {
+        List<Chapter> result = new ArrayList<>(ids.size());
+        List<UUID> missingIds = new ArrayList<>();
+
+        for(UUID id : ids) {
+            chapterRepository.findById(id).ifPresentOrElse(
+                    chapterEntity -> result.add(chapterMapper.entityToDto(chapterEntity)),
+                    () -> missingIds.add(id)
+            );
+        }
+
+        if(!missingIds.isEmpty()) {
+            throw new EntityNotFoundException("The following chapters could not be found: "
+                    + missingIds.stream().map(UUID::toString).collect(Collectors.joining(", ")));
+        }
+
+        return result;
+    }
 
     /**
      * Creates a chapter.
