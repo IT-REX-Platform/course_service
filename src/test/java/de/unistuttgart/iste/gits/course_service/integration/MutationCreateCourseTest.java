@@ -5,6 +5,7 @@ import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
+import de.unistuttgart.iste.gits.generated.dto.YearDivision;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
@@ -142,7 +143,7 @@ class MutationCreateCourseTest {
         assertThat(course.getStartDate().isEqual(OffsetDateTime.parse("2020-01-01T00:00:00.000Z")), is(true));
         assertThat(course.getEndDate().isEqual(OffsetDateTime.parse("2021-01-01T00:00:00.000Z")), is(true));
         assertThat(course.getStartYear(), is(2020));
-        assertThat(course.getYearDivision(), is(CourseEntity.YearDivision.FIRST_SEMESTER));
+        assertThat(course.getYearDivision(), is(YearDivision.FIRST_SEMESTER));
 
         assertThat(chapterRepository.count(), is(0L));
     }
