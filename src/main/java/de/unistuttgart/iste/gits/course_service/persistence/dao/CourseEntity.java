@@ -46,7 +46,7 @@ public class CourseEntity {
     private Set<CourseResourceAssociationEntity> resources;
 
     @Column()
-    private int startYear;
+    private Integer startYear;
 
     @Enumerated(EnumType.STRING)
     private YearDivision yearDivision;
