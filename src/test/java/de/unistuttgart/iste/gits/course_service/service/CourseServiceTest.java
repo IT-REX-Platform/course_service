@@ -10,6 +10,7 @@ import de.unistuttgart.iste.gits.course_service.persistence.validation.CourseVal
 import de.unistuttgart.iste.gits.generated.dto.Course;
 import de.unistuttgart.iste.gits.generated.dto.CreateCourseInput;
 import de.unistuttgart.iste.gits.generated.dto.UpdateCourseInput;
+import de.unistuttgart.iste.gits.generated.dto.YearDivision;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -62,6 +63,38 @@ class CourseServiceTest {
         assertThat(actualCourse.getDescription(), is(expectedCourseEntity.getDescription()));
         assertThat(actualCourse.getStartDate(), is(expectedCourseEntity.getStartDate()));
         assertThat(actualCourse.getEndDate(), is(expectedCourseEntity.getEndDate()));
+
+        // verify
+        verify(courseValidator).validateCreateCourseInput(input);
+        verify(courseRepository, times(1)).save(any(CourseEntity.class));
+    }
+
+    /**
+     * Given a valid CreateCourseInput
+     * When createCourse is called
+     * Then a Course is returned and the CourseRepository is called
+     */
+    @Test
+    void testCreateCourseWithTermSuccessful() {
+        // arrange
+        CreateCourseInput input = dummyCreateCourseInputBuilder().setStartYear(2023).setYearDivision(YearDivision.FIRST_SEMESTER).build();
+        CourseEntity expectedCourseEntity = dummyCourseEntityBuilder().startYear(2023).yearDivision(YearDivision.FIRST_SEMESTER).build();
+
+        // mock repository
+        when(courseRepository.save(any(CourseEntity.class)))
+                .thenReturn(expectedCourseEntity);
+
+        // act
+        Course actualCourse = courseService.createCourse(input);
+
+        // assert
+        assertThat(actualCourse.getId(), is(expectedCourseEntity.getId()));
+        assertThat(actualCourse.getTitle(), is(expectedCourseEntity.getTitle()));
+        assertThat(actualCourse.getDescription(), is(expectedCourseEntity.getDescription()));
+        assertThat(actualCourse.getStartDate(), is(expectedCourseEntity.getStartDate()));
+        assertThat(actualCourse.getEndDate(), is(expectedCourseEntity.getEndDate()));
+        assertThat(actualCourse.getStartYear(), is(expectedCourseEntity.getStartYear()));
+        assertThat(actualCourse.getYearDivision(), is(expectedCourseEntity.getYearDivision()));
 
         // verify
         verify(courseValidator).validateCreateCourseInput(input);

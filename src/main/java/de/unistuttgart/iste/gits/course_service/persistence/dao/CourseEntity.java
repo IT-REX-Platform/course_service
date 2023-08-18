@@ -1,5 +1,6 @@
 package de.unistuttgart.iste.gits.course_service.persistence.dao;
 
+import de.unistuttgart.iste.gits.generated.dto.YearDivision;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -43,5 +44,12 @@ public class CourseEntity {
 
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "courseId")
     private Set<CourseResourceAssociationEntity> resources;
+
+    @Column()
+    private int startYear;
+
+    @Enumerated(EnumType.STRING)
+    private YearDivision yearDivision;
+
 
 }
