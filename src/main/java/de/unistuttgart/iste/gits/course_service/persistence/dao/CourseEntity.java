@@ -44,4 +44,23 @@ public class CourseEntity {
     @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "courseId")
     private Set<CourseResourceAssociationEntity> resources;
 
+    @Column()
+    private int startYear;
+
+    @Enumerated(EnumType.STRING)
+    private YearDivision yearDivision;
+
+    public enum YearDivision{
+        FIRST_SEMESTER,
+        SECOND_SEMESTER,
+        FIRST_TRIMESTER,
+        SECOND_TRIMESTER,
+        THIRD_TRIMESTER,
+        FIRST_QUARTER,
+        SECOND_QUARTER,
+        THIRD_QUARTER,
+        FOURTH_QUARTER
+
+    }
+
 }

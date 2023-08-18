@@ -32,6 +32,14 @@ type Course {
     """
     published: Boolean!
     """
+    The year in which the term starts.
+    """
+    startYear: Int
+    """
+    The division of the academic calendar in which the term takes place.
+    """
+    yearDivision: YearDivision
+    """
     Chapters of the course. Can be filtered and sorted.
     """
     chapters(filter: ChapterFilter,
@@ -45,6 +53,21 @@ type Course {
         """
         sortDirection: [SortDirection!]! = [ASC],
         pagination: Pagination): ChapterPayload!
+}
+
+"""
+The division of the academic year.
+"""
+enum YearDivision {
+    FIRST_SEMESTER,
+    SECOND_SEMESTER,
+    FIRST_TRIMESTER,
+    SECOND_TRIMESTER,
+    THIRD_TRIMESTER,
+    FIRST_QUARTER,
+    SECOND_QUARTER,
+    THIRD_QUARTER,
+    FOURTH_QUARTER
 }
 
 
@@ -74,6 +97,15 @@ input CreateCourseInput {
     Published status of the course.
     """
     published: Boolean!
+    """
+    The year in which the term starts.
+    """
+    startYear: Int
+    """
+    The division of the academic calendar in which the term takes place.
+    """
+    yearDivision: YearDivision
+
 }
 
 """

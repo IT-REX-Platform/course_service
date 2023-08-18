@@ -1,7 +1,7 @@
 package de.unistuttgart.iste.gits.course_service.integration;
 
-import de.unistuttgart.iste.gits.common.testutil.GitsPostgresSqlContainer;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
+import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
@@ -9,8 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -24,9 +22,6 @@ import static org.hamcrest.Matchers.is;
 @ContextConfiguration(classes = MockTopicPublisherConfiguration.class)
 @GraphQlApiTest
 class MutationCreateCourseTest {
-
-    @Container
-    public static PostgreSQLContainer<GitsPostgresSqlContainer> postgreSQLContainer = GitsPostgresSqlContainer.getInstance();
 
     @Autowired
     private CourseRepository courseRepository;
@@ -85,6 +80,69 @@ class MutationCreateCourseTest {
         assertThat(course.isPublished(), is(false));
         assertThat(course.getStartDate().isEqual(OffsetDateTime.parse("2020-01-01T00:00:00.000Z")), is(true));
         assertThat(course.getEndDate().isEqual(OffsetDateTime.parse("2021-01-01T00:00:00.000Z")), is(true));
+
+        assertThat(chapterRepository.count(), is(0L));
+    }
+
+    /**
+     * Given a valid CreateCourseInput
+     * When the createCourse mutation is executed
+     * Then the course is created and returned
+     */
+    @Test
+    void testCreateCourseWithTerm(GraphQlTester tester) {
+        String query = """
+                mutation {
+                    createCourse(
+                        input: {
+                            title: "New Course"
+                            description: "This is a new course"
+                            startDate: "2020-01-01T00:00:00.000Z"
+                            endDate: "2021-01-01T00:00:00.000Z"
+                            published: false
+                            startYear: 2020
+                            yearDivision: FIRST_SEMESTER
+                        }
+                    ) {
+                        id
+                        title
+                        description
+                        startDate
+                        endDate
+                        published
+                        startYear
+                        yearDivision
+                        chapters {
+                            elements {
+                                id
+                            }
+                        }
+                    }
+                }""";
+
+        UUID id = tester.document(query)
+                .execute()
+                .path("createCourse.title").entity(String.class).isEqualTo("New Course")
+                .path("createCourse.description").entity(String.class).isEqualTo("This is a new course")
+                .path("createCourse.startDate").entity(String.class).isEqualTo("2020-01-01T00:00:00.000Z")
+                .path("createCourse.endDate").entity(String.class).isEqualTo("2021-01-01T00:00:00.000Z")
+                .path("createCourse.startYear").entity(Integer.class).isEqualTo(2020)
+                .path("createCourse.yearDivision").entity(String.class).isEqualTo("FIRST_SEMESTER")
+                .path("createCourse.chapters.elements").entityList(String.class).hasSize(0)
+                .path("createCourse.published").entity(Boolean.class).isEqualTo(false)
+                .path("createCourse.id").entity(UUID.class).get();
+
+        // check that the course was created in the database
+        assertThat(courseRepository.count(), is(1L));
+        var course = courseRepository.findAll().get(0);
+        assertThat(course.getId(), is(id));
+        assertThat(course.getTitle(), is("New Course"));
+        assertThat(course.getDescription(), is("This is a new course"));
+        assertThat(course.isPublished(), is(false));
+        assertThat(course.getStartDate().isEqual(OffsetDateTime.parse("2020-01-01T00:00:00.000Z")), is(true));
+        assertThat(course.getEndDate().isEqual(OffsetDateTime.parse("2021-01-01T00:00:00.000Z")), is(true));
+        assertThat(course.getStartYear(), is(2020));
+        assertThat(course.getYearDivision(), is(CourseEntity.YearDivision.FIRST_SEMESTER));
 
         assertThat(chapterRepository.count(), is(0L));
     }
