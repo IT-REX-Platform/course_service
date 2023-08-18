@@ -91,7 +91,6 @@ class QueryCoursesTest {
                             startDate
                             endDate
                             published
-                            startYear
                         }
                         pagination {
                             totalElements
@@ -139,7 +138,6 @@ class QueryCoursesTest {
                             startDate
                             endDate
                             published
-                            startYear
                         }
                         pagination {
                             totalElements
@@ -201,7 +199,6 @@ class QueryCoursesTest {
                             startDate
                             endDate
                             published
-                            startYear
                         }
                     }
                 }""";
@@ -245,7 +242,6 @@ class QueryCoursesTest {
                             startDate
                             endDate
                             published
-                            startYear
                         }
                     }
                 }""";
@@ -315,7 +311,6 @@ class QueryCoursesTest {
                         startDate
                         endDate
                         published
-                        startYear
                     }
                 }""".formatted(initialData.get(1).getId());
 
