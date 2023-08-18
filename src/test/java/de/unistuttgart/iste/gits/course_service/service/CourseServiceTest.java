@@ -78,7 +78,7 @@ class CourseServiceTest {
     void testCreateCourseWithTermSuccessful() {
         // arrange
         CreateCourseInput input = dummyCreateCourseInputBuilder().setStartYear(2023).setYearDivision(YearDivision.FIRST_SEMESTER).build();
-        CourseEntity expectedCourseEntity = dummyCourseEntityBuilder().startYear(2023).yearDivision(CourseEntity.YearDivision.FIRST_SEMESTER).build();
+        CourseEntity expectedCourseEntity = dummyCourseEntityBuilder().startYear(2023).yearDivision(YearDivision.FIRST_SEMESTER).build();
 
         // mock repository
         when(courseRepository.save(any(CourseEntity.class)))

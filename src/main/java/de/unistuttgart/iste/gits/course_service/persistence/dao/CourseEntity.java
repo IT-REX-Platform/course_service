@@ -1,5 +1,6 @@
 package de.unistuttgart.iste.gits.course_service.persistence.dao;
 
+import de.unistuttgart.iste.gits.generated.dto.YearDivision;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -50,17 +51,5 @@ public class CourseEntity {
     @Enumerated(EnumType.STRING)
     private YearDivision yearDivision;
 
-    public enum YearDivision{
-        FIRST_SEMESTER,
-        SECOND_SEMESTER,
-        FIRST_TRIMESTER,
-        SECOND_TRIMESTER,
-        THIRD_TRIMESTER,
-        FIRST_QUARTER,
-        SECOND_QUARTER,
-        THIRD_QUARTER,
-        FOURTH_QUARTER
-
-    }
 
 }
