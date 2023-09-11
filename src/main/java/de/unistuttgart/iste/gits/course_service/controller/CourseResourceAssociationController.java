@@ -1,6 +1,6 @@
 package de.unistuttgart.iste.gits.course_service.controller;
 
-import de.unistuttgart.iste.gits.course_service.service.ResourceService;
+import de.unistuttgart.iste.gits.course_service.service.CourseResourceAssociationService;
 import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -12,18 +12,22 @@ import java.util.UUID;
 
 @Slf4j
 @Controller
-public class ResourceController {
+public class CourseResourceAssociationController {
 
-    private final ResourceService resourceService;
+    private final CourseResourceAssociationService resourceService;
 
 
-    public ResourceController(ResourceService resourceService) {
+    public CourseResourceAssociationController(CourseResourceAssociationService resourceService) {
         this.resourceService = resourceService;
     }
 
     @QueryMapping
     public List<CourseResourceAssociation> resourceById(@Argument(name = "ids") List<UUID> ids) {
-        log.info("received topic message");
-        return resourceService.getCoursesByResourceId(ids);
+        return resourceService.getCourseResourceAssociations(ids);
+    }
+
+    @QueryMapping
+    public List<CourseResourceAssociation> courseResourceAssociationsByIds(@Argument(name = "ids") List<UUID> ids) {
+        return resourceService.getCourseResourceAssociations(ids);
     }
 }

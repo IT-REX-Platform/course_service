@@ -2,26 +2,19 @@ package de.unistuttgart.iste.gits.course_service.service;
 
 import de.unistuttgart.iste.gits.common.event.CrudOperation;
 import de.unistuttgart.iste.gits.course_service.dapr.TopicPublisher;
-import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.mapper.ChapterMapper;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.validation.ChapterValidator;
-import de.unistuttgart.iste.gits.generated.dto.Chapter;
-import de.unistuttgart.iste.gits.generated.dto.CreateChapterInput;
-import de.unistuttgart.iste.gits.generated.dto.UpdateChapterInput;
+import de.unistuttgart.iste.gits.generated.dto.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.time.*;
+import java.util.*;
 
-import static java.time.temporal.ChronoUnit.DAYS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -51,10 +44,8 @@ class ChapterServiceTest {
     @Test
     void testGetChaptersByIdsMissingChapter() {
         UUID wrongUUID = UUID.randomUUID();
-
-        assertThrows(EntityNotFoundException.class, () -> {
-            chapterService.getChaptersByIds(List.of(wrongUUID));
-        });
+        List<UUID> uuids = List.of(wrongUUID);
+        assertThrows(EntityNotFoundException.class, () -> chapterService.getChaptersByIds(uuids));
     }
 
     /**
@@ -100,7 +91,7 @@ class ChapterServiceTest {
     void testCreateChapterStartDateAfterEndDate() {
         // arrange test data
         CreateChapterInput testCreateChapterInput = dummyCreateChapterInputBuilder()
-                .setStartDate(OffsetDateTime.now().plus(1, DAYS))
+                .setStartDate(OffsetDateTime.now().plusDays(1))
                 .setEndDate(OffsetDateTime.now())
                 .build();
 
@@ -191,7 +182,7 @@ class ChapterServiceTest {
         // arrange test data
         ChapterEntity expectedChapter = dummyChapterEntityBuilder().build();
         UpdateChapterInput testUpdateChapterInput = dummyUpdateChapterInputBuilder(expectedChapter.getId())
-                .setStartDate(OffsetDateTime.now().plus(1, DAYS))
+                .setStartDate(OffsetDateTime.now().plusDays(1))
                 .setEndDate(OffsetDateTime.now())
                 .build();
 

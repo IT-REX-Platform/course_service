@@ -2,15 +2,12 @@ package de.unistuttgart.iste.gits.course_service.integration;
 
 import de.unistuttgart.iste.gits.common.testutil.GitsPostgresSqlContainer;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
-import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
-import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
-import de.unistuttgart.iste.gits.generated.dto.Chapter;
-import de.unistuttgart.iste.gits.generated.dto.ChapterFilter;
-import de.unistuttgart.iste.gits.generated.dto.SortDirection;
-import de.unistuttgart.iste.gits.generated.dto.StringFilter;
+import de.unistuttgart.iste.gits.generated.dto.*;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

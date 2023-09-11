@@ -1,6 +1,6 @@
 package de.unistuttgart.iste.gits.course_service.persistence.specification;
 
-import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.generated.dto.CourseFilter;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.Nullable;

@@ -1,10 +1,7 @@
-package de.unistuttgart.iste.gits.course_service.persistence.dao;
+package de.unistuttgart.iste.gits.course_service.persistence.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.UUID;
 

@@ -1,6 +1,6 @@
 package de.unistuttgart.iste.gits.course_service.persistence.mapper;
 
-import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import de.unistuttgart.iste.gits.generated.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
