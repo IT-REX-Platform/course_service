@@ -37,9 +37,6 @@ public class CourseEntity {
     @OrderBy("number ASC")
     private List<ChapterEntity> chapters;
 
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "courseId")
-    private Set<CourseResourceAssociationEntity> resources;
-
     @Column()
     private Integer startYear;
 

@@ -19,19 +19,11 @@ type Query {
     Returns the courses with the given ids.
     """
     coursesByIds(ids: [UUID!]!): [Course!]!
+
     """
     Returns the chapters with the given ids.
     """
     chaptersByIds(ids: [UUID!]!): [Chapter!]!
-
-    """
-    Returns a set of Resource Objects for the given resource ids, containing a list of all course IDs for a resource and its availability in the course.
-    """
-    courseResourceAssociationsByIds(ids: [UUID!]!): [CourseResourceAssociation!]!
-    """
-    Returns a set of Resource Objects for the given resource ids, containing a list of all course IDs for a resource and its availability in the course.
-    """
-    resourceById(ids: [UUID!]!): [CourseResourceAssociation!]! @deprecated(reason: "Use courseResourceAssociationsByIds instead.")
 
     """
     Get the list of chapters for a course. Can be filtered, sorted and paginated.
