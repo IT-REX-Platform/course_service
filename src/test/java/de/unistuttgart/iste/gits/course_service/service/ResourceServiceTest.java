@@ -2,20 +2,14 @@ package de.unistuttgart.iste.gits.course_service.service;
 
 import de.unistuttgart.iste.gits.common.event.CourseAssociationEvent;
 import de.unistuttgart.iste.gits.common.event.CrudOperation;
-import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
-import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
-import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseResourceAssociationEntity;
-import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
-import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.course_service.persistence.repository.ResourceRepository;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.*;
+import de.unistuttgart.iste.gits.course_service.persistence.repository.*;
 import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociation;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -23,12 +17,12 @@ import static org.mockito.Mockito.when;
 
 class ResourceServiceTest {
 
-    private final ResourceRepository resourceRepository = Mockito.mock(ResourceRepository.class);
+    private final CourseResourceAssociationRepository resourceRepository = Mockito.mock(CourseResourceAssociationRepository.class);
     private final CourseRepository courseRepository = Mockito.mock(CourseRepository.class);
 
     private final ChapterRepository chapterRepository = Mockito.mock(ChapterRepository.class);
 
-    private final ResourceService resourceService = new ResourceService(resourceRepository, courseRepository, chapterRepository);
+    private final CourseResourceAssociationService resourceService = new CourseResourceAssociationService(resourceRepository, courseRepository, chapterRepository);
 
     /**
      * This test checks if a correct Resource DTO is created and has the correct availability of a resource for a course depending on the published variable.
@@ -66,7 +60,7 @@ class ResourceServiceTest {
         when(courseRepository.findAllById(any())).thenReturn(courseEntityList);
 
         //run method under test
-        List<CourseResourceAssociation> actualResult = resourceService.getCoursesByResourceId(List.of(resourceId));
+        List<CourseResourceAssociation> actualResult = resourceService.getCourseResourceAssociations(List.of(resourceId));
 
         //compare result
         assertEquals(expected, actualResult.get(0));
@@ -107,7 +101,7 @@ class ResourceServiceTest {
         when(courseRepository.findAllById(any())).thenReturn(courseEntityList);
 
         //run method under test
-        List<CourseResourceAssociation> actualResult = resourceService.getCoursesByResourceId(List.of(resourceId));
+        List<CourseResourceAssociation> actualResult = resourceService.getCourseResourceAssociations(List.of(resourceId));
 
         //compare result
         assertEquals(expected, actualResult.get(0));

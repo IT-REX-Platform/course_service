@@ -2,11 +2,10 @@ package de.unistuttgart.iste.gits.course_service.integration;
 
 import de.unistuttgart.iste.gits.common.testutil.GitsPostgresSqlContainer;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
-import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
-import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
-import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseResourceAssociationEntity;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseResourceAssociationEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.course_service.persistence.repository.ResourceRepository;
+import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseResourceAssociationRepository;
 import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
 import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociation;
 import org.junit.jupiter.api.Test;
@@ -32,7 +31,7 @@ class QueryResourcesTest {
     private CourseRepository courseRepository;
 
     @Autowired
-    private ResourceRepository resourceRepository;
+    private CourseResourceAssociationRepository resourceRepository;
 
     /**
      * Test to check if response when a resource doesn't exist in database

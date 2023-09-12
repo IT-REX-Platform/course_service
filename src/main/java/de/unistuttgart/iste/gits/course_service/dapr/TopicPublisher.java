@@ -25,10 +25,11 @@ public class TopicPublisher {
 
     /**
      * method used to publish dapr messages to a topic
+     *
      * @param dto message
      */
-    private void publishChanges(Object dto, String topic){
-        log.info("publishing message");
+    private void publishChanges(Object dto, String topic) {
+        log.info("publishing message {} to topic {}", dto, topic);
         client.publishEvent(
                 PUBSUB_NAME,
                 topic,
@@ -37,10 +38,11 @@ public class TopicPublisher {
 
     /**
      * Method that creates Course Change Event Message and publishes it to a topic
-     * @param courseID course that received changes
+     *
+     * @param courseID  course that received changes
      * @param operation type of change performed as CRUD operation
      */
-    public void notifyCourseChanges(UUID courseID, CrudOperation operation){
+    public void notifyCourseChanges(UUID courseID, CrudOperation operation) {
         CourseChangeEvent dto = CourseChangeEvent.builder()
                 .courseId(courseID)
                 .operation(operation)
@@ -50,10 +52,11 @@ public class TopicPublisher {
 
     /**
      * Method that creates Chapter Change Event Message and publishes it to a topic
+     *
      * @param chapterIds List of Chapter IDs on which changes were performed
-     * @param operation type of change performed as CRUD operation
+     * @param operation  type of change performed as CRUD operation
      */
-    public void notifyChapterChanges(List<UUID> chapterIds, CrudOperation operation){
+    public void notifyChapterChanges(List<UUID> chapterIds, CrudOperation operation) {
         ChapterChangeEvent dto = ChapterChangeEvent.builder()
                 .chapterIds(chapterIds)
                 .operation(operation)

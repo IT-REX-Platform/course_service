@@ -1,6 +1,6 @@
 package de.unistuttgart.iste.gits.course_service.persistence.repository;
 
-import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

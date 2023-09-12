@@ -13,10 +13,25 @@ import java.time.OffsetDateTime;
 @Component
 public class ChapterValidator {
 
+    /**
+     * Validates the input for creating a chapter.
+     * A chapter is valid if:
+     * <ul>
+     *     <li>the start date is before the end date</li>
+     *     <li>the suggested start date is after the start date</li>
+     *     <li>the suggested start date is before the end date</li>
+     *     <li>the suggested start date is before the suggested end date</li>
+     *     <li>the suggested end date is after the start date</li>
+     *     <li>the suggested end date is before the end date</li>>
+     * </ul>
+     */
     public void validateCreateChapterInput(CreateChapterInput input) {
         validateDates(input.getStartDate(), input.getEndDate(), input.getSuggestedStartDate(), input.getSuggestedEndDate());
     }
 
+    /**
+     * @see #validateCreateChapterInput(CreateChapterInput)
+     */
     public void validateUpdateChapterInput(UpdateChapterInput input) {
         validateDates(input.getStartDate(), input.getEndDate(), input.getSuggestedStartDate(), input.getSuggestedEndDate());
     }

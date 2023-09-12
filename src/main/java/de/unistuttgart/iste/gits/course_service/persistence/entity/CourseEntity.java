@@ -1,16 +1,11 @@
-package de.unistuttgart.iste.gits.course_service.persistence.dao;
+package de.unistuttgart.iste.gits.course_service.persistence.entity;
 
 import de.unistuttgart.iste.gits.generated.dto.YearDivision;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Entity(name = "Course")
 @Data

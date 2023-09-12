@@ -1,7 +1,7 @@
 package de.unistuttgart.iste.gits.course_service.persistence.specification;
 
 import de.unistuttgart.iste.gits.common.util.SpecificationUtil;
-import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import de.unistuttgart.iste.gits.generated.dto.ChapterFilter;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.Nullable;

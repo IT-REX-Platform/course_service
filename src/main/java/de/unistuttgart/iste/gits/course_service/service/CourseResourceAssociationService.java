@@ -2,33 +2,25 @@ package de.unistuttgart.iste.gits.course_service.service;
 
 import de.unistuttgart.iste.gits.common.event.CourseAssociationEvent;
 import de.unistuttgart.iste.gits.common.event.CrudOperation;
-import de.unistuttgart.iste.gits.course_service.persistence.dao.ChapterEntity;
-import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseEntity;
-import de.unistuttgart.iste.gits.course_service.persistence.dao.CourseResourceAssociationEntity;
-import de.unistuttgart.iste.gits.course_service.persistence.dao.ResourcePk;
-import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
-import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.course_service.persistence.repository.ResourceRepository;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.*;
+import de.unistuttgart.iste.gits.course_service.persistence.repository.*;
 import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
 
 /**
- * Service that takes care of all operations regarding resources of a course.
+ * Service that takes care of all operations regarding associated resources of a course.
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ResourceService {
+public class CourseResourceAssociationService {
 
-    private final ResourceRepository resourceRepository;
+    private final CourseResourceAssociationRepository resourceRepository;
     private final CourseRepository courseRepository;
     private final ChapterRepository chapterRepository;
 
@@ -38,29 +30,28 @@ public class ResourceService {
      * @param resourceIds List of resource IDs
      * @return List of resource DTOs that contain a resource ID, List of Course IDs with their current availability
      */
-    public List<CourseResourceAssociation> getCoursesByResourceId(List<UUID> resourceIds) {
+    public List<CourseResourceAssociation> getCourseResourceAssociations(List<UUID> resourceIds) {
         ArrayList<CourseResourceAssociation> resultList = new ArrayList<>();
 
-        //resources can be part of multiple courses for which each a resource Entities is present
+        // resources can be part of multiple courses for which each a resource Entities is present
         List<CourseResourceAssociationEntity> resourceEntities;
         List<CourseEntity> courseEntities;
 
         for (UUID resourceId : resourceIds) {
-            //retrieve all resource entities for a resource ID
+            // retrieve all resource entities for a resource ID
             resourceEntities = resourceRepository.findCourseResourceAssociationEntitiesByResourceIdOrderByCourseIdAsc(resourceId);
 
-            //skip if resource ID does not exist
-            if (resourceEntities == null || resourceEntities.isEmpty())
+            // skip if resource ID does not exist
+            if (resourceEntities == null || resourceEntities.isEmpty()) {
                 continue;
+            }
 
             // retrieve all courses. Uses a stream to collect course IDs from the resource Entities
             // and in the end another stream to turn result into a list
             courseEntities = courseRepository.findAllById(
-                    resourceEntities.stream().map(
-                            CourseResourceAssociationEntity::getCourseId
-                    ).toList());
+                    resourceEntities.stream().map(CourseResourceAssociationEntity::getCourseId).toList());
 
-            resultList.add(createResourceDTO(resourceId, courseEntities));
+            resultList.add(createCourseResourceAssociationDto(resourceId, courseEntities));
         }
         return resultList;
     }
@@ -72,7 +63,7 @@ public class ResourceService {
      * @param courses    Courses that contain the resource
      * @return Resource DTO containing resource ID, List of Courses including the availability of the resource within the course
      */
-    private CourseResourceAssociation createResourceDTO(UUID resourceId, List<CourseEntity> courses) {
+    private CourseResourceAssociation createCourseResourceAssociationDto(UUID resourceId, List<CourseEntity> courses) {
         //init
         OffsetDateTime currentTime = OffsetDateTime.now();
         CourseResourceAssociation resource = CourseResourceAssociation.builder().setId(resourceId)
@@ -82,10 +73,11 @@ public class ResourceService {
 
         //add courses to available or unavailable list
         for (CourseEntity course : courses) {
-            if (isAvailable(course, currentTime))
+            if (isAvailable(course, currentTime)) {
                 resource.getAvailableCourses().add(course.getId());
-            else
+            } else {
                 resource.getUnAvailableCourses().add(course.getId());
+            }
         }
 
         return resource;
@@ -100,10 +92,11 @@ public class ResourceService {
      * @return a resource's availability
      */
     private boolean isAvailable(CourseEntity courseEntity, OffsetDateTime currentTime) {
-        //1st check: course is published
-        if (courseEntity.isPublished())
-            //2nd check: the course has already started but has not ended yet
+        // 1st check: course is published
+        if (courseEntity.isPublished()) {
+            // 2nd check: the course has already started but has not ended yet
             return courseEntity.getStartDate().isBefore(currentTime) && courseEntity.getEndDate().isAfter(currentTime);
+        }
 
         return false;
     }
@@ -147,7 +140,9 @@ public class ResourceService {
         if (dto.getOperation().equals(CrudOperation.UPDATE)) {
             currentAssociations = resourceRepository.findCourseResourceAssociationEntitiesByResourceIdOrderByCourseIdAsc(dto.getResourceId());
             // remove resource associations that are not part of the updated associations
-            currentAssociations.stream().filter(entity -> !dtoAssociations.contains(entity)).forEach(resourceRepository::delete);
+            currentAssociations.stream()
+                    .filter(entity -> !dtoAssociations.contains(entity))
+                    .forEach(resourceRepository::delete);
         }
     }
 
@@ -157,12 +152,12 @@ public class ResourceService {
      * @param primary   Primary key for CourseResourceAssociations
      * @param operation type of Operation performed
      * @return a CourseResourceAssociations in case of an UPDATE operation. default is null
-     * @throws NoSuchElementException
+     * @throws NoSuchElementException if no entity exists for either course or chapter ID
      */
     private CourseResourceAssociationEntity performCrudOperation(ResourcePk primary, CrudOperation operation) throws NoSuchElementException {
 
         switch (operation) {
-            case CREATE:
+            case CREATE -> {
                 if (!resourceRepository.existsById(primary)) {
                     CourseResourceAssociationEntity entity = CourseResourceAssociationEntity.builder()
                             .resourceId(primary.getResourceId())
@@ -174,22 +169,25 @@ public class ResourceService {
 
                 }
                 return null;
-            case UPDATE:
+            }
+            case UPDATE -> {
                 CourseResourceAssociationEntity entity = CourseResourceAssociationEntity.builder()
                         .resourceId(primary.getResourceId())
                         .chapterId(primary.getChapterId())
                         .courseId(getCourseFromChapterId(primary.getChapterId()))
                         .build();
-
                 resourceRepository.save(entity);
                 return entity;
-            case DELETE:
+            }
+            case DELETE -> {
                 if (resourceRepository.existsById(primary)) {
                     resourceRepository.deleteById(primary);
                 }
                 return null;
-            default:
+            }
+            default -> {
                 return null;
+            }
         }
     }
 
@@ -198,11 +196,10 @@ public class ResourceService {
      *
      * @param chapterId Chapter of a course
      * @return course ID
-     * @throws NoSuchElementException if no entity exists for either course or chapter ID
+     * @throws NoSuchElementException if no entity exists for chapter ID
      */
     private UUID getCourseFromChapterId(UUID chapterId) throws NoSuchElementException {
         ChapterEntity chapter = chapterRepository.findById(chapterId).orElseThrow();
-        CourseEntity course = courseRepository.findCourseEntityByChaptersContaining(chapter).orElseThrow();
-        return course.getId();
+        return chapter.getCourseId();
     }
 }
