@@ -211,8 +211,8 @@ class ChapterServiceTest {
         // mock repository
         doNothing()
                 .when(chapterRepository).deleteById(any());
-        doReturn(true)
-                .when(chapterRepository).existsById(any());
+        doReturn(Optional.of(dummyChapterEntityBuilder().build()))
+                .when(chapterRepository).findById(any());
 
         // act
         UUID deletedChapterId = chapterService.deleteChapter(testChapterId);

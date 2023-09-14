@@ -86,10 +86,8 @@ public class ChapterService {
      */
     public Chapter updateChapter(UpdateChapterInput chapterData) {
         chapterValidator.validateUpdateChapterInput(chapterData);
-        requireChapterExisting(chapterData.getId());
 
-        UUID courseID = chapterRepository.findById(chapterData.getId())
-                .orElseThrow()
+        UUID courseID = requireChapterExisting(chapterData.getId())
                 .getCourseId();
 
         ChapterEntity updatedChapterEntity = chapterMapper.dtoToEntity(chapterData);
@@ -118,15 +116,27 @@ public class ChapterService {
     }
 
     /**
+     * Gets the course for a chapter.
+     *
+     * @param chapterId The id of the chapter to get the course for.
+     * @return The course of the chapter.
+     */
+    public Course getCourseForChapterId(UUID chapterId) {
+        ChapterEntity chapterEntity = requireChapterExisting(chapterId);
+        courseService.requireCourseExisting(chapterEntity.getCourseId());
+        return courseService.getCoursesByIds(List.of(chapterEntity.getCourseId())).get(0);
+    }
+
+    /**
      * Checks if a chapter exists.
      *
      * @param uuid The id of the chapter to check.
      * @throws EntityNotFoundException If the chapter does not exist.
+     * @return The chapter entity with the given id.
      */
-    private void requireChapterExisting(UUID uuid) {
-        if (!chapterRepository.existsById(uuid)) {
-            throw new EntityNotFoundException("Chapter with id " + uuid + " not found");
-        }
+    private ChapterEntity requireChapterExisting(UUID uuid) {
+        return chapterRepository.findById(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("Chapter with id " + uuid + " not found"));
     }
 
     public ChapterPayload getChapters(UUID courseId,
