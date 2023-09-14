@@ -1,6 +1,6 @@
 # Course Service
 
-The Course Service serves as a pivotal component within our system, offering essential features related to courses and chapters:
+The Course Service offers features related to courses and chapters:
 
 1. **Course Information:** The Course Service provides detailed information about the courses available within our system. It also offers insights into the chapters included within each course, including their order and structure.
 
