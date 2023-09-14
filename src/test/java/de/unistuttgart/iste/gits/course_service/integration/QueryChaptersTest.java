@@ -1,6 +1,5 @@
 package de.unistuttgart.iste.gits.course_service.integration;
 
-import de.unistuttgart.iste.gits.common.testutil.GitsPostgresSqlContainer;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
@@ -13,8 +12,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -27,9 +24,6 @@ import java.util.stream.Stream;
 @ContextConfiguration(classes = MockTopicPublisherConfiguration.class)
 @GraphQlApiTest
 class QueryChaptersTest {
-
-    @Container
-    public static PostgreSQLContainer<GitsPostgresSqlContainer> postgreSQLContainer = GitsPostgresSqlContainer.getInstance();
 
     @Autowired
     private ChapterRepository chapterRepository;
@@ -150,6 +144,34 @@ class QueryChaptersTest {
                 .path("chapters.pagination.page").entity(Integer.class).isEqualTo(0)
                 .path("chapters.pagination.size").entity(Integer.class).isEqualTo(2)
                 .path("chapters.pagination.hasNext").entity(Boolean.class).isEqualTo(false);
+    }
+
+    @Test
+    void testQueryCourseInChapter(GraphQlTester graphQlTester) {
+        CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
+        chapterRepository.save(dummyChapterBuilder().title("Chapter 3").courseId(course.getId()).build());
+
+        String query = String.format("""
+                query {
+                    chapters(courseId: "%s") {
+                        elements {
+                            course {
+                                id
+                            }
+                        }
+                        pagination {
+                            totalElements
+                            totalPages
+                            page
+                            size
+                            hasNext
+                        }
+                    }
+                }""", course.getId());
+
+        graphQlTester.document(query)
+                .execute()
+                .path("chapters.elements[0].course.id").entity(UUID.class).isEqualTo(course.getId());
     }
 
     /**

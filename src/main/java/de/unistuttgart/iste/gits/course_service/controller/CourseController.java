@@ -3,9 +3,7 @@ package de.unistuttgart.iste.gits.course_service.controller;
 import de.unistuttgart.iste.gits.course_service.service.CourseService;
 import de.unistuttgart.iste.gits.generated.dto.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.*;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 
