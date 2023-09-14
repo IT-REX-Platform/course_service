@@ -1,9 +1,17 @@
 # Course Service
 
-The Course Service plays a pivotal role in the platform's educational ecosystem by serving as a comprehensive repository of essential course-related information. This information encompasses a wide array of details, including course names, comprehensive course descriptions, and the structural breakdown of courses into chapters and sections. This wealth of data is pivotal in guiding both educators and students through their learning journey within the platform.
+The Course Service serves as a pivotal component within our system, offering essential features related to courses and chapters:
 
-One of the distinctive functions of the Course Service is its interaction with Keycloak, a robust identity and access management system. It leverages Keycloak to orchestrate the creation of course-level roles, subsequently assigning these roles to the respective users. This role assignment is instrumental in tailoring the user experience, granting access to specific course materials, assessments, and privileges in alignment with their course enrollment.
+1. **Course Information:** The Course Service provides detailed information about the courses available within our system. It also offers insights into the chapters included within each course, including their order and structure.
 
-Behind the scenes, the Course Service is intricately connected to a persistent database. Within this database, course-specific information is meticulously stored, ensuring data consistency and availability throughout the platform. This persistent storage guarantees that course details remain intact and readily accessible, even across different sessions and interactions.
+2. **Course Management:** This service allows users to create new courses, edit existing ones, and delete courses that are no longer needed.
+
+## Purpose
+
+The Course Service plays a crucial role in our system by:
+
+- **Facilitating Course Access:** It ensures that users have access to information about available courses, helping them make informed choices.
+
+- **Simplifying Course Management:** Users can create, edit, and delete courses, ensuring that the course catalog remains up-to-date and relevant.
 
 
