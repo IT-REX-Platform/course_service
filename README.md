@@ -8,6 +8,6 @@ Who has access to the course and the different roles such as lecturer, teaching 
 
 ## GraphQL API
 
-The API documentation can be found in the wiki in the [API docs folder](https://github.com/IT-REX-Platform/wiki/tree/main/api-docs).
+The API documentation can be found in the wiki in the [API docs](api.md).
 
 The API is available at `/graphql` and the GraphiQL interface is available at `/graphiql`.
