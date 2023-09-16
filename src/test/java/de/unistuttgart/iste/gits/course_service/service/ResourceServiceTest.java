@@ -2,6 +2,7 @@ package de.unistuttgart.iste.gits.course_service.service;
 
 import de.unistuttgart.iste.gits.common.event.CourseAssociationEvent;
 import de.unistuttgart.iste.gits.common.event.CrudOperation;
+import de.unistuttgart.iste.gits.common.exception.IncompleteEventMessageException;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.*;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.*;
 import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociation;
@@ -150,9 +151,9 @@ class ResourceServiceTest {
         assertDoesNotThrow(() -> resourceService.updateResourceAssociations(missingDbCourseEntity));
 
         // case: incomplete DTO
-        assertThrows(NullPointerException.class, () -> resourceService.updateResourceAssociations(missingChapter));
-        assertThrows(NullPointerException.class, () -> resourceService.updateResourceAssociations(missingResource));
-        assertThrows(NullPointerException.class, () -> resourceService.updateResourceAssociations(missingOperator));
+        assertThrows(IncompleteEventMessageException.class, () -> resourceService.updateResourceAssociations(missingChapter));
+        assertThrows(IncompleteEventMessageException.class, () -> resourceService.updateResourceAssociations(missingResource));
+        assertThrows(IncompleteEventMessageException.class, () -> resourceService.updateResourceAssociations(missingOperator));
     }
 
 

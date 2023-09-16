@@ -2,6 +2,7 @@ package de.unistuttgart.iste.gits.course_service.service;
 
 import de.unistuttgart.iste.gits.common.event.CourseAssociationEvent;
 import de.unistuttgart.iste.gits.common.event.CrudOperation;
+import de.unistuttgart.iste.gits.common.exception.IncompleteEventMessageException;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.*;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.*;
 import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociation;
@@ -106,14 +107,14 @@ public class CourseResourceAssociationService {
      *
      * @param dto Association description including CRUD Operation to be performed on Association
      */
-    public void updateResourceAssociations(CourseAssociationEvent dto) {
+    public void updateResourceAssociations(CourseAssociationEvent dto) throws IncompleteEventMessageException {
 
         List<CourseResourceAssociationEntity> currentAssociations;
         List<CourseResourceAssociationEntity> dtoAssociations = new ArrayList<>();
 
         // completeness check of input
         if (dto.getResourceId() == null || dto.getChapterIds() == null || dto.getOperation() == null) {
-            throw new NullPointerException("incomplete message received: all fields of a message must be non-null");
+            throw new IncompleteEventMessageException(IncompleteEventMessageException.ERROR_INCOMPLETE_MESSAGE);
         }
 
         // perform operation for each Chapter ID
