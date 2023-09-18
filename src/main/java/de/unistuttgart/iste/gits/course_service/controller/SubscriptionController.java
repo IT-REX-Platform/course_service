@@ -29,7 +29,7 @@ public class SubscriptionController {
             try {
                 resourceService.updateResourceAssociations(cloudEvent.getData());
             } catch (Exception e) {
-                log.error("Error while updating resource associations", e);
+                log.error("Error while processing resource-association event. {}", e.getMessage());
             }
         });
     }
