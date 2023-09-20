@@ -15,6 +15,7 @@ Who has access to the course and the different roles such as lecturer, teaching 
 | DAPR_HTTP_PORT             | Dapr HTTP Port                     | 2000                                            | 3500                                                               |
 | server.port                | Port on which the application runs | 2001                                            | 2001                                                               |
 
+### Other properties
 | Name                                        | Description                                 | Value in Dev Environment                            | Value in Prod Environment                                                |
 | ------------------------------------------- | ------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------ |
 | spring.graphql.graphiql.enabled             | Enable GraphiQL web interface for GraphQL   | true                                                | true                                                                     |
