@@ -11,7 +11,7 @@ Who has access to the course and the different roles such as lecturer, teaching 
 |----------------------------|------------------------------------|-------------------------------------------------|--------------------------------------------------------------------|
 | spring.datasource.url      | PostgreSQL database URL            | jdbc:postgresql://localhost:2032/course_service | jdbc:postgresql://course-service-db-postgresql:5432/course-service |
 | spring.datasource.username | Database username                  | root                                            | gits                                                               |
-| spring.datasource.password | Database password                  | root                                            | secret                                                             |
+| spring.datasource.password | Database password                  | root                                            | *secret*                                                           |
 | DAPR_HTTP_PORT             | Dapr HTTP Port                     | 2000                                            | 3500                                                               |
 | server.port                | Port on which the application runs | 2001                                            | 2001                                                               |
 
