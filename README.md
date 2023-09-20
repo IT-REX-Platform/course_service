@@ -25,7 +25,7 @@ Who has access to the course and the different roles such as lecturer, teaching 
 | spring.sql.init.mode                    | SQL initialization mode                   | always                                  | always                                  |
 | spring.jpa.show-sql                     | Show SQL queries in logs                  | true                                    | true                                    |
 | spring.sql.init.continue-on-error       | Continue on SQL init error                | true                                    | true                                    |
-| spring.jpa.hibernate.ddl-auto           | Hibernate DDL auto strategy               | update                                  | update                                  |
+| spring.jpa.hibernate.ddl-auto           | Hibernate DDL auto strategy               | create                                  | update                                  |
 | DAPR_GRPC_PORT                          | Dapr gRPC Port                            | -                                       | 50001                                   |
 
 ## GraphQL API
