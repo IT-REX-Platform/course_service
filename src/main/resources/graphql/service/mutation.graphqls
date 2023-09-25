@@ -28,4 +28,19 @@ type Mutation {
     Deletes an existing chapter, throws an error if no chapter with the given id exists.
     """
     deleteChapter(id: UUID!): UUID!
+
+    """
+    registers a user to a course with a role
+    """
+    createMembership(input: CourseMembershipInput!): CourseMembership!
+
+    """
+    updates the role of a user in a course
+    """
+    updateMembership(input: CourseMembershipInput!): CourseMembership!
+
+    """
+    deletes user course link
+    """
+    deleteMembership(input: CourseMembershipInput!): CourseMembership!
 }
