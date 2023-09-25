@@ -14,11 +14,6 @@ type CourseMembership {
     The role of the user in the course.
     """
     role: UserRoleInCourse!
-
-    """
-    Course of the Course Membership
-    """
-    course: Course!
 }
 
 """

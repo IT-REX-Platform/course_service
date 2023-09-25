@@ -38,10 +38,10 @@ public class CourseService {
      * @param courseInput The data of the course to create.
      * @return The created course.
      */
-    public Course createCourse(final CreateCourseInput courseInput) {
+    public Course createCourse(CreateCourseInput courseInput) {
         courseValidator.validateCreateCourseInput(courseInput);
 
-        final CourseEntity courseEntity = courseRepository.save(courseMapper.dtoToEntity(courseInput));
+        CourseEntity courseEntity = courseRepository.save(courseMapper.dtoToEntity(courseInput));
 
         return courseMapper.entityToDto(courseEntity);
     }
@@ -52,11 +52,11 @@ public class CourseService {
      * @param input The data of the course to update.
      * @return The updated course.
      */
-    public Course updateCourse(final UpdateCourseInput input) {
+    public Course updateCourse(UpdateCourseInput input) {
         courseValidator.validateUpdateCourseInput(input);
         requireCourseExisting(input.getId());
 
-        final CourseEntity updatedCourseEntity = courseRepository.save(courseMapper.dtoToEntity(input));
+        CourseEntity updatedCourseEntity = courseRepository.save(courseMapper.dtoToEntity(input));
 
         return courseMapper.entityToDto(updatedCourseEntity);
     }
@@ -68,12 +68,12 @@ public class CourseService {
      * @return The id of the deleted course.
      * @throws EntityNotFoundException If a course with the given id does not exist.
      */
-    public UUID deleteCourse(final UUID uuid) {
+    public UUID deleteCourse(UUID uuid) {
         requireCourseExisting(uuid);
 
         //collect chapters that would be deleted with the course due to cascading deletion
-        final CourseEntity entity = courseRepository.getReferenceById(uuid);
-        final List<UUID> chapterIds = entity.getChapters().stream().map(ChapterEntity::getId).toList();
+        CourseEntity entity = courseRepository.getReferenceById(uuid);
+        List<UUID> chapterIds = entity.getChapters().stream().map(ChapterEntity::getId).toList();
 
         //delete course and any chapters
         courseRepository.delete(entity);
@@ -92,11 +92,11 @@ public class CourseService {
      * @return A list of courses with the given ids, preserving the order of the ids.
      * @throws EntityNotFoundException If a course with at least one of the given ids does not exist.
      */
-    public List<Course> getCoursesByIds(final List<UUID> ids) {
-        final var result = new ArrayList<Course>(ids.size());
-        final var missingIds = new ArrayList<UUID>();
+    public List<Course> getCoursesByIds(List<UUID> ids) {
+        var result = new ArrayList<Course>(ids.size());
+        var missingIds = new ArrayList<UUID>();
 
-        for (final var id : ids) {
+        for (var id : ids) {
             courseRepository.findById(id)
                     .ifPresentOrElse(
                             courseEntity -> result.add(courseMapper.entityToDto(courseEntity)),
@@ -118,7 +118,7 @@ public class CourseService {
      * @param id The id of the course to check.
      * @throws EntityNotFoundException If a course with the given id does not exist.
      */
-    public void requireCourseExisting(final UUID id) {
+    public void requireCourseExisting(UUID id) {
         if (!courseRepository.existsById(id)) {
             throw new EntityNotFoundException("Course with id " + id + " not found");
         }
@@ -133,35 +133,30 @@ public class CourseService {
      * @param pagination    optional pagination
      * @return a list of all courses
      */
-    public CoursePayload getCourses(final CourseFilter filter,
-                                    final List<String> sortBy,
-                                    final List<SortDirection> sortDirection,
-                                    final Pagination pagination) {
+    public CoursePayload getCourses(CourseFilter filter,
+                                    List<String> sortBy,
+                                    List<SortDirection> sortDirection,
+                                    Pagination pagination) {
 
-        final Sort sort = SortUtil.createSort(sortBy, sortDirection);
-        final Pageable pageRequest = PaginationUtil.createPageable(pagination, sort);
+        Sort sort = SortUtil.createSort(sortBy, sortDirection);
+        Pageable pageRequest = PaginationUtil.createPageable(pagination, sort);
 
-        final Specification<CourseEntity> specification = CourseFilterSpecification.courseFilter(filter);
+        Specification<CourseEntity> specification = CourseFilterSpecification.courseFilter(filter);
 
         if (pageRequest.isPaged()) {
-            final Page<CourseEntity> result = courseRepository.findAll(specification, pageRequest);
+            Page<CourseEntity> result = courseRepository.findAll(specification, pageRequest);
             return createCoursePayloadPaged(result);
         }
 
-        final List<CourseEntity> result = courseRepository.findAll(specification, sort);
+        List<CourseEntity> result = courseRepository.findAll(specification, sort);
         return createCoursePayloadUnpaged(result);
     }
 
-    private CoursePayload createCoursePayloadPaged(final Page<CourseEntity> result) {
+    private CoursePayload createCoursePayloadPaged(Page<CourseEntity> result) {
         return courseMapper.createPayload(result.stream(), PaginationUtil.createPaginationInfo(result));
     }
 
-    private CoursePayload createCoursePayloadUnpaged(final List<CourseEntity> result) {
+    private CoursePayload createCoursePayloadUnpaged(List<CourseEntity> result) {
         return courseMapper.createPayload(result.stream(), PaginationUtil.unpagedPaginationInfo(result.size()));
-    }
-
-    public Course getCourseById(final UUID courseId) {
-        final CourseEntity entity = courseRepository.getReferenceById(courseId);
-        return courseMapper.entityToDto(entity);
     }
 }

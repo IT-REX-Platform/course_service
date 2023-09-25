@@ -21,8 +21,8 @@ public class MembershipController {
     private final MembershipService membershipService;
 
     @QueryMapping
-    public List<List<CourseMembership>> courseMembershipsByUserIds(@Argument final List<UUID> userIds) {
-        return membershipService.getAllMembershipsByUserIds(userIds);
+    public List<CourseMembership> courseMemberships(@Argument final UUID userId) {
+        return membershipService.getAllMembershipsByUser(userId);
     }
 
     @MutationMapping
