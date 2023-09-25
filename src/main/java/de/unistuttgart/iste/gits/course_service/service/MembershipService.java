@@ -13,8 +13,8 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import static de.unistuttgart.iste.gits.common.util.GitsCollectionUtils.groupIntoSubLists;
 
 @Service
 @RequiredArgsConstructor
@@ -27,19 +27,16 @@ public class MembershipService {
 
     /**
      * Allows to retrieve a List of Membership Objects that link a course with a User and their role in the course
-     * @param userId User ID for which course memberships are queried
+     * @param userIds User ID for which course memberships are queried
      * @return List of course memberships
      */
-    public List<CourseMembership> getAllMembershipsByUser(final UUID userId) {
-        //init
-        final List<CourseMembershipEntity> membershipEntities;
-
-        // get entities from database
-        membershipEntities = courseMembershipRepository.findCourseMembershipEntitiesByUserIdOrderByCourseId(userId);
-
-        return membershipEntities.stream()
+    public List<List<CourseMembership>> getAllMembershipsByUserIds(final List<UUID> userIds) {
+        final List<CourseMembership> allCourseMemberships = courseMembershipRepository.findByUserIdIn(userIds)
+                .stream()
                 .map(membershipMapper::entityToDto)
                 .toList();
+
+        return groupIntoSubLists(allCourseMemberships, userIds, CourseMembership::getUserId);
     }
 
     /**

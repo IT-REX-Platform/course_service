@@ -19,23 +19,25 @@ class QueryCourseMembershipsTest {
     @Autowired
     private CourseMembershipRepository membershipRepository;
 
-    UUID userId = UUID.randomUUID();
+
+
 
     @Test
     void testNoMembershipExisting(final GraphQlTester tester){
-        final String query = String.format("""
-                query {
-                        courseMemberships(userId: "%s") {
+        final List<UUID> userIds = List.of(UUID.randomUUID());
+        final String query = """
+                query($userIds: [UUID!]!) {
+                        courseMembershipsByUserIds(userIds: $userIds) {
                             userId
                             courseId
                             role
                     }
                 }
-                """, userId);
+                """;
         tester.document(query)
-                .variable("userId", userId)
+                .variable("userIds", userIds.subList(0,1))
                 .execute()
-                .path("courseMemberships")
+                .path("courseMembershipsByUserIds[*][*]")
                 .entityList(CourseMembership.class)
                 .hasSize(0);
     }
@@ -45,6 +47,7 @@ class QueryCourseMembershipsTest {
 
         final UUID userId = UUID.randomUUID();
         final List<CourseMembership> DTOList = new ArrayList<>();
+        final List<UUID> userIds = List.of(userId);
 
         for (int i = 0; i < 2; i++) {
             final UUID courseId = UUID.randomUUID();
@@ -54,19 +57,19 @@ class QueryCourseMembershipsTest {
             DTOList.add(dto);
         }
 
-        final String query = String.format("""
-                query {
-                        courseMemberships(userId: "%s") {
+        final String query = """
+                query($userIds: [UUID!]!) {
+                        courseMembershipsByUserIds(userIds: $userIds) {
                             userId
                             courseId
                             role
                     }
                 }
-                """, userId);
+                """;
         tester.document(query)
-                .variable("userId", userId)
+                .variable("userIds", userIds.subList(0,1))
                 .execute()
-                .path("courseMemberships")
+                .path("courseMembershipsByUserIds[*][*]")
                 .entityList(CourseMembership.class)
                 .hasSize(2)
                 .contains(DTOList.get(0), DTOList.get(1));
