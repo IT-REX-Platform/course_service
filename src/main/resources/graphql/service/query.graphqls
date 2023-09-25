@@ -51,9 +51,4 @@ type Query {
         """
         sortDirection: [SortDirection!]! = [ASC],
         pagination: Pagination): ChapterPayload!
-
-    """
-    Returns the list of courseMemberships for the specified User.
-    """
-    courseMemberships(userId: UUID!) : [CourseMembership!]!
 }
