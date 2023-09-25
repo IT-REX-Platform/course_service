@@ -19,13 +19,13 @@ class QueryCourseMembershipsTest {
     @Autowired
     private CourseMembershipRepository membershipRepository;
 
-    UUID userId = UUID.randomUUID();
+     UUID userId = UUID.randomUUID();
 
     @Test
     void testNoMembershipExisting(final GraphQlTester tester){
         final String query = String.format("""
                 query {
-                        courseMemberships(userId: "%s") {
+                        courseMembershipsByUserIds(userIds: ["2ac12d47-fff1-48c6-81de-f2721f39cdfa"]) {
                             userId
                             courseId
                             role
@@ -33,9 +33,8 @@ class QueryCourseMembershipsTest {
                 }
                 """, userId);
         tester.document(query)
-                .variable("userId", userId)
                 .execute()
-                .path("courseMemberships")
+                .path("courseMembershipsByUserIds")
                 .entityList(CourseMembership.class)
                 .hasSize(0);
     }
@@ -56,7 +55,7 @@ class QueryCourseMembershipsTest {
 
         final String query = String.format("""
                 query {
-                        courseMemberships(userId: "%s") {
+                        courseMembershipsByUserIds(userId: "%s") {
                             userId
                             courseId
                             role
@@ -66,7 +65,7 @@ class QueryCourseMembershipsTest {
         tester.document(query)
                 .variable("userId", userId)
                 .execute()
-                .path("courseMemberships")
+                .path("courseMembershipsByUserIds")
                 .entityList(CourseMembership.class)
                 .hasSize(2)
                 .contains(DTOList.get(0), DTOList.get(1));
