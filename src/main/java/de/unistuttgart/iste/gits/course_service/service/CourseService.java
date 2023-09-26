@@ -13,11 +13,15 @@ import de.unistuttgart.iste.gits.course_service.persistence.validation.CourseVal
 import de.unistuttgart.iste.gits.generated.dto.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -28,6 +32,7 @@ import java.util.stream.Collectors;
 public class CourseService {
 
     private final CourseRepository courseRepository;
+    private final MembershipService membershipService;
     private final CourseMapper courseMapper;
     private final CourseValidator courseValidator;
     private final TopicPublisher topicPublisher;
@@ -38,10 +43,15 @@ public class CourseService {
      * @param courseInput The data of the course to create.
      * @return The created course.
      */
-    public Course createCourse(final CreateCourseInput courseInput) {
+    public Course createCourse(final CreateCourseInput courseInput, final UUID userId) {
         courseValidator.validateCreateCourseInput(courseInput);
 
         final CourseEntity courseEntity = courseRepository.save(courseMapper.dtoToEntity(courseInput));
+
+        // create Membership for the creator of the course
+        final CourseMembershipInput courseMembershipInput = new CourseMembershipInput(userId, courseEntity.getId(), UserRoleInCourse.ADMINISTRATOR);
+
+        membershipService.createMembership(courseMembershipInput);
 
         return courseMapper.entityToDto(courseEntity);
     }
@@ -75,6 +85,8 @@ public class CourseService {
         final CourseEntity entity = courseRepository.getReferenceById(uuid);
         final List<UUID> chapterIds = entity.getChapters().stream().map(ChapterEntity::getId).toList();
 
+        // delete Memberships
+        membershipService.deleteMembershipByCourseId(uuid);
         //delete course and any chapters
         courseRepository.delete(entity);
 

@@ -1,5 +1,6 @@
 package de.unistuttgart.iste.gits.course_service.controller;
 
+import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.gits.course_service.service.CourseService;
 import de.unistuttgart.iste.gits.generated.dto.*;
 import lombok.extern.slf4j.Slf4j;
@@ -41,8 +42,8 @@ public class CourseController {
     }
 
     @MutationMapping
-    public Course createCourse(@Argument(name = "input") final CreateCourseInput input) {
-        return courseService.createCourse(input);
+    public Course createCourse(@Argument(name = "input") final CreateCourseInput input, @ContextValue final LoggedInUser currentUser) {
+        return courseService.createCourse(input, currentUser.getId());
     }
 
     @MutationMapping
