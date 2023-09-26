@@ -55,5 +55,5 @@ type Query {
     """
     Returns the list of courseMemberships for the specified User.
     """
-    courseMemberships(userId: UUID!) : [CourseMembership!]!
+    courseMembershipsByUserIds(userIds: [UUID!]!) : [[CourseMembership!]!]!
 }

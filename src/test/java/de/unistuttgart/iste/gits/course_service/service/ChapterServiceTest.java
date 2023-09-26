@@ -3,6 +3,7 @@ package de.unistuttgart.iste.gits.course_service.service;
 import de.unistuttgart.iste.gits.common.event.CrudOperation;
 import de.unistuttgart.iste.gits.course_service.dapr.TopicPublisher;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.mapper.ChapterMapper;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.validation.ChapterValidator;
@@ -43,8 +44,12 @@ class ChapterServiceTest {
 
     @Test
     void testGetChaptersByIdsMissingChapter() {
-        UUID wrongUUID = UUID.randomUUID();
-        List<UUID> uuids = List.of(wrongUUID);
+        final UUID wrongUUID = UUID.randomUUID();
+        final List<UUID> uuids = List.of(wrongUUID);
+
+        when(chapterRepository.getAllByIdPreservingOrder(uuids))
+                .thenThrow(EntityNotFoundException.class);
+
         assertThrows(EntityNotFoundException.class, () -> chapterService.getChaptersByIds(uuids));
     }
 
@@ -56,16 +61,17 @@ class ChapterServiceTest {
     @Test
     void testCreateChapterSuccessful() {
         // arrange test data
-        CreateChapterInput testCreateChapterInput = dummyCreateChapterInputBuilder().build();
-        ChapterEntity expectedChapter = dummyChapterEntityBuilder().build();
+        final CreateChapterInput testCreateChapterInput = dummyCreateChapterInputBuilder().build();
+        final ChapterEntity expectedChapter = dummyChapterEntityBuilder().build();
 
         // mock repository and service
-        doNothing().when(courseService).requireCourseExisting(any());
+        when(courseService.requireCourseExisting(any()))
+                .thenReturn(new CourseEntity()); // actual return value does not matter
         when(chapterRepository.save(any()))
                 .thenReturn(expectedChapter);
 
         // act
-        Chapter createdChapter = chapterService.createChapter(testCreateChapterInput);
+        final Chapter createdChapter = chapterService.createChapter(testCreateChapterInput);
 
         // assert
         assertThat(createdChapter.getId(), is(expectedChapter.getId()));
@@ -90,13 +96,14 @@ class ChapterServiceTest {
     @Test
     void testCreateChapterStartDateAfterEndDate() {
         // arrange test data
-        CreateChapterInput testCreateChapterInput = dummyCreateChapterInputBuilder()
+        final CreateChapterInput testCreateChapterInput = dummyCreateChapterInputBuilder()
                 .setStartDate(OffsetDateTime.now().plusDays(1))
                 .setEndDate(OffsetDateTime.now())
                 .build();
 
         // mock service
-        doNothing().when(courseService).requireCourseExisting(any());
+        when(courseService.requireCourseExisting(any()))
+                .thenReturn(new CourseEntity()); // actual return value does not matter
 
         // act and assert
         assertThrows(ValidationException.class, () -> chapterService.createChapter(testCreateChapterInput));
@@ -114,7 +121,7 @@ class ChapterServiceTest {
     @Test
     void testCreateChapterCourseNotFound() {
         // arrange test data
-        CreateChapterInput testCreateChapterInput = dummyCreateChapterInputBuilder()
+        final CreateChapterInput testCreateChapterInput = dummyCreateChapterInputBuilder()
                 .setCourseId(UUID.randomUUID())
                 .build();
 
@@ -137,11 +144,11 @@ class ChapterServiceTest {
     @Test
     void testUpdateChapterSuccessful() {
         // arrange test data
-        ChapterEntity expectedChapter = dummyChapterEntityBuilder()
+        final ChapterEntity expectedChapter = dummyChapterEntityBuilder()
                 .description("new description")
                 .courseId(UUID.randomUUID())
                 .build();
-        UpdateChapterInput testUpdateChapterInput = dummyUpdateChapterInputBuilder(expectedChapter.getId())
+        final UpdateChapterInput testUpdateChapterInput = dummyUpdateChapterInputBuilder(expectedChapter.getId())
                 .setDescription("new description")
                 .build();
 
@@ -154,7 +161,7 @@ class ChapterServiceTest {
                 .thenReturn(Optional.of(expectedChapter));
 
         // act
-        Chapter updatedChapter = chapterService.updateChapter(testUpdateChapterInput);
+        final Chapter updatedChapter = chapterService.updateChapter(testUpdateChapterInput);
 
         // assert
         assertThat(updatedChapter.getId(), is(expectedChapter.getId()));
@@ -180,8 +187,8 @@ class ChapterServiceTest {
     @Test
     void testUpdateChapterStartDateAfterEndDate() {
         // arrange test data
-        ChapterEntity expectedChapter = dummyChapterEntityBuilder().build();
-        UpdateChapterInput testUpdateChapterInput = dummyUpdateChapterInputBuilder(expectedChapter.getId())
+        final ChapterEntity expectedChapter = dummyChapterEntityBuilder().build();
+        final UpdateChapterInput testUpdateChapterInput = dummyUpdateChapterInputBuilder(expectedChapter.getId())
                 .setStartDate(OffsetDateTime.now().plusDays(1))
                 .setEndDate(OffsetDateTime.now())
                 .build();
@@ -206,7 +213,7 @@ class ChapterServiceTest {
     @Test
     void testDeleteChapterSuccessful() {
         // arrange test data
-        UUID testChapterId = UUID.randomUUID();
+        final UUID testChapterId = UUID.randomUUID();
 
         // mock repository
         doNothing()
@@ -215,7 +222,7 @@ class ChapterServiceTest {
                 .when(chapterRepository).findById(any());
 
         // act
-        UUID deletedChapterId = chapterService.deleteChapter(testChapterId);
+        final UUID deletedChapterId = chapterService.deleteChapter(testChapterId);
 
         // assert
         assertThat(deletedChapterId, is(testChapterId));
@@ -235,7 +242,7 @@ class ChapterServiceTest {
     @Test
     void testDeleteChapterNotExisting() {
         // arrange test data
-        UUID testChapterId = UUID.randomUUID();
+        final UUID testChapterId = UUID.randomUUID();
 
         // mock repository
         doReturn(false)
@@ -248,7 +255,7 @@ class ChapterServiceTest {
         verify(topicPublisher, never()).notifyChapterChanges(List.of(testChapterId), CrudOperation.DELETE);
     }
 
-    private static UpdateChapterInput.Builder dummyUpdateChapterInputBuilder(UUID uuid) {
+    private static UpdateChapterInput.Builder dummyUpdateChapterInputBuilder(final UUID uuid) {
         return UpdateChapterInput.builder()
                 .setId(uuid)
                 .setTitle("testTitle")
