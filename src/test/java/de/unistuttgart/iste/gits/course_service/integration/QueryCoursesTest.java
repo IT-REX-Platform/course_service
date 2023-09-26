@@ -340,7 +340,7 @@ class QueryCoursesTest {
         tester.document(query)
                 .execute()
                 .errors()
-                .expect(responseError -> requireNonNull(responseError.getMessage()).contains("Course(s) with id(s) ")
+                .expect(responseError -> requireNonNull(responseError.getMessage()).contains("Entities(s) with id(s) ")
                                          && responseError.getMessage().contains(" not found"));
     }
 
