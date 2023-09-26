@@ -3,7 +3,6 @@ package de.unistuttgart.iste.gits.course_service.persistence.repository;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseMembershipEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseMembershipPk;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
