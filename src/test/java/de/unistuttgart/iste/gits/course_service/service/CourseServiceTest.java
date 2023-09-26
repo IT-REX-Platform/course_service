@@ -7,10 +7,7 @@ import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.mapper.CourseMapper;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.validation.CourseValidator;
-import de.unistuttgart.iste.gits.generated.dto.Course;
-import de.unistuttgart.iste.gits.generated.dto.CreateCourseInput;
-import de.unistuttgart.iste.gits.generated.dto.UpdateCourseInput;
-import de.unistuttgart.iste.gits.generated.dto.YearDivision;
+import de.unistuttgart.iste.gits.generated.dto.*;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
@@ -18,12 +15,10 @@ import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -151,8 +146,8 @@ class CourseServiceTest {
         // mock repository
         doReturn(expectedCourseEntity)
                 .when(courseRepository).save(any(CourseEntity.class));
-        doReturn(true)
-                .when(courseRepository).existsById(any(UUID.class));
+        doReturn(Optional.of(expectedCourseEntity))
+                .when(courseRepository).findById(any(UUID.class));
 
         // act
         final Course actualCourse = courseService.updateCourse(input);
@@ -204,11 +199,8 @@ class CourseServiceTest {
         // arrange
         final CourseEntity entity = dummyCourseEntityBuilder().build();
 
-
-
         // mock repository
-        doReturn(true).when(courseRepository).existsById(entity.getId());
-        when(courseRepository.getReferenceById(entity.getId())).thenReturn(entity);
+        when(courseRepository.findById(entity.getId())).thenReturn(Optional.of(entity));
         entity.setChapters(List.of(dummyChapterBuilder(entity.getId()), dummyChapterBuilder(entity.getId())));
 
         // act
@@ -254,16 +246,16 @@ class CourseServiceTest {
     @Test
     void testRequireCourseExisting() {
         // arrange
-        final UUID id = UUID.randomUUID();
+        final CourseEntity entity = dummyCourseEntityBuilder().build();
 
         // mock repository
-        doReturn(true).when(courseRepository).existsById(id);
+        doReturn(Optional.of(entity)).when(courseRepository).findById(entity.getId());
 
         // act
-        assertDoesNotThrow(() -> courseService.requireCourseExisting(id));
+        assertThat(courseService.requireCourseExisting(entity.getId()), is(entity));
 
         // verify
-        verify(courseRepository).existsById(id);
+        verify(courseRepository).findById(entity.getId());
     }
 
     /**
@@ -277,13 +269,13 @@ class CourseServiceTest {
         final UUID id = UUID.randomUUID();
 
         // mock repository
-        doReturn(false).when(courseRepository).existsById(id);
+        doReturn(Optional.empty()).when(courseRepository).findById(id);
 
         // act and assert
         assertThrows(EntityNotFoundException.class, () -> courseService.requireCourseExisting(id));
 
         // verify
-        verify(courseRepository).existsById(id);
+        verify(courseRepository).findById(id);
     }
 
     private CreateCourseInput.Builder dummyCreateCourseInputBuilder() {
@@ -311,7 +303,7 @@ class CourseServiceTest {
                 .setEndDate(OffsetDateTime.parse("2021-01-01T00:00:00Z"));
     }
 
-    private ChapterEntity dummyChapterBuilder(final UUID courseId){
+    private ChapterEntity dummyChapterBuilder(final UUID courseId) {
         return ChapterEntity.builder()
                 .id(UUID.randomUUID())
                 .courseId(courseId)

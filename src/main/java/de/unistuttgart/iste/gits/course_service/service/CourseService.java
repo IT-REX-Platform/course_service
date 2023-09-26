@@ -13,16 +13,11 @@ import de.unistuttgart.iste.gits.course_service.persistence.validation.CourseVal
 import de.unistuttgart.iste.gits.generated.dto.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.*;
 
 /**
  * Service that handles course related operations.
@@ -79,10 +74,8 @@ public class CourseService {
      * @throws EntityNotFoundException If a course with the given id does not exist.
      */
     public UUID deleteCourse(final UUID uuid) {
-        requireCourseExisting(uuid);
-
         //collect chapters that would be deleted with the course due to cascading deletion
-        final CourseEntity entity = courseRepository.getReferenceById(uuid);
+        final CourseEntity entity = requireCourseExisting(uuid);
         final List<UUID> chapterIds = entity.getChapters().stream().map(ChapterEntity::getId).toList();
 
         // delete Memberships
@@ -105,35 +98,33 @@ public class CourseService {
      * @throws EntityNotFoundException If a course with at least one of the given ids does not exist.
      */
     public List<Course> getCoursesByIds(final List<UUID> ids) {
-        final var result = new ArrayList<Course>(ids.size());
-        final var missingIds = new ArrayList<UUID>();
+        return courseRepository.getAllByIdPreservingOrder(ids)
+                .stream()
+                .map(courseMapper::entityToDto)
+                .toList();
+    }
 
-        for (final var id : ids) {
-            courseRepository.findById(id)
-                    .ifPresentOrElse(
-                            courseEntity -> result.add(courseMapper.entityToDto(courseEntity)),
-                            () -> missingIds.add(id));
-        }
-
-        if (!missingIds.isEmpty()) {
-            throw new EntityNotFoundException("Course(s) with id(s) "
-                                              + missingIds.stream().map(UUID::toString).collect(Collectors.joining(", "))
-                                              + " not found");
-        }
-
-        return result;
+    /**
+     * Returns a course by its id.
+     *
+     * @param courseId The id of the course to return.
+     * @return The course with the given id.
+     */
+    public Course getCourseById(final UUID courseId) {
+        final CourseEntity entity = requireCourseExisting(courseId);
+        return courseMapper.entityToDto(entity);
     }
 
     /**
      * Checks if a course with the given id exists. If not, an EntityNotFoundException is thrown.
      *
      * @param id The id of the course to check.
+     * @return The course with the given id.
      * @throws EntityNotFoundException If a course with the given id does not exist.
      */
-    public void requireCourseExisting(final UUID id) {
-        if (!courseRepository.existsById(id)) {
-            throw new EntityNotFoundException("Course with id " + id + " not found");
-        }
+    public CourseEntity requireCourseExisting(final UUID id) {
+        return courseRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Course with id " + id + " not found"));
     }
 
     /**
@@ -164,16 +155,33 @@ public class CourseService {
         return createCoursePayloadUnpaged(result);
     }
 
+    /**
+     * Returns a map of courses by their course memberships.
+     *
+     * @param courseMemberships The course memberships to get the courses for.
+     * @return A map of courses by their course memberships.
+     */
+    public Map<CourseMembership, Course> getCoursesByCourseMemberships(final List<CourseMembership> courseMemberships) {
+        final List<UUID> courseIds = courseMemberships.stream()
+                .map(CourseMembership::getCourseId)
+                .toList();
+
+        final List<Course> courses = getCoursesByIds(courseIds);
+
+        final Map<CourseMembership, Course> courseMap = new HashMap<>();
+
+        for (int i = 0; i < courseIds.size(); i++) {
+            courseMap.put(courseMemberships.get(i), courses.get(i));
+        }
+
+        return courseMap;
+    }
+
     private CoursePayload createCoursePayloadPaged(final Page<CourseEntity> result) {
         return courseMapper.createPayload(result.stream(), PaginationUtil.createPaginationInfo(result));
     }
 
     private CoursePayload createCoursePayloadUnpaged(final List<CourseEntity> result) {
         return courseMapper.createPayload(result.stream(), PaginationUtil.unpagedPaginationInfo(result.size()));
-    }
-
-    public Course getCourseById(final UUID courseId) {
-        final CourseEntity entity = courseRepository.getReferenceById(courseId);
-        return courseMapper.entityToDto(entity);
     }
 }
