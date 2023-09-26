@@ -16,8 +16,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.UUID;
 
 import static de.unistuttgart.iste.gits.course_service.persistence.specification.ChapterFilterSpecification.chapterFilter;
 import static de.unistuttgart.iste.gits.course_service.persistence.specification.ChapterFilterSpecification.courseIdEquals;
@@ -42,23 +42,10 @@ public class ChapterService {
      * @return The chapters with the given ids in order of the given ids.
      * @throws EntityNotFoundException If at least one of the chapters could not be found.
      */
-    public List<Chapter> getChaptersByIds(List<UUID> ids) {
-        List<Chapter> result = new ArrayList<>(ids.size());
-        List<UUID> missingIds = new ArrayList<>();
-
-        for(UUID id : ids) {
-            chapterRepository.findById(id).ifPresentOrElse(
-                    chapterEntity -> result.add(chapterMapper.entityToDto(chapterEntity)),
-                    () -> missingIds.add(id)
-            );
-        }
-
-        if(!missingIds.isEmpty()) {
-            throw new EntityNotFoundException("The following chapters could not be found: "
-                    + missingIds.stream().map(UUID::toString).collect(Collectors.joining(", ")));
-        }
-
-        return result;
+    public List<Chapter> getChaptersByIds(final List<UUID> ids) {
+        return chapterRepository.getAllByIdPreservingOrder(ids).stream()
+                .map(chapterMapper::entityToDto)
+                .toList();
     }
 
     /**
@@ -68,7 +55,7 @@ public class ChapterService {
      * @return The created chapter.
      * @throws EntityNotFoundException If the course with the given id does not exist.
      */
-    public Chapter createChapter(CreateChapterInput chapterData) {
+    public Chapter createChapter(final CreateChapterInput chapterData) {
         chapterValidator.validateCreateChapterInput(chapterData);
         courseService.requireCourseExisting(chapterData.getCourseId());
 
@@ -84,10 +71,10 @@ public class ChapterService {
      * @param chapterData The data of the chapter to update.
      * @return The updated chapter.
      */
-    public Chapter updateChapter(UpdateChapterInput chapterData) {
+    public Chapter updateChapter(final UpdateChapterInput chapterData) {
         chapterValidator.validateUpdateChapterInput(chapterData);
 
-        UUID courseID = requireChapterExisting(chapterData.getId())
+        final UUID courseID = requireChapterExisting(chapterData.getId())
                 .getCourseId();
 
         ChapterEntity updatedChapterEntity = chapterMapper.dtoToEntity(chapterData);
@@ -104,7 +91,7 @@ public class ChapterService {
      * @return The id of the deleted chapter.
      * @throws EntityNotFoundException If the chapter does not exist.
      */
-    public UUID deleteChapter(UUID uuid) {
+    public UUID deleteChapter(final UUID uuid) {
         requireChapterExisting(uuid);
 
         chapterRepository.deleteById(uuid);
@@ -121,10 +108,10 @@ public class ChapterService {
      * @param chapterId The id of the chapter to get the course for.
      * @return The course of the chapter.
      */
-    public Course getCourseForChapterId(UUID chapterId) {
-        ChapterEntity chapterEntity = requireChapterExisting(chapterId);
-        courseService.requireCourseExisting(chapterEntity.getCourseId());
-        return courseService.getCoursesByIds(List.of(chapterEntity.getCourseId())).get(0);
+    public Course getCourseForChapterId(final UUID chapterId) {
+        final ChapterEntity chapterEntity = requireChapterExisting(chapterId);
+
+        return courseService.getCourseById(chapterEntity.getCourseId());
     }
 
     /**
@@ -134,39 +121,39 @@ public class ChapterService {
      * @throws EntityNotFoundException If the chapter does not exist.
      * @return The chapter entity with the given id.
      */
-    private ChapterEntity requireChapterExisting(UUID uuid) {
+    private ChapterEntity requireChapterExisting(final UUID uuid) {
         return chapterRepository.findById(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Chapter with id " + uuid + " not found"));
     }
 
-    public ChapterPayload getChapters(UUID courseId,
-                                      @Nullable ChapterFilter filter,
-                                      List<String> sortBy,
-                                      List<SortDirection> sortDirection,
-                                      @Nullable Pagination pagination) {
+    public ChapterPayload getChapters(final UUID courseId,
+                                      @Nullable final ChapterFilter filter,
+                                      final List<String> sortBy,
+                                      final List<SortDirection> sortDirection,
+                                      @Nullable final Pagination pagination) {
         courseService.requireCourseExisting(courseId);
 
-        Sort sort = SortUtil.createSort(sortBy, sortDirection);
-        Pageable pageRequest = PaginationUtil.createPageable(pagination, sort);
+        final Sort sort = SortUtil.createSort(sortBy, sortDirection);
+        final Pageable pageRequest = PaginationUtil.createPageable(pagination, sort);
 
-        Specification<ChapterEntity> specification =
+        final Specification<ChapterEntity> specification =
                 where(courseIdEquals(courseId)).and(chapterFilter(filter));
 
         if (pageRequest.isPaged()) {
-            Page<ChapterEntity> result = chapterRepository.findAll(specification, pageRequest);
+            final Page<ChapterEntity> result = chapterRepository.findAll(specification, pageRequest);
             return createChapterPayloadPaged(result);
         }
 
-        List<ChapterEntity> result = chapterRepository.findAll(specification, sort);
+        final List<ChapterEntity> result = chapterRepository.findAll(specification, sort);
         return createChapterPayloadUnpaged(result);
     }
 
-    private ChapterPayload createChapterPayloadPaged(Page<ChapterEntity> chapters) {
+    private ChapterPayload createChapterPayloadPaged(final Page<ChapterEntity> chapters) {
         return chapterMapper.createChapterPayload(chapters.stream(),
                 PaginationUtil.createPaginationInfo(chapters));
     }
 
-    private ChapterPayload createChapterPayloadUnpaged(List<ChapterEntity> chapters) {
+    private ChapterPayload createChapterPayloadUnpaged(final List<ChapterEntity> chapters) {
         return chapterMapper.createChapterPayload(chapters.stream(),
                 PaginationUtil.unpagedPaginationInfo(chapters.size()));
     }

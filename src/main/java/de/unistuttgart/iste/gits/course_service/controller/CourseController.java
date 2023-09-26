@@ -7,8 +7,7 @@ import org.springframework.graphql.data.method.annotation.*;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Slf4j
 @Controller
@@ -20,9 +19,9 @@ public class CourseController {
         this.courseService = courseService;
     }
 
-    @SchemaMapping
-    public Course course(final CourseMembership courseMembership) {
-        return courseService.getCourseById(courseMembership.getCourseId());
+    @BatchMapping(typeName = "CourseMembership")
+    public Map<CourseMembership, Course> course(final List<CourseMembership> courseMemberships) {
+        return courseService.getCoursesByCourseMemberships(courseMemberships);
     }
 
     @QueryMapping
