@@ -6,6 +6,7 @@ import de.unistuttgart.iste.gits.common.exception.IncompleteEventMessageExceptio
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseMembershipEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.mapper.MembershipMapper;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseMembershipRepository;
+import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.generated.dto.Course;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
 import de.unistuttgart.iste.gits.generated.dto.UserRoleInCourse;
@@ -25,9 +26,11 @@ class MembershipServiceTest {
 
     private final CourseMembershipRepository courseMembershipRepository = Mockito.mock(CourseMembershipRepository.class);
 
+    private final CourseRepository courseRepository = Mockito.mock(CourseRepository.class);
+
     private final MembershipMapper membershipMapper = new MembershipMapper(new ModelMapper());
 
-    private final MembershipService membershipService = new MembershipService(courseMembershipRepository, membershipMapper);
+    private final MembershipService membershipService = new MembershipService(courseMembershipRepository, courseRepository, membershipMapper);
 
     @Test
     void getAllMembershipsByUserIdsTest() {

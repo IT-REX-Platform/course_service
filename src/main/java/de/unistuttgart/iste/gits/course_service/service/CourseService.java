@@ -27,6 +27,7 @@ import java.util.*;
 public class CourseService {
 
     private final CourseRepository courseRepository;
+    private final MembershipService membershipService;
     private final CourseMapper courseMapper;
     private final CourseValidator courseValidator;
     private final TopicPublisher topicPublisher;
@@ -37,10 +38,15 @@ public class CourseService {
      * @param courseInput The data of the course to create.
      * @return The created course.
      */
-    public Course createCourse(final CreateCourseInput courseInput) {
+    public Course createCourse(final CreateCourseInput courseInput, final UUID userId) {
         courseValidator.validateCreateCourseInput(courseInput);
 
         final CourseEntity courseEntity = courseRepository.save(courseMapper.dtoToEntity(courseInput));
+
+        // create Membership for the creator of the course
+        final CourseMembershipInput courseMembershipInput = new CourseMembershipInput(userId, courseEntity.getId(), UserRoleInCourse.ADMINISTRATOR);
+
+        membershipService.createMembership(courseMembershipInput);
 
         return courseMapper.entityToDto(courseEntity);
     }
@@ -72,6 +78,8 @@ public class CourseService {
         final CourseEntity entity = requireCourseExisting(uuid);
         final List<UUID> chapterIds = entity.getChapters().stream().map(ChapterEntity::getId).toList();
 
+        // delete Memberships
+        membershipService.deleteMembershipByCourseId(uuid);
         //delete course and any chapters
         courseRepository.delete(entity);
 

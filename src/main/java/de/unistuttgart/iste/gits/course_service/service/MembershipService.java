@@ -7,13 +7,16 @@ import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseMembers
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseMembershipPk;
 import de.unistuttgart.iste.gits.course_service.persistence.mapper.MembershipMapper;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseMembershipRepository;
+import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembershipInput;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.UUID;
+
 import static de.unistuttgart.iste.gits.common.util.GitsCollectionUtils.groupIntoSubLists;
 
 @Service
@@ -21,6 +24,8 @@ import static de.unistuttgart.iste.gits.common.util.GitsCollectionUtils.groupInt
 public class MembershipService {
 
     private final CourseMembershipRepository courseMembershipRepository;
+
+    private final CourseRepository courseRepository;
 
     private final MembershipMapper membershipMapper;
 
@@ -45,6 +50,10 @@ public class MembershipService {
      * @return created entity
      */
     public CourseMembership createMembership(final CourseMembershipInput inputDto) {
+            if (!courseRepository.existsById(inputDto.getCourseId())) {
+                throw new EntityNotFoundException("Course with id " + inputDto.getCourseId() + " not found");
+            }
+
         final CourseMembershipEntity entity = courseMembershipRepository.save(membershipMapper.dtoToEntity(inputDto));
 
         return membershipMapper.entityToDto(entity);

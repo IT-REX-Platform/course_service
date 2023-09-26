@@ -1,14 +1,17 @@
 package de.unistuttgart.iste.gits.course_service.integration;
 
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseMembershipEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseMembershipRepository;
+import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
 import de.unistuttgart.iste.gits.generated.dto.UserRoleInCourse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @GraphQlApiTest
@@ -17,12 +20,16 @@ class MutationCourseMembershipTest {
     @Autowired
     CourseMembershipRepository courseMembershipRepository;
 
+    @Autowired
+    CourseRepository courseRepository;
     @Test
     void createMembershipTest(final GraphQlTester tester){
 
+        final CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
+
         final CourseMembership expectedDto = CourseMembership.builder()
                 .setUserId(UUID.randomUUID())
-                .setCourseId(UUID.randomUUID())
+                .setCourseId(course.getId())
                 .setRole(UserRoleInCourse.STUDENT)
                 .build();
 
@@ -205,6 +212,15 @@ class MutationCourseMembershipTest {
                 .path("deleteMembership")
                 .entity(CourseMembership.class)
                 .isEqualTo(expectedDto);
+    }
+
+    private CourseEntity.CourseEntityBuilder dummyCourseBuilder() {
+        return CourseEntity.builder()
+                .title("Course 1")
+                .description("This is course 1")
+                .published(false)
+                .startDate(OffsetDateTime.parse("2020-01-01T00:00:00.000Z"))
+                .endDate(OffsetDateTime.parse("2021-01-01T00:00:00.000Z"));
     }
 
 }
