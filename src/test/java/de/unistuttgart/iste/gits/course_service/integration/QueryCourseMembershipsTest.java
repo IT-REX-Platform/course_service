@@ -27,7 +27,7 @@ class QueryCourseMembershipsTest {
         final List<UUID> userIds = List.of(UUID.randomUUID());
         final String query = """
                 query($userIds: [UUID!]!) {
-                        courseMembershipsByUserIds(userIds: $userIds) {
+                        _internal_noauth_courseMembershipsByUserIds(userIds: $userIds) {
                             userId
                             courseId
                             role
@@ -37,7 +37,7 @@ class QueryCourseMembershipsTest {
         tester.document(query)
                 .variable("userIds", userIds.subList(0,1))
                 .execute()
-                .path("courseMembershipsByUserIds[*][*]")
+                .path("_internal_noauth_courseMembershipsByUserIds[*][*]")
                 .entityList(CourseMembership.class)
                 .hasSize(0);
     }
@@ -71,7 +71,7 @@ class QueryCourseMembershipsTest {
 
         final String query = """
                 query($userIds: [UUID!]!) {
-                        courseMembershipsByUserIds(userIds: $userIds) {
+                        _internal_noauth_courseMembershipsByUserIds(userIds: $userIds) {
                             userId
                             courseId
                             role
@@ -87,7 +87,7 @@ class QueryCourseMembershipsTest {
         tester.document(query)
                 .variable("userIds", userIds.subList(0,1))
                 .execute()
-                .path("courseMembershipsByUserIds[*][*]")
+                .path("_internal_noauth_courseMembershipsByUserIds[*][*]")
                 .entityList(CourseMembership.class)
                 .hasSize(2)
                 .contains(courseMemberships.get(0), courseMemberships.get(1));

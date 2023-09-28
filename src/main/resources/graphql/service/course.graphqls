@@ -41,6 +41,7 @@ type Course {
     yearDivision: YearDivision
     """
     Chapters of the course. Can be filtered and sorted.
+    🔒 User needs to be enrolled in the course to access this field.
     """
     chapters(filter: ChapterFilter,
         """
