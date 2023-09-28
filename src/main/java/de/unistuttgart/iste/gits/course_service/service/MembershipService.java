@@ -1,8 +1,5 @@
 package de.unistuttgart.iste.gits.course_service.service;
 
-import de.unistuttgart.iste.gits.common.event.CourseChangeEvent;
-import de.unistuttgart.iste.gits.common.event.CrudOperation;
-import de.unistuttgart.iste.gits.common.exception.IncompleteEventMessageException;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseMembershipEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseMembershipPk;
 import de.unistuttgart.iste.gits.course_service.persistence.mapper.MembershipMapper;
@@ -104,23 +101,6 @@ public class MembershipService {
         }
     }
 
-    /**
-     * method to handle course deletion events. removes all course memberships associated with the course ID
-     * @param changeEvent course change event
-     */
-    public void removeCourse(final CourseChangeEvent changeEvent) throws IncompleteEventMessageException {
-        // evaluate course Update message
-        if (changeEvent.getCourseId() == null || changeEvent.getOperation() == null){
-            throw new IncompleteEventMessageException(IncompleteEventMessageException.ERROR_INCOMPLETE_MESSAGE);
-        }
-        //only consider DELETE events
-        if (!changeEvent.getOperation().equals(CrudOperation.DELETE)){
-            return;
-        }
-
-        //delete Memberships in course
-        deleteMembershipByCourseId(changeEvent.getCourseId());
-    }
 
     /**
      * Helper function to validate existence of an entity in the database
@@ -130,7 +110,6 @@ public class MembershipService {
         if (!courseMembershipRepository.existsById(membershipPk)) {
             throw new EntityNotFoundException("User with id " + membershipPk.getUserId() + " not member in course" + membershipPk.getCourseId());
         }
-
     }
 
 }

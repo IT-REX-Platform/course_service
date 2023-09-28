@@ -138,6 +138,14 @@ input UpdateCourseInput {
     The new published status of the course.
     """
     published: Boolean!
+    """
+    The year in which the term starts.
+    """
+    startYear: Int
+    """
+    The division of the academic calendar in which the term takes place.
+    """
+    yearDivision: YearDivision
 }
 
 """

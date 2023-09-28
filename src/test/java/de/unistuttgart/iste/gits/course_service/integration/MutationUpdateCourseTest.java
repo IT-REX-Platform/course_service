@@ -1,6 +1,5 @@
 package de.unistuttgart.iste.gits.course_service.integration;
 
-import de.unistuttgart.iste.gits.common.testutil.GitsPostgresSqlContainer;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
@@ -8,13 +7,12 @@ import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRe
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
 import de.unistuttgart.iste.gits.generated.dto.Chapter;
+import de.unistuttgart.iste.gits.generated.dto.YearDivision;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -30,9 +28,6 @@ import static org.hamcrest.Matchers.is;
 @GraphQlApiTest
 class MutationUpdateCourseTest {
 
-    @Container
-    public static PostgreSQLContainer<GitsPostgresSqlContainer> postgreSQLContainer = GitsPostgresSqlContainer.getInstance();
-
     @Autowired
     private CourseRepository courseRepository;
     @Autowired
@@ -45,12 +40,14 @@ class MutationUpdateCourseTest {
      */
     @Test
     @Transactional
-    void testUpdateCourseSuccessful(GraphQlTester tester) {
+    void testUpdateCourseSuccessful(final GraphQlTester tester) {
         // create a course with a chapter in the database
-        var initialData = courseRepository.save(CourseEntity.builder().title("Course 1")
+        final var initialData = courseRepository.save(CourseEntity.builder().title("Course 1")
                 .description("This is course 1")
                 .startDate(OffsetDateTime.parse("2020-01-01T00:00:00.000Z"))
                 .endDate(OffsetDateTime.parse("2021-01-01T00:00:00.000Z"))
+                .startYear(2021)
+                .yearDivision(YearDivision.FIRST_SEMESTER)
                 .published(true)
                 .build());
         chapterRepository.save(ChapterEntity.builder()
@@ -62,7 +59,7 @@ class MutationUpdateCourseTest {
                 .number(1)
                 .build());
 
-        String query = """
+        final String query = """
                 mutation {
                     updateCourse(
                         input: {
@@ -71,6 +68,8 @@ class MutationUpdateCourseTest {
                             description: "This is a new course"
                             startDate: "2000-01-01T00:00:00.000Z"
                             endDate: "2001-01-01T00:00:00.000Z"
+                            startYear: 2021
+                            yearDivision: FIRST_SEMESTER
                             published: false
                         }
                     ) {
@@ -79,6 +78,8 @@ class MutationUpdateCourseTest {
                         description
                         startDate
                         endDate
+                        startYear
+                        yearDivision
                         published
                         chapters {
                             elements {
@@ -95,11 +96,13 @@ class MutationUpdateCourseTest {
                 .path("updateCourse.description").entity(String.class).isEqualTo("This is a new course")
                 .path("updateCourse.startDate").entity(String.class).isEqualTo("2000-01-01T00:00:00.000Z")
                 .path("updateCourse.endDate").entity(String.class).isEqualTo("2001-01-01T00:00:00.000Z")
+                .path("updateCourse.startYear").entity(Integer.class).isEqualTo(2021)
+                .path("updateCourse.yearDivision").entity(YearDivision.class).isEqualTo(YearDivision.FIRST_SEMESTER)
                 .path("updateCourse.published").entity(Boolean.class).isEqualTo(false)
                 .path("updateCourse.chapters.elements").entityList(Chapter.class).hasSize(1);
 
         // check that the course was updated in the database
-        var updatedCourse = courseRepository.findById(initialData.getId()).orElseThrow();
+        final var updatedCourse = courseRepository.findById(initialData.getId()).orElseThrow();
         assertThat(updatedCourse.getTitle(), is("New Course"));
         assertThat(updatedCourse.getDescription(), is("This is a new course"));
         assertThat(updatedCourse.isPublished(), is(false));
@@ -107,7 +110,7 @@ class MutationUpdateCourseTest {
         assertThat(updatedCourse.getEndDate().isEqual(OffsetDateTime.parse("2001-01-01T00:00:00.000Z")), is(true));
 
         // check that the chapter was not deleted
-        var chapters = chapterRepository.findAll();
+        final var chapters = chapterRepository.findAll();
         assertThat(chapters.size(), is(1));
         // assertThat(chapters.get(0).getCourse().getId(), is(initialData.getId()));
     }
@@ -118,9 +121,9 @@ class MutationUpdateCourseTest {
      * Then an error is returned
      */
     @Test
-    void testUpdateCourseNotExisting(GraphQlTester tester) {
-        UUID id = UUID.randomUUID();
-        String query = String.format("""
+    void testUpdateCourseNotExisting(final GraphQlTester tester) {
+        final UUID id = UUID.randomUUID();
+        final String query = String.format("""
                 mutation {
                     updateCourse(
                         input: {
@@ -149,8 +152,8 @@ class MutationUpdateCourseTest {
      * Then a validation error is returned
      */
     @Test
-    void testErrorOnBlankTitle(GraphQlTester tester) {
-        String query = """
+    void testErrorOnBlankTitle(final GraphQlTester tester) {
+        final String query = """
                 mutation {
                     updateCourse(
                         input: {
@@ -180,8 +183,8 @@ class MutationUpdateCourseTest {
      * Then a validation error is returned
      */
     @Test
-    void testTooLongTitle(GraphQlTester tester) {
-        String query = String.format("""
+    void testTooLongTitle(final GraphQlTester tester) {
+        final String query = String.format("""
                 mutation {
                     updateCourse(
                         input: {
@@ -211,8 +214,8 @@ class MutationUpdateCourseTest {
      * Then a validation error is returned
      */
     @Test
-    void testTooLongDescription(GraphQlTester tester) {
-        String query = String.format("""
+    void testTooLongDescription(final GraphQlTester tester) {
+        final String query = String.format("""
                 mutation {
                     updateCourse(
                         input: {
@@ -242,8 +245,8 @@ class MutationUpdateCourseTest {
      * Then a validation error is returned
      */
     @Test
-    void testStartDateAfterEndDate(GraphQlTester tester) {
-        String query = """
+    void testStartDateAfterEndDate(final GraphQlTester tester) {
+        final String query = """
                 mutation {
                     updateCourse(
                         input: {
