@@ -2,10 +2,13 @@ package de.unistuttgart.iste.gits.course_service.integration;
 
 
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
+import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
-import de.unistuttgart.iste.gits.generated.dto.*;
+import de.unistuttgart.iste.gits.generated.dto.Course;
+import de.unistuttgart.iste.gits.generated.dto.CourseFilter;
+import de.unistuttgart.iste.gits.generated.dto.SortDirection;
+import de.unistuttgart.iste.gits.generated.dto.StringFilter;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +25,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Tests that the courses query works correctly.
  */
-@ContextConfiguration(classes = MockTopicPublisherConfiguration.class)
+@ContextConfiguration(classes = MockTestPublisherConfiguration.class)
 @GraphQlApiTest
 class QueryCoursesTest {
 
@@ -37,8 +40,8 @@ class QueryCoursesTest {
      * Then an empty list is returned and the pagination information is correct.
      */
     @Test
-    void testGetCoursesEmpty(GraphQlTester tester) {
-        String query = """
+    void testGetCoursesEmpty(final GraphQlTester tester) {
+        final String query = """
                 query {
                     courses {
                         elements {
@@ -70,15 +73,15 @@ class QueryCoursesTest {
      * Then the courses are returned and the pagination information is correct.
      */
     @Test
-    void testGetAllCourses(GraphQlTester tester) {
+    void testGetAllCourses(final GraphQlTester tester) {
         // create two courses in the database
-        var initialData = Stream.of(
+        final var initialData = Stream.of(
                         dummyCourseBuilder().title("Course 1").build(),
                         dummyCourseBuilder().title("Course 2").build())
                 .map(courseRepository::save)
                 .toList();
 
-        String query = """
+        final String query = """
                 query {
                     courses {
                         elements {
@@ -116,8 +119,8 @@ class QueryCoursesTest {
      * Then the courses are returned and the pagination information is correct.
      */
     @Test
-    void testGetAllCoursesWithPagination(GraphQlTester tester) {
-        var data = Stream.of(
+    void testGetAllCoursesWithPagination(final GraphQlTester tester) {
+        final var data = Stream.of(
                         dummyCourseBuilder().title("Course 1").build(),
                         dummyCourseBuilder().title("Course 2").build(),
                         dummyCourseBuilder().title("Course 3").build(),
@@ -125,7 +128,7 @@ class QueryCoursesTest {
                 .map(courseRepository::save)
                 .toList();
 
-        String query = """
+        final String query = """
                 query($page: Int!) {
                     courses(pagination: {page: $page, size: 2}) {
                         elements {
@@ -177,8 +180,8 @@ class QueryCoursesTest {
      * HINT: Test multiple sort fields in the future
      */
     @Test
-    void testGetAllCoursesWithSort(GraphQlTester tester) {
-        var data = Stream.of(
+    void testGetAllCoursesWithSort(final GraphQlTester tester) {
+        final var data = Stream.of(
                         dummyCourseBuilder().description("A").build(),
                         dummyCourseBuilder().description("B").build(),
                         dummyCourseBuilder().description("C").build(),
@@ -186,7 +189,7 @@ class QueryCoursesTest {
                 .map(courseRepository::save)
                 .toList();
 
-        String query = """
+        final String query = """
                 query($sortDirection: SortDirection!) {
                     courses(sortBy: "description", sortDirection: [$sortDirection]) {
                         elements {
@@ -220,8 +223,8 @@ class QueryCoursesTest {
      * HINT: Maybe test more filter fields in the future
      */
     @Test
-    void testGetCoursesWithFilter(GraphQlTester tester) {
-        var data = Stream.of(
+    void testGetCoursesWithFilter(final GraphQlTester tester) {
+        final var data = Stream.of(
                         dummyCourseBuilder().title("Course 1").description("A").build(),
                         dummyCourseBuilder().title("Course 2").description("B").build(),
                         dummyCourseBuilder().title("Course 3").description("C").build(),
@@ -229,7 +232,7 @@ class QueryCoursesTest {
                 .map(courseRepository::save)
                 .toList();
 
-        String query = """
+        final String query = """
                 query($filter: CourseFilter!) {
                     courses(filter: $filter) {
                         elements {
@@ -291,15 +294,15 @@ class QueryCoursesTest {
      * Then the course is returned
      */
     @Test
-    void testGetByIds(GraphQlTester tester) {
+    void testGetByIds(final GraphQlTester tester) {
         // create two courses in the database
-        var initialData = Stream.of(
+        final var initialData = Stream.of(
                         dummyCourseBuilder().title("Course 1").build(),
                         dummyCourseBuilder().title("Course 2").build())
                 .map(courseRepository::save)
                 .toList();
 
-        String query = """
+        final String query = """
                 query {
                     coursesByIds(ids: ["%s"]) {
                         id
@@ -324,8 +327,8 @@ class QueryCoursesTest {
      * Then an error is returned
      */
     @Test
-    void testGetByIdsWithNotExistingId(GraphQlTester tester) {
-        String query = """
+    void testGetByIdsWithNotExistingId(final GraphQlTester tester) {
+        final String query = """
                 query {
                     coursesByIds(ids: ["%s"]) {
                         id
@@ -353,11 +356,11 @@ class QueryCoursesTest {
                 .endDate(OffsetDateTime.parse("2021-01-01T00:00:00.000Z"));
     }
 
-    private Course entityToDto(CourseEntity entity) {
+    private Course entityToDto(final CourseEntity entity) {
         return modelMapper.map(entity, Course.class);
     }
 
-    private Course[] entitiesToDtos(List<CourseEntity> entities) {
+    private Course[] entitiesToDtos(final List<CourseEntity> entities) {
         return entities.stream().map(this::entityToDto).toArray(Course[]::new);
     }
 }

@@ -1,12 +1,15 @@
 package de.unistuttgart.iste.gits.course_service.integration;
 
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
+import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
-import de.unistuttgart.iste.gits.generated.dto.*;
+import de.unistuttgart.iste.gits.generated.dto.Chapter;
+import de.unistuttgart.iste.gits.generated.dto.ChapterFilter;
+import de.unistuttgart.iste.gits.generated.dto.SortDirection;
+import de.unistuttgart.iste.gits.generated.dto.StringFilter;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +24,7 @@ import java.util.stream.Stream;
 /**
  * Test class for the chapters query.
  */
-@ContextConfiguration(classes = MockTopicPublisherConfiguration.class)
+@ContextConfiguration(classes = MockTestPublisherConfiguration.class)
 @GraphQlApiTest
 class QueryChaptersTest {
 
@@ -38,10 +41,10 @@ class QueryChaptersTest {
      * Then an empty list is returned and the pagination information is correct.
      */
     @Test
-    void testGetChaptersEmpty(GraphQlTester tester) {
-        CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
+    void testGetChaptersEmpty(final GraphQlTester tester) {
+        final CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
 
-        String query = String.format("""
+        final String query = String.format("""
                 query {
                     chapters(courseId: "%s") {
                         elements {
@@ -68,15 +71,15 @@ class QueryChaptersTest {
     }
 
     @Test
-    void testGetChaptersByIds(GraphQlTester tester) {
-        UUID courseId = UUID.randomUUID();
-        List<ChapterEntity> expectedChapters = Stream.of(
+    void testGetChaptersByIds(final GraphQlTester tester) {
+        final UUID courseId = UUID.randomUUID();
+        final List<ChapterEntity> expectedChapters = Stream.of(
                         dummyChapterBuilder().title("Chapter 1").courseId(courseId).build(),
                         dummyChapterBuilder().title("Chapter 2").courseId(courseId).build())
                 .map(chapterRepository::save)
                 .toList();
 
-        String query = """
+        final String query = """
                 query($chapterIds: [UUID!]!) {
                     chaptersByIds(ids: $chapterIds) {
                         id
@@ -102,11 +105,11 @@ class QueryChaptersTest {
      * Then the chapters are returned and the pagination information is correct.
      */
     @Test
-    void testGetAllChapters(GraphQlTester tester) {
-        CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
-        CourseEntity anotherCourse = courseRepository.save(dummyCourseBuilder().build());
+    void testGetAllChapters(final GraphQlTester tester) {
+        final CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
+        final CourseEntity anotherCourse = courseRepository.save(dummyCourseBuilder().build());
         // create two chapters in the database
-        var initialData = Stream.of(
+        final var initialData = Stream.of(
                         dummyChapterBuilder().title("Chapter 1").courseId(course.getId()).build(),
                         dummyChapterBuilder().title("Chapter 2").courseId(course.getId()).build())
                 .map(chapterRepository::save)
@@ -114,7 +117,7 @@ class QueryChaptersTest {
         // create a chapter in another course
         chapterRepository.save(dummyChapterBuilder().title("Chapter 3").courseId(anotherCourse.getId()).build());
 
-        String query = String.format("""
+        final String query = String.format("""
                 query {
                     chapters(courseId: "%s") {
                         elements {
@@ -147,11 +150,11 @@ class QueryChaptersTest {
     }
 
     @Test
-    void testQueryCourseInChapter(GraphQlTester graphQlTester) {
-        CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
+    void testQueryCourseInChapter(final GraphQlTester graphQlTester) {
+        final CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
         chapterRepository.save(dummyChapterBuilder().title("Chapter 3").courseId(course.getId()).build());
 
-        String query = String.format("""
+        final String query = String.format("""
                 query {
                     chapters(courseId: "%s") {
                         elements {
@@ -180,9 +183,9 @@ class QueryChaptersTest {
      * Then the chapters are returned and the pagination information is correct.
      */
     @Test
-    void testGetAllChaptersWithPagination(GraphQlTester tester) {
-        CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
-        var data = Stream.of(
+    void testGetAllChaptersWithPagination(final GraphQlTester tester) {
+        final CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
+        final var data = Stream.of(
                         dummyChapterBuilder().title("Chapter 1").courseId(course.getId()).build(),
                         dummyChapterBuilder().title("Chapter 2").courseId(course.getId()).build(),
                         dummyChapterBuilder().title("Chapter 3").courseId(course.getId()).build(),
@@ -190,7 +193,7 @@ class QueryChaptersTest {
                 .map(chapterRepository::save)
                 .toList();
 
-        String query = """
+        final String query = """
                 query($courseId: UUID!, $page: Int!) {
                     chapters(courseId: $courseId, pagination: {page: $page, size: 2}) {
                         elements {
@@ -244,9 +247,9 @@ class QueryChaptersTest {
      * HINT: Test multiple sort fields in the future
      */
     @Test
-    void testGetAllChaptersWithSort(GraphQlTester tester) {
-        CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
-        var data = Stream.of(
+    void testGetAllChaptersWithSort(final GraphQlTester tester) {
+        final CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
+        final var data = Stream.of(
                         dummyChapterBuilder().description("A").courseId(course.getId()).build(),
                         dummyChapterBuilder().description("B").courseId(course.getId()).build(),
                         dummyChapterBuilder().description("C").courseId(course.getId()).build(),
@@ -254,7 +257,7 @@ class QueryChaptersTest {
                 .map(chapterRepository::save)
                 .toList();
 
-        String query = """
+        final String query = """
                 query($courseId: UUID!, $sortDirection: SortDirection!) {
                     chapters(courseId: $courseId, sortBy: "description", sortDirection: [$sortDirection]) {
                         elements {
@@ -290,9 +293,9 @@ class QueryChaptersTest {
      * HINT: Maybe test more filter fields in the future
      */
     @Test
-    void testGetChaptersWithFilter(GraphQlTester tester) {
-        CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
-        var data = Stream.of(
+    void testGetChaptersWithFilter(final GraphQlTester tester) {
+        final CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
+        final var data = Stream.of(
                         dummyChapterBuilder().title("Chapter 1").description("A").courseId(course.getId()).build(),
                         dummyChapterBuilder().title("Chapter 2").description("B").courseId(course.getId()).build(),
                         dummyChapterBuilder().title("Chapter 3").description("C").courseId(course.getId()).build(),
@@ -300,7 +303,7 @@ class QueryChaptersTest {
                 .map(chapterRepository::save)
                 .toList();
 
-        String query = """
+        final String query = """
                 query($courseId: UUID!, $filter: ChapterFilter!) {
                     chapters(courseId: $courseId, filter: $filter) {
                         elements {
@@ -377,13 +380,13 @@ class QueryChaptersTest {
                 .endDate(OffsetDateTime.parse("2021-01-01T00:00:00.000Z"));
     }
 
-    private Chapter entityToDto(ChapterEntity entity) {
-        var result = modelMapper.map(entity, Chapter.class);
+    private Chapter entityToDto(final ChapterEntity entity) {
+        final var result = modelMapper.map(entity, Chapter.class);
         result.setCourse(null); // we don't check the course here
         return result;
     }
 
-    private Chapter[] entitiesToDtos(List<ChapterEntity> entities) {
+    private Chapter[] entitiesToDtos(final List<ChapterEntity> entities) {
         return entities.stream().map(this::entityToDto).toArray(Chapter[]::new);
     }
 }

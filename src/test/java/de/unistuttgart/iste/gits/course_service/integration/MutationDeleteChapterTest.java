@@ -2,11 +2,11 @@ package de.unistuttgart.iste.gits.course_service.integration;
 
 import de.unistuttgart.iste.gits.common.testutil.GitsPostgresSqlContainer;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
+import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
@@ -24,12 +24,9 @@ import static org.hamcrest.Matchers.*;
 /**
  * Tests for the `deleteChapter` mutation.
  */
-@ContextConfiguration(classes = MockTopicPublisherConfiguration.class)
+@ContextConfiguration(classes = MockTestPublisherConfiguration.class)
 @GraphQlApiTest
 class MutationDeleteChapterTest {
-
-    @Container
-    public static PostgreSQLContainer<GitsPostgresSqlContainer> postgreSQLContainer = GitsPostgresSqlContainer.getInstance();
 
     @Autowired
     private CourseRepository courseRepository;
@@ -42,17 +39,17 @@ class MutationDeleteChapterTest {
      * Then the chapter is deleted and the uuid is returned
      */
     @Test
-    void testDeletion(GraphQlTester tester) {
+    void testDeletion(final GraphQlTester tester) {
         // create a course in the database
-        var course = courseRepository.save(dummyCourseBuilder().build());
+        final var course = courseRepository.save(dummyCourseBuilder().build());
         // create two chapters in the database
-        var chapters = Stream.of(
+        final var chapters = Stream.of(
                         dummyChapterBuilder().courseId(course.getId()).title("Chapter 1").build(),
                         dummyChapterBuilder().courseId(course.getId()).title("Chapter 2").build())
                 .map(chapterRepository::save)
                 .toList();
 
-        String query = """
+        final String query = """
                 mutation {
                     deleteChapter(id: "%s")
                 }""".formatted(chapters.get(0).getId());
@@ -61,7 +58,7 @@ class MutationDeleteChapterTest {
                 .execute()
                 .path("deleteChapter").entity(UUID.class).isEqualTo(chapters.get(0).getId());
 
-        var entities = chapterRepository.findAll();
+        final var entities = chapterRepository.findAll();
         assertThat(entities, hasSize(1));
         assertThat(entities.get(0).getId(), equalTo(chapters.get(1).getId()));
     }
@@ -72,8 +69,8 @@ class MutationDeleteChapterTest {
      * Then an error is returned
      */
     @Test
-    void testDeletionInvalidId(GraphQlTester tester) {
-        String query = """
+    void testDeletionInvalidId(final GraphQlTester tester) {
+        final String query = """
                 mutation {
                     deleteChapter(id: "%s")
                 }""".formatted(UUID.randomUUID());

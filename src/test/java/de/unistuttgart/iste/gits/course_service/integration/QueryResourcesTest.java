@@ -2,11 +2,11 @@ package de.unistuttgart.iste.gits.course_service.integration;
 
 import de.unistuttgart.iste.gits.common.testutil.GitsPostgresSqlContainer;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
+import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseResourceAssociationEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseResourceAssociationRepository;
-import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
 import de.unistuttgart.iste.gits.generated.dto.CourseResourceAssociation;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +20,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-@ContextConfiguration(classes = MockTopicPublisherConfiguration.class)
+@ContextConfiguration(classes = MockTestPublisherConfiguration.class)
 @GraphQlApiTest
 class QueryResourcesTest {
-
-    @Container
-    public static PostgreSQLContainer<GitsPostgresSqlContainer> postgreSQLContainer = GitsPostgresSqlContainer.getInstance();
 
     @Autowired
     private CourseRepository courseRepository;
@@ -38,10 +35,10 @@ class QueryResourcesTest {
      * @param tester GraphQlTester instance
      */
     @Test
-    void testResourceNotExisting(GraphQlTester tester){
+    void testResourceNotExisting(final GraphQlTester tester){
 
         //GraphQL query
-        String query = """
+        final String query = """
                 query {
                     resourceById(ids: ["%s"]) {
                         id
@@ -57,20 +54,20 @@ class QueryResourcesTest {
     }
 
     @Test
-    void testGetCourseIdsByResourceId(GraphQlTester tester){
+    void testGetCourseIdsByResourceId(final GraphQlTester tester){
 
-        OffsetDateTime now = OffsetDateTime.now();
-        UUID resourceId = UUID.randomUUID();
+        final OffsetDateTime now = OffsetDateTime.now();
+        final UUID resourceId = UUID.randomUUID();
 
         // create two courses in the database
-        List<CourseEntity> initialCourseData = Stream.of(
+        final List<CourseEntity> initialCourseData = Stream.of(
                         dummyCourseEntityBuilder(now, true).title("Course 1").build(),
                         dummyCourseEntityBuilder(now,true).title("Course 2").endDate(now.minusMonths(1)).build())
                 .map(courseRepository::save)
                 .toList();
 
         //create a resource for each course in the database
-        List<CourseResourceAssociationEntity> initialResourceData = Stream.of(
+        final List<CourseResourceAssociationEntity> initialResourceData = Stream.of(
                 CourseResourceAssociationEntity.builder()
                         .courseId(initialCourseData.get(0).getId())
                         .chapterId(UUID.randomUUID())
@@ -84,7 +81,7 @@ class QueryResourcesTest {
         ).map(resourceRepository::save).toList();
 
         // expected: two courses share a resource.
-        CourseResourceAssociation expected = CourseResourceAssociation.builder()
+        final CourseResourceAssociation expected = CourseResourceAssociation.builder()
                 .setId(resourceId)
                 .setAvailableCourses(List.of(initialCourseData.get(0).getId()))
                 .setUnAvailableCourses(List.of(initialCourseData.get(1).getId()))
@@ -92,7 +89,7 @@ class QueryResourcesTest {
 
 
         //GraphQL query
-        String query = """
+        final String query = """
                 query {
                     resourceById(ids: ["%s"]) {
                         id
@@ -109,7 +106,7 @@ class QueryResourcesTest {
     }
 
     // Builder functions for entities
-    private CourseEntity.CourseEntityBuilder dummyCourseEntityBuilder(OffsetDateTime now, boolean published) {
+    private CourseEntity.CourseEntityBuilder dummyCourseEntityBuilder(final OffsetDateTime now, final boolean published) {
         return CourseEntity.builder()
                 .id(UUID.randomUUID())
                 .title("title")

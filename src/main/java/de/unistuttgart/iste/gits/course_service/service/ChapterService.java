@@ -1,9 +1,9 @@
 package de.unistuttgart.iste.gits.course_service.service;
 
+import de.unistuttgart.iste.gits.common.dapr.TopicPublisher;
 import de.unistuttgart.iste.gits.common.event.CrudOperation;
 import de.unistuttgart.iste.gits.common.util.PaginationUtil;
 import de.unistuttgart.iste.gits.common.util.SortUtil;
-import de.unistuttgart.iste.gits.course_service.dapr.TopicPublisher;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.mapper.ChapterMapper;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
@@ -38,6 +38,7 @@ public class ChapterService {
 
     /**
      * Gets all chapters with the given ids.
+     *
      * @param ids The ids of the chapters to get.
      * @return The chapters with the given ids in order of the given ids.
      * @throws EntityNotFoundException If at least one of the chapters could not be found.
@@ -118,8 +119,8 @@ public class ChapterService {
      * Checks if a chapter exists.
      *
      * @param uuid The id of the chapter to check.
-     * @throws EntityNotFoundException If the chapter does not exist.
      * @return The chapter entity with the given id.
+     * @throws EntityNotFoundException If the chapter does not exist.
      */
     private ChapterEntity requireChapterExisting(final UUID uuid) {
         return chapterRepository.findById(uuid)

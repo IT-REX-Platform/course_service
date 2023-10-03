@@ -1,9 +1,9 @@
 package de.unistuttgart.iste.gits.course_service.service;
 
+import de.unistuttgart.iste.gits.common.dapr.TopicPublisher;
 import de.unistuttgart.iste.gits.common.event.CrudOperation;
 import de.unistuttgart.iste.gits.common.util.PaginationUtil;
 import de.unistuttgart.iste.gits.common.util.SortUtil;
-import de.unistuttgart.iste.gits.course_service.dapr.TopicPublisher;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.mapper.CourseMapper;
