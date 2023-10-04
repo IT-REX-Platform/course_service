@@ -44,7 +44,18 @@ public class CourseController {
     @MutationMapping
     public Course createCourse(@Argument(name = "input") final CreateCourseInput input,
                                @ContextValue final LoggedInUser currentUser) {
-        return courseService.createCourse(input, currentUser.getId());
+        final Course course = courseService.createCourse(input, currentUser.getId());
+
+        // update user course memberships in context with the newly created course (the creator of the course
+        // always gets admin permissions)
+        currentUser.getCourseMemberships().add(new LoggedInUser.CourseMembership(
+                course.getId(),
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR,
+                course.getPublished(),
+                course.getStartDate(),
+                course.getEndDate()));
+
+        return course;
     }
 
     @MutationMapping
