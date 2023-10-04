@@ -1,6 +1,7 @@
 package de.unistuttgart.iste.gits.course_service.integration;
 
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
+import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseMembershipEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseMembershipRepository;
@@ -9,23 +10,37 @@ import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
 import de.unistuttgart.iste.gits.generated.dto.UserRoleInCourse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.graphql.test.tester.HttpGraphQlTester;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
+
+import static de.unistuttgart.iste.gits.common.testutil.HeaderUtils.addCurrentUserHeader;
+import static de.unistuttgart.iste.gits.common.testutil.TestUsers.userWithMembershipInCourseWithId;
+import static de.unistuttgart.iste.gits.course_service.test_utils.TestUtils.saveCourseMembershipsOfUserToRepository;
 
 @GraphQlApiTest
 class MutationCourseMembershipTest {
 
     @Autowired
-    CourseMembershipRepository courseMembershipRepository;
+    private CourseMembershipRepository courseMembershipRepository;
 
     @Autowired
-    CourseRepository courseRepository;
-    @Test
-    void createMembershipTest(final GraphQlTester tester){
+    private CourseRepository courseRepository;
 
+    @Test
+    void createMembershipTest(HttpGraphQlTester tester) {
+        // create course
         final CourseEntity course = courseRepository.save(dummyCourseBuilder().build());
+
+        // create admin user object
+        final LoggedInUser adminUser = userWithMembershipInCourseWithId(course.getId(),
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+        // save course memberships of admin to repository
+        saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
+
+        // add admin user data to header
+        tester = addCurrentUserHeader(tester, adminUser);
 
         final CourseMembership expectedDto = CourseMembership.builder()
                 .setUserId(UUID.randomUUID())
@@ -57,14 +72,22 @@ class MutationCourseMembershipTest {
     }
 
     @Test
-    void updateMembershipMembershipNotExistingTest(final GraphQlTester tester){
-
-        //init input data
-        final UUID userId = UUID.randomUUID();
+    void updateMembershipMembershipNotExistingTest(HttpGraphQlTester tester) {
         final UUID courseId = UUID.randomUUID();
 
+        // create admin user object
+        final LoggedInUser adminUser = userWithMembershipInCourseWithId(courseId,
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+        // save course memberships of admin to repository
+        saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
+
+        // add admin user data to header
+        tester = addCurrentUserHeader(tester, adminUser);
+
+        final UUID userIdToTest = UUID.randomUUID();
+
         final CourseMembership expectedDto = CourseMembership.builder()
-                .setUserId(userId)
+                .setUserId(userIdToTest)
                 .setCourseId(courseId)
                 .setRole(UserRoleInCourse.STUDENT)
                 .build();
@@ -92,11 +115,20 @@ class MutationCourseMembershipTest {
     }
 
     @Test
-    void updateMembershipTest(final GraphQlTester tester){
+    void updateMembershipTest(HttpGraphQlTester tester) {
+        final UUID courseId = UUID.randomUUID();
+
+        // create admin user object
+        final LoggedInUser adminUser = userWithMembershipInCourseWithId(courseId,
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+        // save course memberships of admin to repository
+        saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
+
+        // add admin user data to header
+        tester = addCurrentUserHeader(tester, adminUser);
 
         //init input data
         final UUID userId = UUID.randomUUID();
-        final UUID courseId = UUID.randomUUID();
 
         final CourseMembershipEntity entity = CourseMembershipEntity.builder()
                 .userId(userId)
@@ -136,11 +168,20 @@ class MutationCourseMembershipTest {
     }
 
     @Test
-    void deleteNotExistingMembershipTest(final GraphQlTester tester){
+    void deleteNotExistingMembershipTest(HttpGraphQlTester tester) {
+        final UUID courseId = UUID.randomUUID();
+
+        // create admin user object
+        final LoggedInUser adminUser = userWithMembershipInCourseWithId(courseId,
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+        // save course memberships of admin to repository
+        saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
+
+        // add admin user data to header
+        tester = addCurrentUserHeader(tester, adminUser);
 
         //init input data
         final UUID userId = UUID.randomUUID();
-        final UUID courseId = UUID.randomUUID();
 
         final CourseMembership expectedDto = CourseMembership.builder()
                 .setUserId(userId)
@@ -172,11 +213,20 @@ class MutationCourseMembershipTest {
     }
 
     @Test
-    void deleteMembershipTest(final GraphQlTester tester){
+    void deleteMembershipTest(HttpGraphQlTester tester) {
+        final UUID courseId = UUID.randomUUID();
+
+        // create admin user object
+        final LoggedInUser adminUser = userWithMembershipInCourseWithId(courseId,
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+        // save course memberships of admin to repository
+        saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
+
+        // add admin user data to header
+        tester = addCurrentUserHeader(tester, adminUser);
 
         //init input data
         final UUID userId = UUID.randomUUID();
-        final UUID courseId = UUID.randomUUID();
 
         final CourseMembershipEntity entity = CourseMembershipEntity.builder()
                 .userId(userId)
@@ -214,8 +264,13 @@ class MutationCourseMembershipTest {
                 .isEqualTo(expectedDto);
     }
 
+    /**
+     * Helper method to create a course builder and initialize it with some dummy data.
+     * @return The course builder.
+     */
     private CourseEntity.CourseEntityBuilder dummyCourseBuilder() {
         return CourseEntity.builder()
+                .id(UUID.randomUUID())
                 .title("Course 1")
                 .description("This is course 1")
                 .published(false)
