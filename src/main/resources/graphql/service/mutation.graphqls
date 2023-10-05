@@ -38,6 +38,11 @@ type Mutation {
     deleteChapter(id: UUID!): UUID!
 
     """
+    Lets the current user join a course as a student.
+    """
+    joinCourse(courseId: UUID!): CourseMembership!
+
+    """
     Adds the specified user to the specified course with the specified role.
     🔒 The calling user must be an admin in this course to perform this action.
     """

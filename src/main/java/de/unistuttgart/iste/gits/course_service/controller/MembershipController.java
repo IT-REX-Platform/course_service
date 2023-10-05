@@ -3,8 +3,10 @@ package de.unistuttgart.iste.gits.course_service.controller;
 import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.gits.common.user_handling.UserCourseAccessValidator;
 import de.unistuttgart.iste.gits.course_service.service.MembershipService;
+import de.unistuttgart.iste.gits.generated.dto.Course;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
 import de.unistuttgart.iste.gits.generated.dto.CourseMembershipInput;
+import de.unistuttgart.iste.gits.generated.dto.UserRoleInCourse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -26,6 +28,16 @@ public class MembershipController {
     @QueryMapping(name = "_internal_noauth_courseMembershipsByUserIds")
     public List<List<CourseMembership>> courseMembershipsByUserIds(@Argument final List<UUID> userIds) {
         return membershipService.getAllMembershipsByUserIds(userIds);
+    }
+
+    @MutationMapping
+    public CourseMembership joinCourse(@Argument final UUID courseId,
+                             @ContextValue final LoggedInUser currentUser) {
+        return membershipService.createMembership(CourseMembershipInput.builder()
+                .setCourseId(courseId)
+                .setUserId(currentUser.getId())
+                .setRole(UserRoleInCourse.STUDENT)
+                .build());
     }
 
     @MutationMapping
