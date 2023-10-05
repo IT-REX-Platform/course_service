@@ -54,6 +54,12 @@ type Course {
         """
         sortDirection: [SortDirection!]! = [ASC],
         pagination: Pagination): ChapterPayload!
+    """
+    Course Memberships of this course. Contains information about which users are members of the course and what
+    role they have in it.
+    🔒 User needs to be at least an admin of the course to access this field.
+    """
+    memberships: [CourseMembership!]!
 }
 
 """

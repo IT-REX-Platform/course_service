@@ -101,6 +101,13 @@ public class MembershipService {
         }
     }
 
+    public List<CourseMembership> getMembershipsOfCourse(final UUID courseId) {
+        return courseMembershipRepository.findCourseMembershipEntitiesByCourseId(courseId)
+                .stream()
+                .map(membershipMapper::entityToDto)
+                .toList();
+    }
+
 
     /**
      * Helper function to validate existence of an entity in the database

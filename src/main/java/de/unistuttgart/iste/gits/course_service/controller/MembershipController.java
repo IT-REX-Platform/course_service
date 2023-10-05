@@ -9,10 +9,7 @@ import de.unistuttgart.iste.gits.generated.dto.CourseMembershipInput;
 import de.unistuttgart.iste.gits.generated.dto.UserRoleInCourse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.graphql.data.method.annotation.Argument;
-import org.springframework.graphql.data.method.annotation.ContextValue;
-import org.springframework.graphql.data.method.annotation.MutationMapping;
-import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.*;
 import org.springframework.stereotype.Controller;
 
 import java.util.List;
@@ -68,5 +65,15 @@ public class MembershipController {
                 inputDto.getCourseId());
 
         return membershipService.deleteMembership(inputDto);
+    }
+
+    @SchemaMapping(typeName = "Course", field = "memberships")
+    public List<CourseMembership> memberships(final Course course,
+                                              @ContextValue final LoggedInUser currentUser) {
+        UserCourseAccessValidator.validateUserHasAccessToCourse(currentUser,
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR,
+                course.getId());
+
+        return membershipService.getMembershipsOfCourse(course.getId());
     }
 }
