@@ -1,6 +1,7 @@
 package de.unistuttgart.iste.gits.course_service.controller;
 
 import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
+import de.unistuttgart.iste.gits.common.user_handling.UserCourseAccessValidator;
 import de.unistuttgart.iste.gits.course_service.service.CourseService;
 import de.unistuttgart.iste.gits.generated.dto.*;
 import lombok.extern.slf4j.Slf4j;
@@ -41,17 +42,39 @@ public class CourseController {
     }
 
     @MutationMapping
-    public Course createCourse(@Argument(name = "input") final CreateCourseInput input, @ContextValue final LoggedInUser currentUser) {
-        return courseService.createCourse(input, currentUser.getId());
+    public Course createCourse(@Argument(name = "input") final CreateCourseInput input,
+                               @ContextValue final LoggedInUser currentUser) {
+        final Course course = courseService.createCourse(input, currentUser.getId());
+
+        // update user course memberships in context with the newly created course (the creator of the course
+        // always gets admin permissions)
+        currentUser.getCourseMemberships().add(new LoggedInUser.CourseMembership(
+                course.getId(),
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR,
+                course.getPublished(),
+                course.getStartDate(),
+                course.getEndDate()));
+
+        return course;
     }
 
     @MutationMapping
-    public Course updateCourse(@Argument(name = "input") final UpdateCourseInput input) {
+    public Course updateCourse(@Argument(name = "input") final UpdateCourseInput input,
+                               @ContextValue final LoggedInUser currentUser) {
+        UserCourseAccessValidator.validateUserHasAccessToCourse(currentUser,
+                                                                LoggedInUser.UserRoleInCourse.ADMINISTRATOR,
+                                                                input.getId());
+
         return courseService.updateCourse(input);
     }
 
     @MutationMapping
-    public UUID deleteCourse(@Argument(name = "id") final UUID id) {
+    public UUID deleteCourse(@Argument(name = "id") final UUID id,
+                             @ContextValue final LoggedInUser currentUser) {
+        UserCourseAccessValidator.validateUserHasAccessToCourse(currentUser,
+                                                                LoggedInUser.UserRoleInCourse.ADMINISTRATOR,
+                                                                id);
+
         return courseService.deleteCourse(id);
     }
 

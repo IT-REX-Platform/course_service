@@ -1,5 +1,7 @@
 package de.unistuttgart.iste.gits.course_service.controller;
 
+import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
+import de.unistuttgart.iste.gits.common.user_handling.UserCourseAccessValidator;
 import de.unistuttgart.iste.gits.course_service.service.ChapterService;
 import de.unistuttgart.iste.gits.generated.dto.*;
 import lombok.extern.slf4j.Slf4j;
@@ -22,27 +24,33 @@ public class ChapterController {
 
 
     @MutationMapping
-    public Chapter createChapter(@Argument("input") final CreateChapterInput input) {
+    public Chapter createChapter(@Argument("input") final CreateChapterInput input,
+                                 @ContextValue final LoggedInUser currentUser) {
+        UserCourseAccessValidator.validateUserHasAccessToCourse(currentUser,
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR,
+                input.getCourseId());
+
         return chapterService.createChapter(input);
     }
 
     @MutationMapping
-    public Chapter updateChapter(@Argument("input") final UpdateChapterInput input) {
+    public Chapter updateChapter(@Argument("input") final UpdateChapterInput input,
+                                 @ContextValue final LoggedInUser currentUser) {
+        UserCourseAccessValidator.validateUserHasAccessToCourse(currentUser,
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR,
+                chapterService.getCourseIdForChapterId(input.getId()));
+
         return chapterService.updateChapter(input);
     }
 
     @MutationMapping
-    public UUID deleteChapter(@Argument("id") final UUID id) {
-        return chapterService.deleteChapter(id);
-    }
+    public UUID deleteChapter(@Argument("id") final UUID id,
+                              @ContextValue final LoggedInUser currentUser) {
+        UserCourseAccessValidator.validateUserHasAccessToCourse(currentUser,
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR,
+                chapterService.getCourseIdForChapterId(id));
 
-    @QueryMapping
-    public ChapterPayload chapters(@Argument("courseId") final UUID courseId,
-                                   @Argument("filter") @Nullable final ChapterFilter filter,
-                                   @Argument("sortBy") final List<String> sortBy,
-                                   @Argument("sortDirection") final List<SortDirection> sortDirection,
-                                   @Argument("pagination") @Nullable final Pagination pagination) {
-        return chapterService.getChapters(courseId, filter, sortBy, sortDirection, pagination);
+        return chapterService.deleteChapter(id);
     }
 
     @SchemaMapping(typeName = "Course", field = "chapters")
@@ -50,11 +58,16 @@ public class ChapterController {
                                    @Argument("filter") @Nullable final ChapterFilter filter,
                                    @Argument("sortBy") final List<String> sortBy,
                                    @Argument("sortDirection") final List<SortDirection> sortDirection,
-                                   @Argument("pagination") @Nullable final Pagination pagination) {
+                                   @Argument("pagination") @Nullable final Pagination pagination,
+                                   @ContextValue final LoggedInUser currentUser) {
+        UserCourseAccessValidator.validateUserHasAccessToCourse(currentUser,
+                LoggedInUser.UserRoleInCourse.STUDENT,
+                course.getId());
+
         return chapterService.getChapters(course.getId(), filter, sortBy, sortDirection, pagination);
     }
 
-    @QueryMapping
+    @QueryMapping(name = "_internal_noauth_chaptersByIds")
     public List<Chapter> chaptersByIds(@Argument final List<UUID> ids) {
         return chapterService.getChaptersByIds(ids);
     }

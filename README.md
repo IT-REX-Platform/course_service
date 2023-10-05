@@ -33,3 +33,9 @@ Who has access to the course and the different roles such as lecturer, teaching 
 The API documentation can be found in the wiki in the [API docs](api.md).
 
 The API is available at `/graphql` and the GraphiQL interface is available at `/graphiql`.
+
+## Get started
+A guide how to start development can be
+found [wiki](https://gits-enpro.readthedocs.io/en/latest/dev-manuals/backend/get-started.html).
+
+

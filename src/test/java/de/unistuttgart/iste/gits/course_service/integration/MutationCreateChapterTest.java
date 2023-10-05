@@ -1,22 +1,27 @@
 package de.unistuttgart.iste.gits.course_service.integration;
 
-import de.unistuttgart.iste.gits.common.testutil.GitsPostgresSqlContainer;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
+import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
+import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseMembershipRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.generated.dto.Chapter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.graphql.test.tester.HttpGraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 
 import java.time.OffsetDateTime;
 import java.util.Objects;
+import java.util.UUID;
 
+import static de.unistuttgart.iste.gits.common.testutil.HeaderUtils.addCurrentUserHeader;
+import static de.unistuttgart.iste.gits.common.testutil.TestUsers.userWithMembershipInCourseWithId;
+import static de.unistuttgart.iste.gits.course_service.test_utils.TestUtils.saveCourseMembershipsOfUserToRepository;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -26,9 +31,10 @@ class MutationCreateChapterTest {
 
     @Autowired
     private CourseRepository courseRepository;
-
     @Autowired
     private ChapterRepository chapterRepository;
+    @Autowired
+    private CourseMembershipRepository courseMembershipRepository;
 
     /**
      * Given a valid CreateChapterInput
@@ -36,14 +42,23 @@ class MutationCreateChapterTest {
      * Then the chapter is created and returned
      */
     @Test
-    void testCreateChapter(final GraphQlTester tester) {
-        final var course = courseRepository.save(CourseEntity.builder()
+    void testCreateChapter(HttpGraphQlTester tester) {
+        final CourseEntity course = courseRepository.save(CourseEntity.builder()
                 .title("New Course")
                 .description("This is a new course")
                 .startDate(OffsetDateTime.parse("2020-01-01T00:00:00.000Z"))
                 .endDate(OffsetDateTime.parse("2021-01-01T00:00:00.000Z"))
                 .published(false)
                 .build());
+
+        // create admin user object
+        final LoggedInUser adminUser = userWithMembershipInCourseWithId(course.getId(),
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+        // save course memberships of admin to repository
+        saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
+
+        // add admin user data to header
+        tester = addCurrentUserHeader(tester, adminUser);
 
         final String query = """
                 mutation {
@@ -79,7 +94,7 @@ class MutationCreateChapterTest {
                 });
 
         assertThat(chapterRepository.count(), is(1L));
-        final var chapter = chapterRepository.findAll().get(0);
+        final ChapterEntity chapter = chapterRepository.findAll().get(0);
         assertThat(chapter.getTitle(), is("New Chapter"));
         assertThat(chapter.getDescription(), is("This is a new chapter"));
         assertThat(chapter.getStartDate().isEqual(OffsetDateTime.parse("2020-01-01T00:00:00.000Z")), is(true));
@@ -93,12 +108,23 @@ class MutationCreateChapterTest {
      * Then an error is returned
      */
     @Test
-    void testCreateChapterCourseNotExisting(final GraphQlTester tester) {
-        final String query = """
+    void testCreateChapterCourseNotExisting(HttpGraphQlTester tester) {
+        UUID courseId = UUID.randomUUID();
+
+        // create admin user object
+        final LoggedInUser adminUser = userWithMembershipInCourseWithId(courseId,
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+        // save course memberships of admin to repository
+        saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
+
+        // add admin user data to header
+        tester = addCurrentUserHeader(tester, adminUser);
+
+        String query = """
                 mutation {
                     createChapter(
                         input: {
-                            courseId: "00000000-0000-0000-0000-000000000000"
+                            courseId: "%s"
                             title: "New Chapter"
                             description: "This is a new chapter"
                             startDate: "2020-01-01T00:00:00.000Z"
@@ -113,13 +139,13 @@ class MutationCreateChapterTest {
                         endDate
                         number
                     }
-                }""";
+                }""".formatted(courseId);
 
         tester.document(query)
                 .execute()
                 .errors()
                 .expect(responseError -> Objects.requireNonNull(responseError.getMessage())
-                        .contains("Course with id 00000000-0000-0000-0000-000000000000 not found"));
+                        .contains("Course with id " + courseId + " not found"));
 
         assertThat(chapterRepository.count(), is(0L));
     }
@@ -223,12 +249,23 @@ class MutationCreateChapterTest {
      * Then a validation error is returned
      */
     @Test
-    void testStartDateAfterEndDate(final GraphQlTester tester) {
+    void testStartDateAfterEndDate(HttpGraphQlTester tester) {
+        final UUID courseId = UUID.randomUUID();
+
+        // create admin user object
+        final LoggedInUser adminUser = userWithMembershipInCourseWithId(courseId,
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+        // save course memberships of admin to repository
+        saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
+
+        // add admin user data to header
+        tester = addCurrentUserHeader(tester, adminUser);
+
         final String query = """
                 mutation {
                     createChapter(
                         input: {
-                            courseId: "00000000-0000-0000-0000-000000000000"
+                            courseId: "%s"
                             title: "New Chapter"
                             description: "This is a new chapter"
                             startDate: "2021-01-01T00:00:00.000Z"
@@ -239,7 +276,7 @@ class MutationCreateChapterTest {
                         id
                         title
                     }
-                }""";
+                }""".formatted(courseId);
 
         tester.document(query)
                 .execute()
@@ -255,12 +292,23 @@ class MutationCreateChapterTest {
      * Then a validation error is returned
      */
     @Test
-    void testSuggestedStartDateAfterEndDate(final GraphQlTester tester) {
+    void testSuggestedStartDateAfterEndDate(HttpGraphQlTester tester) {
+        final UUID courseId = UUID.randomUUID();
+
+        // create admin user object
+        final LoggedInUser adminUser = userWithMembershipInCourseWithId(courseId,
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+        // save course memberships of admin to repository
+        saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
+
+        // add admin user data to header
+        tester = addCurrentUserHeader(tester, adminUser);
+
         final String query = """
                 mutation {
                     createChapter(
                         input: {
-                            courseId: "00000000-0000-0000-0000-000000000000"
+                            courseId: "%s"
                             title: "New Chapter"
                             description: "This is a new chapter"
                             startDate: "2021-01-01T00:00:00.000Z"
@@ -272,7 +320,7 @@ class MutationCreateChapterTest {
                         id
                         title
                     }
-                }""";
+                }""".formatted(courseId);
 
         tester.document(query)
                 .execute()
@@ -288,12 +336,23 @@ class MutationCreateChapterTest {
      * Then a validation error is returned
      */
     @Test
-    void testSuggestedStartDateAfterSuggestedEndDate(final GraphQlTester tester) {
+    void testSuggestedStartDateAfterSuggestedEndDate(HttpGraphQlTester tester) {
+        final UUID courseId = UUID.randomUUID();
+
+        // create admin user object
+        final LoggedInUser adminUser = userWithMembershipInCourseWithId(courseId,
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+        // save course memberships of admin to repository
+        saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
+
+        // add admin user data to header
+        tester = addCurrentUserHeader(tester, adminUser);
+
         final String query = """
                 mutation {
                     createChapter(
                         input: {
-                            courseId: "00000000-0000-0000-0000-000000000000"
+                            courseId: "%s"
                             title: "New Chapter"
                             description: "This is a new chapter"
                             startDate: "2020-01-01T00:00:00.000Z"
@@ -306,7 +365,7 @@ class MutationCreateChapterTest {
                         id
                         title
                     }
-                }""";
+                }""".formatted(courseId);
 
         tester.document(query)
                 .execute()
@@ -322,12 +381,23 @@ class MutationCreateChapterTest {
      * Then a validation error is returned
      */
     @Test
-    void testSuggestedStartDateBeforeStartDate(final GraphQlTester tester) {
+    void testSuggestedStartDateBeforeStartDate(HttpGraphQlTester tester) {
+        final UUID courseId = UUID.randomUUID();
+
+        // create admin user object
+        final LoggedInUser adminUser = userWithMembershipInCourseWithId(courseId,
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+        // save course memberships of admin to repository
+        saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
+
+        // add admin user data to header
+        tester = addCurrentUserHeader(tester, adminUser);
+
         final String query = """
                 mutation {
                     createChapter(
                         input: {
-                            courseId: "00000000-0000-0000-0000-000000000000"
+                            courseId: "%s"
                             title: "New Chapter"
                             description: "This is a new chapter"
                             startDate: "2021-01-01T00:00:00.000Z"
@@ -339,7 +409,7 @@ class MutationCreateChapterTest {
                         id
                         title
                     }
-                }""";
+                }""".formatted(courseId);
 
         tester.document(query)
                 .execute()
@@ -355,12 +425,23 @@ class MutationCreateChapterTest {
      * Then a validation error is returned
      */
     @Test
-    void testSuggestedEndDateBeforeStartDate(final GraphQlTester tester) {
+    void testSuggestedEndDateBeforeStartDate(HttpGraphQlTester tester) {
+        final UUID courseId = UUID.randomUUID();
+
+        // create admin user object
+        final LoggedInUser adminUser = userWithMembershipInCourseWithId(courseId,
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+        // save course memberships of admin to repository
+        saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
+
+        // add admin user data to header
+        tester = addCurrentUserHeader(tester, adminUser);
+
         final String query = """
                 mutation {
                     createChapter(
                         input: {
-                            courseId: "00000000-0000-0000-0000-000000000000"
+                            courseId: "%s"
                             title: "New Chapter"
                             description: "This is a new chapter"
                             startDate: "2021-01-01T00:00:00.000Z"
@@ -372,7 +453,7 @@ class MutationCreateChapterTest {
                         id
                         title
                     }
-                }""";
+                }""".formatted(courseId);
 
         tester.document(query)
                 .execute()
@@ -388,12 +469,23 @@ class MutationCreateChapterTest {
      * Then a validation error is returned
      */
     @Test
-    void testSuggestedEndDateAfterEndDate(final GraphQlTester tester) {
+    void testSuggestedEndDateAfterEndDate(HttpGraphQlTester tester) {
+        final UUID courseId = UUID.randomUUID();
+
+        // create admin user object
+        final LoggedInUser adminUser = userWithMembershipInCourseWithId(courseId,
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+        // save course memberships of admin to repository
+        saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
+
+        // add admin user data to header
+        tester = addCurrentUserHeader(tester, adminUser);
+
         final String query = """
                 mutation {
                     createChapter(
                         input: {
-                            courseId: "00000000-0000-0000-0000-000000000000"
+                            courseId: "%s"
                             title: "New Chapter"
                             description: "This is a new chapter"
                             startDate: "2021-01-01T00:00:00.000Z"
@@ -405,7 +497,7 @@ class MutationCreateChapterTest {
                         id
                         title
                     }
-                }""";
+                }""".formatted(courseId);
 
         tester.document(query)
                 .execute()

@@ -116,6 +116,17 @@ public class ChapterService {
     }
 
     /**
+     * Gets the course id for a chapter.
+     * @param chapterId The id of the chapter to get the course id for.
+     * @return The id of the course the chapter belongs to.
+     */
+    public UUID getCourseIdForChapterId(final UUID chapterId) {
+        final ChapterEntity chapterEntity = requireChapterExisting(chapterId);
+
+        return chapterEntity.getCourseId();
+    }
+
+    /**
      * Checks if a chapter exists.
      *
      * @param uuid The id of the chapter to check.
