@@ -41,7 +41,7 @@ type Query {
     resourceById(ids: [UUID!]!): [CourseResourceAssociation!]! @deprecated(reason: "Use courseResourceAssociationsByIds instead.")
 
     """
-    Returns the list of courseMemberships for the specified User.
+    Returns the list of courseMemberships for the specified users.
     ⚠️ This query is only accessible internally in the system and allows the caller to retrieve courseMemberships for
     any user and should not be called without any validation of the caller's permissions. ⚠️
     """
