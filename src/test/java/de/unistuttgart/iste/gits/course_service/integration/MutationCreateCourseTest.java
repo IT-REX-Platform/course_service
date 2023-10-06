@@ -1,9 +1,9 @@
 package de.unistuttgart.iste.gits.course_service.integration;
 
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
+import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
 import de.unistuttgart.iste.gits.generated.dto.YearDivision;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.is;
 /**
  * Tests for the `createCourse` mutation.
  */
-@ContextConfiguration(classes = MockTopicPublisherConfiguration.class)
+@ContextConfiguration(classes = MockTestPublisherConfiguration.class)
 @GraphQlApiTest
 class MutationCreateCourseTest {
 
@@ -293,7 +293,8 @@ class MutationCreateCourseTest {
                     "userName": "MyUserName",
                     "firstName": "John",
                     "lastName": "Doe",
-                    "courseMemberships": []
+                    "courseMemberships": [],
+                    "realmRoles": []
                 }
                 """.formatted(userId.toString());
     }

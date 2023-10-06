@@ -1,44 +1,40 @@
 package de.unistuttgart.iste.gits.course_service.integration;
 
-import de.unistuttgart.iste.gits.common.testutil.GitsPostgresSqlContainer;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.common.testutil.HeaderUtils;
+import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
 import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.graphql.test.tester.HttpGraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 
 import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
 
 /**
  * Tests for the `deleteChapter` mutation.
  */
-@ContextConfiguration(classes = MockTopicPublisherConfiguration.class)
+@ContextConfiguration(classes = MockTestPublisherConfiguration.class)
 @GraphQlApiTest
 class MutationDeleteChapterTest {
-
-    @Container
-    public static PostgreSQLContainer<GitsPostgresSqlContainer> postgreSQLContainer = GitsPostgresSqlContainer.getInstance();
 
     @Autowired
     private CourseRepository courseRepository;
     @Autowired
     private ChapterRepository chapterRepository;
+
 
     /**
      * Given a valid chapter id
@@ -48,15 +44,15 @@ class MutationDeleteChapterTest {
     @Test
     void testDeletion(HttpGraphQlTester tester) {
         // create a course in the database
-        var course = courseRepository.save(dummyCourseBuilder().build());
+        final var course = courseRepository.save(dummyCourseBuilder().build());
         // create two chapters in the database
-        var chapters = Stream.of(
+        final var chapters = Stream.of(
                         dummyChapterBuilder().courseId(course.getId()).title("Chapter 1").build(),
                         dummyChapterBuilder().courseId(course.getId()).title("Chapter 2").build())
                 .map(chapterRepository::save)
                 .toList();
 
-        String query = """
+        final String query = """
                 mutation {
                     deleteChapter(id: "%s")
                 }""".formatted(chapters.get(0).getId());
@@ -71,13 +67,13 @@ class MutationDeleteChapterTest {
                         false,
                         OffsetDateTime.now(),
                         OffsetDateTime.now())
-                )));
+                ), Collections.emptySet()));
 
         tester.document(query)
                 .execute()
                 .path("deleteChapter").entity(UUID.class).isEqualTo(chapters.get(0).getId());
 
-        var entities = chapterRepository.findAll();
+        final var entities = chapterRepository.findAll();
         assertThat(entities, hasSize(1));
         assertThat(entities.get(0).getId(), equalTo(chapters.get(1).getId()));
     }
@@ -89,9 +85,9 @@ class MutationDeleteChapterTest {
      */
     @Test
     void testDeletionInvalidId(HttpGraphQlTester tester) {
-        UUID chapterId = UUID.randomUUID();
+        final UUID chapterId = UUID.randomUUID();
 
-        String query = """
+        final String query = """
                 mutation {
                     deleteChapter(id: "%s")
                 }""".formatted(chapterId);
@@ -106,14 +102,12 @@ class MutationDeleteChapterTest {
                         false,
                         OffsetDateTime.now(),
                         OffsetDateTime.now())
-                )));
+                ), Collections.emptySet()));
 
         tester.document(query)
                 .execute()
                 .errors()
-                .satisfy(responseErrors -> {
-                    assertThat(responseErrors, hasSize(1));
-                });
+                .satisfy(responseErrors -> assertThat(responseErrors, hasSize(1)));
     }
 
     private CourseEntity.CourseEntityBuilder dummyCourseBuilder() {

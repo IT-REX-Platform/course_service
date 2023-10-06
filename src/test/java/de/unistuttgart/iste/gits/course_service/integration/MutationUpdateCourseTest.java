@@ -1,14 +1,15 @@
 package de.unistuttgart.iste.gits.course_service.integration;
 
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
+import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
 import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseMembershipRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
 import de.unistuttgart.iste.gits.generated.dto.Chapter;
+import de.unistuttgart.iste.gits.generated.dto.YearDivision;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
@@ -30,7 +31,7 @@ import static org.hamcrest.Matchers.is;
 /**
  * Tests for the `updateCourse` mutation.
  */
-@ContextConfiguration(classes = MockTopicPublisherConfiguration.class)
+@ContextConfiguration(classes = MockTestPublisherConfiguration.class)
 @GraphQlApiTest
 class MutationUpdateCourseTest {
 
@@ -54,6 +55,8 @@ class MutationUpdateCourseTest {
                 .description("This is course 1")
                 .startDate(OffsetDateTime.parse("2020-01-01T00:00:00.000Z"))
                 .endDate(OffsetDateTime.parse("2021-01-01T00:00:00.000Z"))
+                .startYear(2021)
+                .yearDivision(YearDivision.FIRST_SEMESTER)
                 .published(true)
                 .build());
 
@@ -84,6 +87,8 @@ class MutationUpdateCourseTest {
                             description: "This is a new course"
                             startDate: "2000-01-01T00:00:00.000Z"
                             endDate: "2001-01-01T00:00:00.000Z"
+                            startYear: 2021
+                            yearDivision: FIRST_SEMESTER
                             published: false
                         }
                     ) {
@@ -92,6 +97,8 @@ class MutationUpdateCourseTest {
                         description
                         startDate
                         endDate
+                        startYear
+                        yearDivision
                         published
                         chapters {
                             elements {
@@ -108,6 +115,8 @@ class MutationUpdateCourseTest {
                 .path("updateCourse.description").entity(String.class).isEqualTo("This is a new course")
                 .path("updateCourse.startDate").entity(String.class).isEqualTo("2000-01-01T00:00:00.000Z")
                 .path("updateCourse.endDate").entity(String.class).isEqualTo("2001-01-01T00:00:00.000Z")
+                .path("updateCourse.startYear").entity(Integer.class).isEqualTo(2021)
+                .path("updateCourse.yearDivision").entity(YearDivision.class).isEqualTo(YearDivision.FIRST_SEMESTER)
                 .path("updateCourse.published").entity(Boolean.class).isEqualTo(false)
                 .path("updateCourse.chapters.elements").entityList(Chapter.class).hasSize(1);
 
