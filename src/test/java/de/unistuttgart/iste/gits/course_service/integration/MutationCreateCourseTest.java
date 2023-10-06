@@ -293,7 +293,8 @@ class MutationCreateCourseTest {
                     "userName": "MyUserName",
                     "firstName": "John",
                     "lastName": "Doe",
-                    "courseMemberships": []
+                    "courseMemberships": [],
+                    "realmRoles": []
                 }
                 """.formatted(userId.toString());
     }

@@ -1,6 +1,5 @@
 package de.unistuttgart.iste.gits.course_service.integration;
 
-import de.unistuttgart.iste.gits.common.testutil.GitsPostgresSqlContainer;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
 import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
@@ -15,12 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.graphql.test.tester.HttpGraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 
 import java.time.OffsetDateTime;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -128,14 +124,15 @@ class MutationUpdateChapterTest {
                 "admin",
                 "admin",
                 "admin",
-                Collections.emptyList());
+                Collections.emptyList(),
+                Collections.emptySet());
         // save course memberships of admin to repository
         saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
 
         // add admin user data to header
         tester = addCurrentUserHeader(tester, adminUser);
 
-        String query = """
+        final String query = """
                 mutation {
                     updateChapter(
                         input: {
@@ -266,7 +263,7 @@ class MutationUpdateChapterTest {
     @Test
     void testStartDateAfterEndDate(HttpGraphQlTester tester) {
         // create and save chapter
-        ChapterEntity chapter = chapterRepository.save(dummyChapterBuilder().build());
+        final ChapterEntity chapter = chapterRepository.save(dummyChapterBuilder().build());
 
         // create admin user object
         final LoggedInUser adminUser = userWithMembershipInCourseWithId(chapter.getCourseId(),
@@ -277,7 +274,7 @@ class MutationUpdateChapterTest {
         // add admin user data to header
         tester = addCurrentUserHeader(tester, adminUser);
 
-        String query = """
+        final String query = """
                 mutation {
                     updateChapter(
                         input: {
