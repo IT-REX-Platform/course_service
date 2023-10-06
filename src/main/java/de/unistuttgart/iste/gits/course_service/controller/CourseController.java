@@ -1,5 +1,6 @@
 package de.unistuttgart.iste.gits.course_service.controller;
 
+import de.unistuttgart.iste.gits.common.user_handling.GlobalPermissionAccessValidator;
 import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.gits.common.user_handling.UserCourseAccessValidator;
 import de.unistuttgart.iste.gits.course_service.service.CourseService;
@@ -9,7 +10,10 @@ import org.springframework.graphql.data.method.annotation.*;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 @Controller
@@ -43,8 +47,10 @@ public class CourseController {
 
     @MutationMapping
     public Course createCourse(@Argument(name = "input") final CreateCourseInput input,
-                               @ContextValue final LoggedInUser currentUser) {
+                               @ContextValue final LoggedInUser currentUser){
         final Course course = courseService.createCourse(input, currentUser.getId());
+
+        GlobalPermissionAccessValidator.validateUserHasGlobalPermission(currentUser, Set.of(LoggedInUser.RealmRole.COURSE_CREATOR));
 
         // update user course memberships in context with the newly created course (the creator of the course
         // always gets admin permissions)

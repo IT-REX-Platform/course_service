@@ -294,7 +294,7 @@ class MutationCreateCourseTest {
                     "firstName": "John",
                     "lastName": "Doe",
                     "courseMemberships": [],
-                    "realmRoles": []
+                    "realmRoles": ["course-creator"]
                 }
                 """.formatted(userId.toString());
     }
