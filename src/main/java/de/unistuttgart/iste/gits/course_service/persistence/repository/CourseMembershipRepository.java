@@ -16,18 +16,19 @@ import java.util.UUID;
 public interface CourseMembershipRepository extends JpaRepository<CourseMembershipEntity, CourseMembershipPk> {
 
     /**
-     * Find Courses by CourseID
+     * Finds all course memberships for the specified users. Returns a list of CourseMembershipEntities for the given
+     * user ids in no particular order.
      *
-     * @param userIds of the courses to find
-     * @return List of CourseMembershipEntities
+     * @param userIds IDs of the users to find their courses for.
+     * @return List of CourseMembershipEntities for the users with the given ids.
      */
     List<CourseMembershipEntity> findByUserIdIn(List<UUID> userIds);
 
     /**
-     * Hibernate Query. Find Entities by Course ID. ORDERED BY User ID
+     * Finds all course memberships of the course with the specified id.
      *
-     * @param courseId Course ID
-     * @return List of Entities
+     * @param courseId ID of the course to find the memberships for.
+     * @return List of CourseMembershipEntities for the course with the given id.
      */
     List<CourseMembershipEntity> findCourseMembershipEntitiesByCourseId(UUID courseId);
 }

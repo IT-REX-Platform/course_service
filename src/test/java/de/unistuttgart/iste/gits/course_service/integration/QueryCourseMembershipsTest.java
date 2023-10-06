@@ -1,6 +1,8 @@
 package de.unistuttgart.iste.gits.course_service.integration;
 
+import de.unistuttgart.iste.gits.common.exception.NoAccessToCourseException;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
+import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseMembershipEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseMembershipRepository;
@@ -9,9 +11,14 @@ import de.unistuttgart.iste.gits.generated.dto.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.graphql.test.tester.HttpGraphQlTester;
 
 import java.time.OffsetDateTime;
 import java.util.*;
+
+import static de.unistuttgart.iste.gits.common.testutil.HeaderUtils.addCurrentUserHeader;
+import static de.unistuttgart.iste.gits.common.testutil.TestUsers.userWithMembershipInCourseWithId;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @GraphQlApiTest
 class QueryCourseMembershipsTest {
@@ -91,6 +98,77 @@ class QueryCourseMembershipsTest {
                 .entityList(CourseMembership.class)
                 .hasSize(2)
                 .contains(courseMemberships.get(0), courseMemberships.get(1));
+    }
+
+    @Test
+    void testMembershipsFieldInCourse(HttpGraphQlTester tester) {
+        final CourseEntity course = courseRepository.save(createTestCourse());
+
+        final LoggedInUser currentUser = userWithMembershipInCourseWithId(course.getId(),
+                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+
+        tester = addCurrentUserHeader(tester, currentUser);
+
+        membershipRepository.save(CourseMembershipEntity.builder()
+                .userId(currentUser.getId())
+                .courseId(course.getId())
+                .role(UserRoleInCourse.ADMINISTRATOR)
+                .build());
+
+        final String query =
+                """
+                query($courseId: UUID!) {
+                    coursesByIds(ids: [$courseId]) {
+                        memberships {
+                            userId
+                            courseId
+                            role
+                        }
+                    }
+                }
+                """;
+
+        tester.document(query)
+                .variable("courseId", course.getId())
+                .execute()
+                .path("coursesByIds[0].memberships").entityList(CourseMembership.class).hasSize(1)
+                .path("coursesByIds[0].memberships[0].userId").entity(UUID.class).isEqualTo(currentUser.getId())
+                .path("coursesByIds[0].memberships[0].courseId").entity(UUID.class).isEqualTo(course.getId())
+                .path("coursesByIds[0].memberships[0].role").entity(UserRoleInCourse.class).isEqualTo(UserRoleInCourse.ADMINISTRATOR);
+    }
+
+    @Test
+    void testMembershipsFieldInCourseNoPermission(HttpGraphQlTester tester) {
+        final CourseEntity course = courseRepository.save(createTestCourse());
+
+        final LoggedInUser currentUser = userWithMembershipInCourseWithId(course.getId(),
+                LoggedInUser.UserRoleInCourse.STUDENT);
+
+        tester = addCurrentUserHeader(tester, currentUser);
+
+        membershipRepository.save(CourseMembershipEntity.builder()
+                .userId(currentUser.getId())
+                .courseId(course.getId())
+                .role(UserRoleInCourse.STUDENT)
+                .build());
+
+        final String query =
+                """
+                query($courseId: UUID!) {
+                    coursesByIds(ids: [$courseId]) {
+                        memberships {
+                            userId
+                            courseId
+                            role
+                        }
+                    }
+                }
+                """;
+
+        tester.document(query)
+                .variable("courseId", course.getId())
+                .execute().errors().expect(e ->
+                        e.getExtensions().get("exception").equals(NoAccessToCourseException.class.getSimpleName()));
     }
 
     private static Course createTestCourseDto() {
