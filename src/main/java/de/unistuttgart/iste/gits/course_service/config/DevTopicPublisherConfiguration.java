@@ -1,12 +1,11 @@
 package de.unistuttgart.iste.gits.course_service.config;
 
-import de.unistuttgart.iste.gits.common.event.CrudOperation;
-import de.unistuttgart.iste.gits.course_service.dapr.TopicPublisher;
+import de.unistuttgart.iste.gits.common.dapr.MockTopicPublisher;
+import de.unistuttgart.iste.gits.common.dapr.TopicPublisher;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.*;
-
-import java.util.List;
-import java.util.UUID;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /**
  * This is a dev-config for the TopicPublisher. It is intended to be used for development only.
@@ -25,22 +24,5 @@ public class DevTopicPublisherConfiguration {
     public TopicPublisher getTopicPublisher() {
         log.warn("TopicPublisher is mocked. This is intended for development use only.");
         return new MockTopicPublisher();
-    }
-
-    private static class MockTopicPublisher extends TopicPublisher {
-
-        public MockTopicPublisher() {
-            super(null);
-        }
-
-        @Override
-        public void notifyCourseChanges(UUID courseID, CrudOperation operation) {
-            log.info("notifyChange called with {} and {}", courseID, operation);
-        }
-
-        @Override
-        public void notifyChapterChanges(List<UUID> chapterIds, CrudOperation operation) {
-            log.info("notifyChange called with {} and {}", chapterIds, operation);
-        }
     }
 }

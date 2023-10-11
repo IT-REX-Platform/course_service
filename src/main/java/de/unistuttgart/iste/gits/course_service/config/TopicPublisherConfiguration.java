@@ -1,7 +1,7 @@
 package de.unistuttgart.iste.gits.course_service.config;
 
 
-import de.unistuttgart.iste.gits.course_service.dapr.TopicPublisher;
+import de.unistuttgart.iste.gits.common.dapr.TopicPublisher;
 import io.dapr.client.DaprClientBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

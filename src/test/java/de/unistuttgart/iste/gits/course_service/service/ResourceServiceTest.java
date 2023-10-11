@@ -31,25 +31,25 @@ class ResourceServiceTest {
     @Test
     void testGetCoursesByResourceId() {
         //init data
-        UUID resourceId = UUID.randomUUID();
+        final UUID resourceId = UUID.randomUUID();
 
-        CourseEntity courseEntity = dummyCourseEntityBuilder(OffsetDateTime.now(), false).build();
-        CourseEntity anotherCourseEntity = dummyCourseEntityBuilder(OffsetDateTime.now(), true).build();
+        final CourseEntity courseEntity = dummyCourseEntityBuilder(OffsetDateTime.now(), false).build();
+        final CourseEntity anotherCourseEntity = dummyCourseEntityBuilder(OffsetDateTime.now(), true).build();
 
-        CourseResourceAssociationEntity courseResourceAssociationEntity = CourseResourceAssociationEntity.builder()
+        final CourseResourceAssociationEntity courseResourceAssociationEntity = CourseResourceAssociationEntity.builder()
                 .courseId(courseEntity.getId())
                 .resourceId(resourceId)
                 .build();
-        CourseResourceAssociationEntity anotherCourseResourceAssociationEntity = CourseResourceAssociationEntity.builder()
+        final CourseResourceAssociationEntity anotherCourseResourceAssociationEntity = CourseResourceAssociationEntity.builder()
                 .courseId(anotherCourseEntity.getId())
                 .resourceId(resourceId)
                 .build();
 
-        List<CourseResourceAssociationEntity> courseResourceAssociationEntityList = List.of(courseResourceAssociationEntity, anotherCourseResourceAssociationEntity);
-        List<CourseEntity> courseEntityList = List.of(courseEntity, anotherCourseEntity);
+        final List<CourseResourceAssociationEntity> courseResourceAssociationEntityList = List.of(courseResourceAssociationEntity, anotherCourseResourceAssociationEntity);
+        final List<CourseEntity> courseEntityList = List.of(courseEntity, anotherCourseEntity);
 
         // expected: two courses have the same resource
-        CourseResourceAssociation expected = CourseResourceAssociation.builder()
+        final CourseResourceAssociation expected = CourseResourceAssociation.builder()
                 .setId(resourceId)
                 .setAvailableCourses(List.of(courseEntityList.get(1).getId()))
                 .setUnAvailableCourses(List.of(courseEntityList.get(0).getId()))
@@ -61,7 +61,7 @@ class ResourceServiceTest {
         when(courseRepository.findAllById(any())).thenReturn(courseEntityList);
 
         //run method under test
-        List<CourseResourceAssociation> actualResult = resourceService.getCourseResourceAssociations(List.of(resourceId));
+        final List<CourseResourceAssociation> actualResult = resourceService.getCourseResourceAssociations(List.of(resourceId));
 
         //compare result
         assertEquals(expected, actualResult.get(0));
@@ -73,24 +73,24 @@ class ResourceServiceTest {
     @Test
     void testAvailabilityCheckWithExpiredDate(){
         //init data
-        UUID resourceId = UUID.randomUUID();
+        final UUID resourceId = UUID.randomUUID();
 
-        CourseEntity courseEntity = invalidDummyCourseEntityBuilder(OffsetDateTime.now(), true).build();
-        CourseEntity anotherCourseEntity = dummyCourseEntityBuilder(OffsetDateTime.now(), true).build();
+        final CourseEntity courseEntity = invalidDummyCourseEntityBuilder(OffsetDateTime.now(), true).build();
+        final CourseEntity anotherCourseEntity = dummyCourseEntityBuilder(OffsetDateTime.now(), true).build();
 
-        CourseResourceAssociationEntity courseResourceAssociationEntity = CourseResourceAssociationEntity.builder()
+        final CourseResourceAssociationEntity courseResourceAssociationEntity = CourseResourceAssociationEntity.builder()
                 .courseId(courseEntity.getId())
                 .resourceId(resourceId)
                 .build();
-        CourseResourceAssociationEntity anotherCourseResourceAssociationEntity = CourseResourceAssociationEntity.builder()
+        final CourseResourceAssociationEntity anotherCourseResourceAssociationEntity = CourseResourceAssociationEntity.builder()
                 .courseId(anotherCourseEntity.getId())
                 .resourceId(resourceId)
                 .build();
-        List<CourseResourceAssociationEntity> courseResourceAssociationEntityList = List.of(courseResourceAssociationEntity, anotherCourseResourceAssociationEntity);
-        List<CourseEntity> courseEntityList = List.of(courseEntity, anotherCourseEntity);
+        final List<CourseResourceAssociationEntity> courseResourceAssociationEntityList = List.of(courseResourceAssociationEntity, anotherCourseResourceAssociationEntity);
+        final List<CourseEntity> courseEntityList = List.of(courseEntity, anotherCourseEntity);
 
         // expected: two courses share a resource.
-        CourseResourceAssociation expected = CourseResourceAssociation.builder()
+        final CourseResourceAssociation expected = CourseResourceAssociation.builder()
                 .setId(resourceId)
                 .setAvailableCourses(List.of(courseEntityList.get(1).getId()))
                 .setUnAvailableCourses(List.of(courseEntityList.get(0).getId()))
@@ -102,7 +102,7 @@ class ResourceServiceTest {
         when(courseRepository.findAllById(any())).thenReturn(courseEntityList);
 
         //run method under test
-        List<CourseResourceAssociation> actualResult = resourceService.getCourseResourceAssociations(List.of(resourceId));
+        final List<CourseResourceAssociation> actualResult = resourceService.getCourseResourceAssociations(List.of(resourceId));
 
         //compare result
         assertEquals(expected, actualResult.get(0));
@@ -111,12 +111,12 @@ class ResourceServiceTest {
     @Test
     void testResourceCreation(){
         //init
-        CourseEntity courseEntity = dummyCourseEntityBuilder(OffsetDateTime.now(), true).build();
-        ChapterEntity chapterEntity = dummyChapterEntityBuilder(courseEntity.getId()).build();
+        final CourseEntity courseEntity = dummyCourseEntityBuilder(OffsetDateTime.now(), true).build();
+        final ChapterEntity chapterEntity = dummyChapterEntityBuilder(courseEntity.getId()).build();
 
         courseEntity.setChapters(List.of(chapterEntity));
 
-        CourseAssociationEvent dto = CourseAssociationEvent.builder().chapterIds(List.of(chapterEntity.getId())).resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
+        final CourseAssociationEvent dto = CourseAssociationEvent.builder().chapterIds(List.of(chapterEntity.getId())).resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
 
 
         //mock repositories
@@ -132,14 +132,14 @@ class ResourceServiceTest {
     @Test
     void testResourceCreationFromInvalidInput(){
         //init
-        UUID chapterId = UUID.randomUUID();
-        ChapterEntity chapterEntity = dummyChapterEntityBuilder(chapterId).build();
-        CourseAssociationEvent missingDbCourseEntity = CourseAssociationEvent.builder().chapterIds(List.of(chapterId)).resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
-        CourseAssociationEvent missingDbChapterEntity = CourseAssociationEvent.builder().chapterIds(List.of(UUID.randomUUID())).resourceId(UUID.randomUUID()).operation(CrudOperation.DELETE).build();
+        final UUID chapterId = UUID.randomUUID();
+        final ChapterEntity chapterEntity = dummyChapterEntityBuilder(chapterId).build();
+        final CourseAssociationEvent missingDbCourseEntity = CourseAssociationEvent.builder().chapterIds(List.of(chapterId)).resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
+        final CourseAssociationEvent missingDbChapterEntity = CourseAssociationEvent.builder().chapterIds(List.of(UUID.randomUUID())).resourceId(UUID.randomUUID()).operation(CrudOperation.DELETE).build();
 
-        CourseAssociationEvent missingChapter = CourseAssociationEvent.builder().resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
-        CourseAssociationEvent missingResource = CourseAssociationEvent.builder().chapterIds(List.of(UUID.randomUUID())).operation(CrudOperation.CREATE).build();
-        CourseAssociationEvent missingOperator = CourseAssociationEvent.builder().chapterIds(List.of(UUID.randomUUID())).resourceId(UUID.randomUUID()).build();
+        final CourseAssociationEvent missingChapter = CourseAssociationEvent.builder().resourceId(UUID.randomUUID()).operation(CrudOperation.CREATE).build();
+        final CourseAssociationEvent missingResource = CourseAssociationEvent.builder().chapterIds(List.of(UUID.randomUUID())).operation(CrudOperation.CREATE).build();
+        final CourseAssociationEvent missingOperator = CourseAssociationEvent.builder().chapterIds(List.of(UUID.randomUUID())).resourceId(UUID.randomUUID()).build();
 
         // mock repository
         when(chapterRepository.findById(chapterId))
@@ -158,7 +158,7 @@ class ResourceServiceTest {
 
 
     // Builder methods used for creating entities
-    private CourseEntity.CourseEntityBuilder dummyCourseEntityBuilder(OffsetDateTime now, boolean published) {
+    private CourseEntity.CourseEntityBuilder dummyCourseEntityBuilder(final OffsetDateTime now, final boolean published) {
         return CourseEntity.builder()
                 .id(UUID.randomUUID())
                 .title("title")
@@ -169,7 +169,7 @@ class ResourceServiceTest {
 
     }
 
-    private CourseEntity.CourseEntityBuilder invalidDummyCourseEntityBuilder(OffsetDateTime now, boolean published) {
+    private CourseEntity.CourseEntityBuilder invalidDummyCourseEntityBuilder(final OffsetDateTime now, final boolean published) {
         return CourseEntity.builder()
                 .id(UUID.randomUUID())
                 .title("title")
@@ -180,7 +180,7 @@ class ResourceServiceTest {
 
     }
 
-    private static ChapterEntity.ChapterEntityBuilder dummyChapterEntityBuilder(UUID courseId) {
+    private static ChapterEntity.ChapterEntityBuilder dummyChapterEntityBuilder(final UUID courseId) {
         return ChapterEntity.builder()
                 .id(UUID.randomUUID())
                 .courseId(courseId)

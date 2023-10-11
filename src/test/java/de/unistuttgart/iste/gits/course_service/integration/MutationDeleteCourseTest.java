@@ -1,13 +1,13 @@
 package de.unistuttgart.iste.gits.course_service.integration;
 
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
+import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
 import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseMembershipRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.HttpGraphQlTester;
@@ -28,7 +28,7 @@ import static de.unistuttgart.iste.gits.common.testutil.TestUsers.userWithMember
 /**
  * Tests for the `deleteCourse` mutation.
  */
-@ContextConfiguration(classes = MockTopicPublisherConfiguration.class)
+@ContextConfiguration(classes = MockTestPublisherConfiguration.class)
 @GraphQlApiTest
 class MutationDeleteCourseTest {
 
@@ -65,7 +65,7 @@ class MutationDeleteCourseTest {
         // create a chapter in the database to check that it is deleted
         chapterRepository.save(dummyChapterBuilder().courseId(initialCourses.get(0).getId()).build());
 
-        String query = """
+        final String query = """
                 mutation {
                     deleteCourse(id: "%s")
                 }""".formatted(initialCourses.get(0).getId());
@@ -74,7 +74,7 @@ class MutationDeleteCourseTest {
                 .execute()
                 .path("deleteCourse").entity(UUID.class).isEqualTo(initialCourses.get(0).getId());
 
-        var entities = courseRepository.findAll();
+        final var entities = courseRepository.findAll();
         assertThat(entities, hasSize(1));
         // check that the correct course was deleted and the other one is still there
         assertThat(entities.get(0).getId(), equalTo(initialCourses.get(1).getId()));

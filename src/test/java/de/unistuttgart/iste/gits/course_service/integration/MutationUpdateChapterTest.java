@@ -1,26 +1,22 @@
 package de.unistuttgart.iste.gits.course_service.integration;
 
-import de.unistuttgart.iste.gits.common.testutil.GitsPostgresSqlContainer;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
+import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
 import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseMembershipRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
 import de.unistuttgart.iste.gits.generated.dto.Chapter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.graphql.test.tester.HttpGraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
-import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
 
 import java.time.OffsetDateTime;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -30,7 +26,7 @@ import static de.unistuttgart.iste.gits.course_service.test_utils.TestUtils.save
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-@ContextConfiguration(classes = MockTopicPublisherConfiguration.class)
+@ContextConfiguration(classes = MockTestPublisherConfiguration.class)
 @GraphQlApiTest
 class MutationUpdateChapterTest {
 
@@ -128,14 +124,15 @@ class MutationUpdateChapterTest {
                 "admin",
                 "admin",
                 "admin",
-                Collections.emptyList());
+                Collections.emptyList(),
+                Collections.emptySet());
         // save course memberships of admin to repository
         saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
 
         // add admin user data to header
         tester = addCurrentUserHeader(tester, adminUser);
 
-        String query = """
+        final String query = """
                 mutation {
                     updateChapter(
                         input: {
@@ -171,8 +168,8 @@ class MutationUpdateChapterTest {
      * Then a validation error is returned
      */
     @Test
-    void testErrorOnBlankTitle(GraphQlTester tester) {
-        String query = """
+    void testErrorOnBlankTitle(final GraphQlTester tester) {
+        final String query = """
                 mutation {
                     updateChapter(
                         input: {
@@ -202,8 +199,8 @@ class MutationUpdateChapterTest {
      * Then a validation error is returned
      */
     @Test
-    void testTooLongTitle(GraphQlTester tester) {
-        String query = String.format("""
+    void testTooLongTitle(final GraphQlTester tester) {
+        final String query = String.format("""
                 mutation {
                     updateChapter(
                         input: {
@@ -233,8 +230,8 @@ class MutationUpdateChapterTest {
      * Then a validation error is returned
      */
     @Test
-    void testTooLongDescription(GraphQlTester tester) {
-        String query = String.format("""
+    void testTooLongDescription(final GraphQlTester tester) {
+        final String query = String.format("""
                 mutation {
                     updateChapter(
                         input: {
@@ -266,7 +263,7 @@ class MutationUpdateChapterTest {
     @Test
     void testStartDateAfterEndDate(HttpGraphQlTester tester) {
         // create and save chapter
-        ChapterEntity chapter = chapterRepository.save(dummyChapterBuilder().build());
+        final ChapterEntity chapter = chapterRepository.save(dummyChapterBuilder().build());
 
         // create admin user object
         final LoggedInUser adminUser = userWithMembershipInCourseWithId(chapter.getCourseId(),
@@ -277,7 +274,7 @@ class MutationUpdateChapterTest {
         // add admin user data to header
         tester = addCurrentUserHeader(tester, adminUser);
 
-        String query = """
+        final String query = """
                 mutation {
                     updateChapter(
                         input: {
