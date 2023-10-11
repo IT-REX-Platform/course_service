@@ -70,7 +70,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'de.unistuttgart.iste.gits:gits-common:0.6.2'
+    implementation 'de.unistuttgart.iste.gits:gits-common:0.6.4'
     implementation 'com.google.code.findbugs:jsr305:3.0.2' // removes a gradle warning about an unknown annotation
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-graphql'
