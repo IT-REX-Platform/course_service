@@ -23,7 +23,7 @@ Who has access to the course and the different roles such as lecturer, teaching 
 | spring.profiles.active                  | Active Spring profile                     | dev                                     | prod                                    |
 | spring.jpa.properties.hibernate.dialect | Hibernate dialect for PostgreSQL          | org.hibernate.dialect.PostgreSQLDialect | org.hibernate.dialect.PostgreSQLDialect |
 | spring.sql.init.mode                    | SQL initialization mode                   | always                                  | always                                  |
-| spring.jpa.show-sql                     | Show SQL queries in logs                  | true                                    | true                                    |
+| spring.jpa.show-sql                     | Show SQL queries in logs                  | true                                    | false                                   |
 | spring.sql.init.continue-on-error       | Continue on SQL init error                | true                                    | true                                    |
 | spring.jpa.hibernate.ddl-auto           | Hibernate DDL auto strategy               | create                                  | update                                  |
 | DAPR_GRPC_PORT                          | Dapr gRPC Port                            | -                                       | 50001                                   |
@@ -36,6 +36,6 @@ The API is available at `/graphql` and the GraphiQL interface is available at `/
 
 ## Get started
 A guide how to start development can be
-found [wiki](https://gits-enpro.readthedocs.io/en/latest/dev-manuals/backend/get-started.html).
+found in the [wiki](https://gits-enpro.readthedocs.io/en/latest/dev-manuals/backend/get-started.html).
 
 
