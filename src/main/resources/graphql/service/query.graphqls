@@ -30,25 +30,6 @@ type Query {
     _internal_noauth_chaptersByIds(ids: [UUID!]!): [Chapter!]!
 
     """
-    Returns a set of Resource Objects for the given resource ids, containing a list of all course IDs for a resource
-    and its availability in the course.
-    """
-    courseResourceAssociationsByIds(ids: [UUID!]!): [CourseResourceAssociation!]!
-
-    """
-    Returns a set of Resource Objects for the given resource ids, containing a list of all course IDs for a resource and its availability in the course.
-    """
-    resourceById(ids: [UUID!]!): [CourseResourceAssociation!]! @deprecated(reason: "Use courseResourceAssociationsByIds instead.")
-
-    """
-    Returns the list of courseMemberships for the specified users.
-    ⚠️ This query is only accessible internally in the system and allows the caller to retrieve courseMemberships for
-    any user and should not be called without any validation of the caller's permissions. ⚠️
-    """
-    _internal_noauth_courseMembershipsByUserIds(userIds: [UUID!]!) : [[CourseMembership!]!]!
-    @deprecated(reason: "Use _internal_noauth_courseMembershipByUserId instead to have filter functionality.")
-
-    """
     Returns the list of courseMemberships for the specified user.
     ⚠️ This query is only accessible internally in the system and allows the caller to retrieve courseMemberships for
     any user and should not be called without any validation of the caller's permissions. ⚠️
