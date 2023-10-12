@@ -7,6 +7,7 @@ import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseMembers
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseMembershipPk;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseMembershipRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
+import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
 import de.unistuttgart.iste.gits.generated.dto.UserRoleInCourse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,11 @@ class MutationLeaveCourseTest {
         tester.document(query)
                 .variable("courseId", course.getId())
                 .execute()
-                .path("leaveCourse").entity(UUID.class).isEqualTo(course.getId());
+                .path("leaveCourse").entity(CourseMembership.class).isEqualTo(CourseMembership.builder()
+                        .setUserId(currentUserId)
+                        .setCourseId(course.getId())
+                        .setRole(UserRoleInCourse.STUDENT)
+                        .build());
 
         assertThat(courseMembershipRepository.findById(new CourseMembershipPk(currentUserId, course.getId()))).isEmpty();
     }
