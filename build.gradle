@@ -87,7 +87,7 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'de.unistuttgart.iste.gits:gits-common-test:0.3.1'
+    testImplementation 'de.unistuttgart.iste.gits:gits-common-test:0.3.2'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework:spring-webflux'
     testImplementation 'org.springframework.graphql:spring-graphql-test'
