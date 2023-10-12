@@ -47,7 +47,11 @@ class MutationLeaveCourseTest {
         final String query =
                 """
                 mutation($courseId: UUID!) {
-                    leaveCourse(courseId: $courseId)
+                    leaveCourse(courseId: $courseId) {
+                        userId
+                        courseId
+                        role
+                    }
                 }
                 """;
 
