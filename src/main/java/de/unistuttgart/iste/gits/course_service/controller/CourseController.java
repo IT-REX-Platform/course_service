@@ -48,9 +48,9 @@ public class CourseController {
     @MutationMapping
     public Course createCourse(@Argument(name = "input") final CreateCourseInput input,
                                @ContextValue final LoggedInUser currentUser){
-        final Course course = courseService.createCourse(input, currentUser.getId());
-
         GlobalPermissionAccessValidator.validateUserHasGlobalPermission(currentUser, Set.of(LoggedInUser.RealmRole.COURSE_CREATOR));
+
+        final Course course = courseService.createCourse(input, currentUser.getId());
 
         // update user course memberships in context with the newly created course (the creator of the course
         // always gets admin permissions)

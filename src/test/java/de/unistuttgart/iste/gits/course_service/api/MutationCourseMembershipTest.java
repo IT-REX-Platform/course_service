@@ -111,7 +111,11 @@ class MutationCourseMembershipTest {
         tester.document(query)
                 .execute()
                 .errors()
-                .expect(responseError -> responseError.getMessage() != null && responseError.getMessage().contains("not member in course"));
+                .expect(responseError -> responseError.getMessage().contains("Membership with user id " +
+                                                                             expectedDto.getUserId() +
+                                                                             " and course id " +
+                                                                             expectedDto.getCourseId() +
+                                                                             " not found"));
     }
 
     @Test
@@ -209,7 +213,11 @@ class MutationCourseMembershipTest {
         tester.document(query)
                 .execute()
                 .errors()
-                .expect(responseError -> responseError.getMessage() != null && responseError.getMessage().contains("not member in course"));
+                .expect(responseError -> responseError.getMessage().contains("Membership with user id " +
+                                                                             expectedDto.getUserId() +
+                                                                             " and course id " +
+                                                                             expectedDto.getCourseId() +
+                                                                             " not found"));
     }
 
     @Test
