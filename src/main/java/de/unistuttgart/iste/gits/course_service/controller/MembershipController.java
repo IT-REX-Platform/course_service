@@ -40,10 +40,7 @@ public class MembershipController {
     @MutationMapping
     public CourseMembership leaveCourse(@Argument final UUID courseId,
                                         @ContextValue final LoggedInUser currentUser) {
-        return membershipService.deleteMembership(CourseMembershipInput.builder()
-                .setCourseId(courseId)
-                .setUserId(currentUser.getId())
-                .build());
+        return membershipService.deleteMembership(currentUser.getId(), courseId);
     }
 
     @MutationMapping
@@ -67,7 +64,7 @@ public class MembershipController {
                                              @ContextValue final LoggedInUser currentUser) {
         validateUserHasAccessToCourse(currentUser, ADMINISTRATOR, inputDto.getCourseId());
 
-        return membershipService.deleteMembership(inputDto);
+        return membershipService.deleteMembership(inputDto.getUserId(), inputDto.getCourseId());
     }
 
     @SchemaMapping(typeName = "Course", field = "memberships")

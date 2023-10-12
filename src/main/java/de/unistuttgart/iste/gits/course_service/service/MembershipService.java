@@ -78,17 +78,12 @@ public class MembershipService {
     /**
      * deletes a course membership of a user
      *
-     * @param inputDto contains user ID, course ID, and course role
      * @return deleted entity
      */
-    public CourseMembership deleteMembership(final CourseMembershipInput inputDto) {
+    public CourseMembership deleteMembership(final UUID userId, final UUID courseId) {
+        final CourseMembershipPk membershipPk = new CourseMembershipPk(userId, courseId);
 
-        final CourseMembershipEntity entity = membershipMapper.dtoToEntity(inputDto);
-
-        // make sure entity exists in database
-        final CourseMembershipPk membershipPk = new CourseMembershipPk(entity.getUserId(), entity.getCourseId());
-
-        requireMembershipExisting(membershipPk);
+        final CourseMembershipEntity entity = requireMembershipExisting(membershipPk);
         courseMembershipRepository.deleteById(membershipPk);
 
         return membershipMapper.entityToDto(entity);
@@ -154,9 +149,12 @@ public class MembershipService {
      *
      * @param membershipPk Primary key of entity to be checked
      */
-    private void requireMembershipExisting(final CourseMembershipPk membershipPk) {
-        if (!courseMembershipRepository.existsById(membershipPk)) {
-            throw new EntityNotFoundException("User with id " + membershipPk.getUserId() + " not member in course" + membershipPk.getCourseId());
-        }
+    private CourseMembershipEntity requireMembershipExisting(final CourseMembershipPk membershipPk) {
+        return courseMembershipRepository.findById(membershipPk)
+                .orElseThrow(() -> new EntityNotFoundException("Membership with user id "
+                                                               + membershipPk.getUserId()
+                                                               + " and course id "
+                                                               + membershipPk.getCourseId()
+                                                               + " not found"));
     }
 }
