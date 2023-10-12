@@ -1,10 +1,23 @@
 # Course Service
+## Core Responsibilities
 
-The Course Service offers features related to courses and chapters:
+The Course Service primarily focuses on the following core responsibilities:
 
-1. **Course Information:** The Course Service provides detailed information about the courses available within our system. It also offers insights into the chapters included within each course, including their order and structure.
+## Managing Course and Chapter Structures
+- Creating new courses and chapters.
+- Modifying existing courses and chapters.
+- Deleting courses and chapters.
 
-2. **Course Management:** This service allows users to create new courses, edit existing ones, and delete courses that are no longer needed.
+## Course Hierarchy
+- Each course can have one or multiple chapters.
+- Chapters can be queried individually.
 
+## Populating Chapters with Content and Structuring Elements
+- Chapters can be further populated with content and structuring elements.
+- Content and structuring elements are provided by the Content Service.
+
+## Access Control
+- Access to courses and their underlying content is restricted by course memberships.
+- Course memberships are managed by the User Service.
 
 
