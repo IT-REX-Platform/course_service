@@ -38,6 +38,15 @@ public class MembershipController {
     }
 
     @MutationMapping
+    public CourseMembership leaveCourse(@Argument final UUID courseId,
+                                        @ContextValue final LoggedInUser currentUser) {
+        return membershipService.deleteMembership(CourseMembershipInput.builder()
+                .setCourseId(courseId)
+                .setUserId(currentUser.getId())
+                .build());
+    }
+
+    @MutationMapping
     public CourseMembership createMembership(@Argument(name = "input") final CourseMembershipInput inputDto,
                                              @ContextValue final LoggedInUser currentUser) {
         validateUserHasAccessToCourse(currentUser, ADMINISTRATOR, inputDto.getCourseId());

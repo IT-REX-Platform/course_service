@@ -43,6 +43,11 @@ type Mutation {
     joinCourse(courseId: UUID!): CourseMembership!
 
     """
+    Lets the current user leave a course. Returns the ID of the course that the user left.
+    """
+    leaveCourse(courseId: UUID!): UUID!
+
+    """
     Adds the specified user to the specified course with the specified role.
     🔒 The calling user must be an admin in this course to perform this action.
     """
