@@ -12,11 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static de.unistuttgart.iste.gits.course_service.test_utils.TestUtils.dummyCourseBuilder;
 import static java.util.Objects.requireNonNull;
 
 /**
@@ -344,14 +344,6 @@ class QueryCoursesTest {
                                          && responseError.getMessage().contains(" not found"));
     }
 
-    private CourseEntity.CourseEntityBuilder dummyCourseBuilder() {
-        return CourseEntity.builder()
-                .title("Course 1")
-                .description("This is course 1")
-                .published(false)
-                .startDate(OffsetDateTime.parse("2020-01-01T00:00:00.000Z"))
-                .endDate(OffsetDateTime.parse("2021-01-01T00:00:00.000Z"));
-    }
 
     private Course entityToDto(final CourseEntity entity) {
         return modelMapper.map(entity, Course.class);

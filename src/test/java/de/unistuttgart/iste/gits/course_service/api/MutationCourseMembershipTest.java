@@ -12,11 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.HttpGraphQlTester;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
 
 import static de.unistuttgart.iste.gits.common.testutil.HeaderUtils.addCurrentUserHeader;
 import static de.unistuttgart.iste.gits.common.testutil.TestUsers.userWithMembershipInCourseWithId;
+import static de.unistuttgart.iste.gits.course_service.test_utils.TestUtils.dummyCourseBuilder;
 import static de.unistuttgart.iste.gits.course_service.test_utils.TestUtils.saveCourseMembershipsOfUserToRepository;
 
 @GraphQlApiTest
@@ -262,20 +262,6 @@ class MutationCourseMembershipTest {
                 .path("deleteMembership")
                 .entity(CourseMembership.class)
                 .isEqualTo(expectedDto);
-    }
-
-    /**
-     * Helper method to create a course builder and initialize it with some dummy data.
-     * @return The course builder.
-     */
-    private CourseEntity.CourseEntityBuilder dummyCourseBuilder() {
-        return CourseEntity.builder()
-                .id(UUID.randomUUID())
-                .title("Course 1")
-                .description("This is course 1")
-                .published(false)
-                .startDate(OffsetDateTime.parse("2020-01-01T00:00:00.000Z"))
-                .endDate(OffsetDateTime.parse("2021-01-01T00:00:00.000Z"));
     }
 
 }

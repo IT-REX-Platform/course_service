@@ -12,17 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.HttpGraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 import static de.unistuttgart.iste.gits.common.testutil.HeaderUtils.addCurrentUserHeader;
 import static de.unistuttgart.iste.gits.common.testutil.TestUsers.userWithMembershipInCourseWithId;
-import static de.unistuttgart.iste.gits.course_service.test_utils.TestUtils.saveCourseMembershipsOfUserToRepository;
+import static de.unistuttgart.iste.gits.course_service.test_utils.TestUtils.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-
 /**
  * Tests for the `deleteCourse` mutation.
  */
@@ -112,22 +110,6 @@ class MutationDeleteCourseTest {
                 });
     }
 
-    private CourseEntity.CourseEntityBuilder dummyCourseBuilder() {
-        return CourseEntity.builder()
-                .title("Course 1")
-                .description("This is course 1")
-                .published(false)
-                .startDate(OffsetDateTime.parse("2020-01-01T00:00:00.000Z"))
-                .endDate(OffsetDateTime.parse("2021-01-01T00:00:00.000Z"));
-    }
 
-    private ChapterEntity.ChapterEntityBuilder dummyChapterBuilder() {
-        return ChapterEntity.builder()
-                .title("Chapter 1")
-                .description("This is chapter 1")
-                .number(1)
-                .startDate(OffsetDateTime.parse("2020-01-01T00:00:00.000Z"))
-                .endDate(OffsetDateTime.parse("2021-01-01T00:00:00.000Z"));
-    }
 
 }
