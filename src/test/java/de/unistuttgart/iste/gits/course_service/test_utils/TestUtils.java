@@ -16,11 +16,12 @@ import java.util.UUID;
 public class TestUtils {
     /**
      * Helper method to save all course memberships of a user to the database.
+     *
      * @param user The user whose course memberships should be saved.
      */
     public static void saveCourseMembershipsOfUserToRepository(final CourseMembershipRepository courseMembershipRepository,
-                                                         final LoggedInUser user) {
-        for(final LoggedInUser.CourseMembership membership : user.getCourseMemberships()) {
+                                                               final LoggedInUser user) {
+        for (final LoggedInUser.CourseMembership membership : user.getCourseMemberships()) {
             courseMembershipRepository.save(CourseMembershipEntity.builder()
                     .courseId(membership.getCourseId())
                     .userId(user.getId())
@@ -41,6 +42,7 @@ public class TestUtils {
                 .startDate(OffsetDateTime.parse("2020-01-01T00:00:00.000Z"))
                 .endDate(OffsetDateTime.parse("2021-01-01T00:00:00.000Z"));
     }
+
     public static ChapterEntity.ChapterEntityBuilder dummyChapterBuilder() {
         return ChapterEntity.builder()
                 .courseId(UUID.randomUUID())

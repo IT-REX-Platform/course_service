@@ -81,7 +81,7 @@ public class AuthorizationTest {
     @Transactional
     void testUpdateCourseAdminOnly(final HttpGraphQlTester tester) {
 
-                final String query = """
+        final String query = """
                 mutation {
                     updateCourse(
                         input: {
