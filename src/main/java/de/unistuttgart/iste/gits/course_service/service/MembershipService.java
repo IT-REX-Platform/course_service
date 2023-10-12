@@ -30,20 +30,24 @@ public class MembershipService {
     /**
      * Returns all memberships of a user
      *
-     * @param userId               ID of the user
-     * @param onlyAvailableCourses if true, only memberships of courses that are
+     * @param userId             ID of the user
+     * @param availabilityFilter Filter field to filter for available or unavailable courses.
+     *                           If this field is true, only available courses are returned.
+     *                           If this field is false, only unavailable courses are returned.
+     *                           If this field is null, all courses are returned.
      * @return List of memberships
      */
-    public List<CourseMembership> getAllMembershipByUserId(final UUID userId, final Boolean onlyAvailableCourses) {
+    public List<CourseMembership> getAllMembershipByUserId(final UUID userId, final Boolean availabilityFilter) {
         return courseMembershipRepository.findByUserId(userId)
                 .stream()
                 .map(membershipMapper::entityToDto)
-                .filter(byAvailability(onlyAvailableCourses))
+                .filter(byAvailability(availabilityFilter))
                 .toList();
     }
 
     /**
      * creates a new course membership
+     *
      * @return created entity
      */
     public CourseMembership createMembership(final CourseMembershipInput inputDto) {
@@ -58,6 +62,7 @@ public class MembershipService {
 
     /**
      * Updates the role of a user in a course
+     *
      * @param inputDto contains user ID, course ID, and course role
      * @return updated entity
      */
@@ -72,6 +77,7 @@ public class MembershipService {
 
     /**
      * deletes a course membership of a user
+     *
      * @param inputDto contains user ID, course ID, and course role
      * @return deleted entity
      */
@@ -90,13 +96,14 @@ public class MembershipService {
 
     /**
      * removes all memberships for a given course ID from the database
+     *
      * @param courseId valid course ID
      */
-    public void deleteMembershipByCourseId(final UUID courseId){
+    public void deleteMembershipByCourseId(final UUID courseId) {
 
         final List<CourseMembershipEntity> memberships = courseMembershipRepository.findCourseMembershipEntitiesByCourseId(courseId);
 
-        if (memberships != null && !memberships.isEmpty()){
+        if (memberships != null && !memberships.isEmpty()) {
             courseMembershipRepository.deleteAll(memberships);
         }
     }
@@ -144,6 +151,7 @@ public class MembershipService {
 
     /**
      * Helper function to validate existence of an entity in the database
+     *
      * @param membershipPk Primary key of entity to be checked
      */
     private void requireMembershipExisting(final CourseMembershipPk membershipPk) {
