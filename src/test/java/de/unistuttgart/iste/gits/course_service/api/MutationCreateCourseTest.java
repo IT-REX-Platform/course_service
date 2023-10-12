@@ -1,7 +1,7 @@
-package de.unistuttgart.iste.gits.course_service.integration;
+package de.unistuttgart.iste.gits.course_service.api;
 
-import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
-import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
+import de.unistuttgart.iste.gits.common.testutil.*;
+import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import de.unistuttgart.iste.gits.generated.dto.YearDivision;
@@ -12,8 +12,11 @@ import org.springframework.graphql.test.tester.HttpGraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.time.OffsetDateTime;
+import java.util.Set;
 import java.util.UUID;
 
+import static de.unistuttgart.iste.gits.common.testutil.TestUsers.userWithMembershipsAndRealmRoles;
+import static de.unistuttgart.iste.gits.common.user_handling.LoggedInUser.RealmRole.COURSE_CREATOR;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -30,6 +33,9 @@ class MutationCreateCourseTest {
     @Autowired
     private ChapterRepository chapterRepository;
 
+    @InjectCurrentUserHeader
+    private final LoggedInUser user = userWithMembershipsAndRealmRoles(Set.of(COURSE_CREATOR));
+
     /**
      * Given a valid CreateCourseInput
      * When the createCourse mutation is executed
@@ -37,8 +43,6 @@ class MutationCreateCourseTest {
      */
     @Test
     void testCreateCourse(final HttpGraphQlTester tester) {
-        final String currentUser = getCurrentUser();
-
         final String query = """
                 mutation {
                     createCourse(
@@ -65,9 +69,6 @@ class MutationCreateCourseTest {
                 }""";
 
         final UUID id = tester
-                .mutate()
-                .header("CurrentUser", currentUser)
-                .build()
                 .document(query)
                 .execute()
                 .path("createCourse.title").entity(String.class).isEqualTo("New Course")
@@ -99,7 +100,6 @@ class MutationCreateCourseTest {
      */
     @Test
     void testCreateCourseWithTerm(final HttpGraphQlTester tester) {
-        final String currentUser = getCurrentUser();
         final String query = """
                 mutation {
                     createCourse(
@@ -129,9 +129,7 @@ class MutationCreateCourseTest {
                     }
                 }""";
 
-        final UUID id = tester.mutate()
-                .header("CurrentUser", currentUser)
-                .build()
+        final UUID id = tester
                 .document(query)
                 .execute()
                 .path("createCourse.title").entity(String.class).isEqualTo("New Course")
@@ -256,8 +254,6 @@ class MutationCreateCourseTest {
      */
     @Test
     void testStartDateAfterEndDate(final HttpGraphQlTester tester) {
-        final String currentUser = getCurrentUser();
-
         final String query = """
                 mutation {
                     createCourse(
@@ -274,28 +270,11 @@ class MutationCreateCourseTest {
                     }
                 }""";
 
-        tester.mutate()
-                .header("CurrentUser", currentUser)
-                .build()
-                .document(query)
+        tester.document(query)
                 .execute()
                 .errors()
                 .expect(responseError -> responseError.getMessage() != null
                                          && responseError.getMessage()
                                                  .toLowerCase().contains("start date must be before end date"));
-    }
-
-    private static String getCurrentUser() {
-        final UUID userId = UUID.randomUUID();
-        return """
-                {
-                    "id": "%s",
-                    "userName": "MyUserName",
-                    "firstName": "John",
-                    "lastName": "Doe",
-                    "courseMemberships": [],
-                    "realmRoles": ["course-creator"]
-                }
-                """.formatted(userId.toString());
     }
 }
