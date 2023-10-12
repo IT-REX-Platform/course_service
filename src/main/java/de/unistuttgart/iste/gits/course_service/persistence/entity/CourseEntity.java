@@ -37,10 +37,7 @@ public class CourseEntity implements IWithId<UUID> {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId")
     @OrderBy("number ASC")
     private List<ChapterEntity> chapters;
-
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "courseId")
-    private Set<CourseResourceAssociationEntity> resources;
-
+    
     @Column()
     private Integer startYear;
 
