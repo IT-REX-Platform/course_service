@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import static de.unistuttgart.iste.gits.common.testutil.HeaderUtils.addCurrentUserHeader;
 import static de.unistuttgart.iste.gits.common.testutil.TestUsers.userWithMembershipInCourseWithId;
+import static de.unistuttgart.iste.gits.course_service.test_utils.TestUtils.dummyChapterBuilder;
 import static de.unistuttgart.iste.gits.course_service.test_utils.TestUtils.saveCourseMembershipsOfUserToRepository;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -299,13 +300,4 @@ class MutationUpdateChapterTest {
                         .toLowerCase().contains("start date must be before end date"));
     }
 
-    private static ChapterEntity.ChapterEntityBuilder dummyChapterBuilder() {
-        return ChapterEntity.builder()
-                .courseId(UUID.randomUUID())
-                .description("Test Description")
-                .startDate(OffsetDateTime.now())
-                .endDate(OffsetDateTime.now().plusDays(1))
-                .title("Test Chapter")
-                .number(1);
-    }
 }
