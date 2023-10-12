@@ -3,12 +3,12 @@
 ## Description
 
 The Course Service primarily focuses on the following core responsibilities:
-
 - Creating new courses and chapters.
 - Modifying existing courses and chapters.
 - Deleting courses and chapters.
 - Managing course memberships. 
 
+## Environment variables
 ### Relevant for deployment
 | Name                       | Description                        | Value in Dev Environment                        | Value in Prod Environment                                          |
 |----------------------------|------------------------------------|-------------------------------------------------|--------------------------------------------------------------------|
@@ -40,7 +40,4 @@ The API is available at `/graphql` and the GraphiQL interface is available at `/
 ## Get started
 A guide how to start development can be
 found in the [wiki](https://gits-enpro.readthedocs.io/en/latest/dev-manuals/backend/get-started.html).
-
-
-
 

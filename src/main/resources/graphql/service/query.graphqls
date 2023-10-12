@@ -1,6 +1,7 @@
 type Query {
     """
     Get a list of courses. Can be filtered, sorted and paginated.
+    Courses and their basic data can be queried by any user, even if they are not enrolled in the course.
     """
     courses(
         filter: CourseFilter,
@@ -17,38 +18,32 @@ type Query {
 
     """
     Returns the courses with the given ids.
+    Courses and their basic data can be queried by any user, even if they are not enrolled in the course.
     """
     coursesByIds(ids: [UUID!]!): [Course!]!
-    """
-    Returns the chapters with the given ids.
-    """
-    chaptersByIds(ids: [UUID!]!): [Chapter!]!
 
     """
-    Returns a set of Resource Objects for the given resource ids, containing a list of all course IDs for a resource and its availability in the course.
+    Returns the chapters with the given ids.
+    ⚠️ This query is only accessible internally in the system and allows the caller to retrieve courseMemberships for
+    any user and should not be called without any validation of the caller's permissions. ⚠️
+    """
+    _internal_noauth_chaptersByIds(ids: [UUID!]!): [Chapter!]!
+
+    """
+    Returns a set of Resource Objects for the given resource ids, containing a list of all course IDs for a resource
+    and its availability in the course.
     """
     courseResourceAssociationsByIds(ids: [UUID!]!): [CourseResourceAssociation!]!
+
     """
     Returns a set of Resource Objects for the given resource ids, containing a list of all course IDs for a resource and its availability in the course.
     """
     resourceById(ids: [UUID!]!): [CourseResourceAssociation!]! @deprecated(reason: "Use courseResourceAssociationsByIds instead.")
 
     """
-    Get the list of chapters for a course. Can be filtered, sorted and paginated.
-    Throws an error if the course does not exist.
-    The default sort order is by chapter number.
+    Returns the list of courseMemberships for the specified users.
+    ⚠️ This query is only accessible internally in the system and allows the caller to retrieve courseMemberships for
+    any user and should not be called without any validation of the caller's permissions. ⚠️
     """
-    chapters(
-        courseId: UUID!,
-        filter: ChapterFilter,
-        """
-        The fields to sort by. The default sort order is by chapter number.
-        Throws an error if no field with the given name exists.
-        """
-        sortBy: [String!]! = [],
-        """
-        The sort direction for each field. If not specified, defaults to ASC.
-        """
-        sortDirection: [SortDirection!]! = [ASC],
-        pagination: Pagination): ChapterPayload!
+    _internal_noauth_courseMembershipsByUserIds(userIds: [UUID!]!) : [[CourseMembership!]!]!
 }

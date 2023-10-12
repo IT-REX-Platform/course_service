@@ -1,5 +1,6 @@
 package de.unistuttgart.iste.gits.course_service.persistence.entity;
 
+import de.unistuttgart.iste.gits.common.persistence.IWithId;
 import de.unistuttgart.iste.gits.generated.dto.YearDivision;
 import jakarta.persistence.*;
 import lombok.*;
@@ -12,7 +13,7 @@ import java.util.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CourseEntity {
+public class CourseEntity implements IWithId<UUID> {
 
     @Id
     @GeneratedValue
@@ -36,10 +37,7 @@ public class CourseEntity {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "courseId")
     @OrderBy("number ASC")
     private List<ChapterEntity> chapters;
-
-    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "courseId")
-    private Set<CourseResourceAssociationEntity> resources;
-
+    
     @Column()
     private Integer startYear;
 

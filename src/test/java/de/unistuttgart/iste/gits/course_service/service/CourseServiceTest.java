@@ -1,7 +1,7 @@
 package de.unistuttgart.iste.gits.course_service.service;
 
+import de.unistuttgart.iste.gits.common.dapr.TopicPublisher;
 import de.unistuttgart.iste.gits.common.event.CrudOperation;
-import de.unistuttgart.iste.gits.course_service.dapr.TopicPublisher;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.mapper.CourseMapper;
@@ -15,12 +15,10 @@ import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -34,7 +32,10 @@ class CourseServiceTest {
     private final CourseMapper courseMapper = new CourseMapper(new ModelMapper());
     private final CourseValidator courseValidator = Mockito.spy(CourseValidator.class);
     private final TopicPublisher topicPublisher = Mockito.mock(TopicPublisher.class);
-    private final CourseService courseService = new CourseService(courseRepository, courseMapper, courseValidator, topicPublisher);
+
+    private final MembershipService membershipService = Mockito.mock(MembershipService.class);
+
+    private final CourseService courseService = new CourseService(courseRepository, membershipService, courseMapper, courseValidator, topicPublisher);
 
     /**
      * Given a valid CreateCourseInput
@@ -44,15 +45,16 @@ class CourseServiceTest {
     @Test
     void testCreateCourseSuccessful() {
         // arrange
-        CreateCourseInput input = dummyCreateCourseInputBuilder().build();
-        CourseEntity expectedCourseEntity = dummyCourseEntityBuilder().build();
+        final CreateCourseInput input = dummyCreateCourseInputBuilder().build();
+        final CourseEntity expectedCourseEntity = dummyCourseEntityBuilder().build();
+        final UUID currentUser = UUID.randomUUID();
 
         // mock repository
         when(courseRepository.save(any(CourseEntity.class)))
                 .thenReturn(expectedCourseEntity);
 
         // act
-        Course actualCourse = courseService.createCourse(input);
+        final Course actualCourse = courseService.createCourse(input, currentUser);
 
         // assert
         assertThat(actualCourse.getId(), is(expectedCourseEntity.getId()));
@@ -74,15 +76,16 @@ class CourseServiceTest {
     @Test
     void testCreateCourseWithTermSuccessful() {
         // arrange
-        CreateCourseInput input = dummyCreateCourseInputBuilder().setStartYear(2023).setYearDivision(YearDivision.FIRST_SEMESTER).build();
-        CourseEntity expectedCourseEntity = dummyCourseEntityBuilder().startYear(2023).yearDivision(YearDivision.FIRST_SEMESTER).build();
+        final CreateCourseInput input = dummyCreateCourseInputBuilder().setStartYear(2023).setYearDivision(YearDivision.FIRST_SEMESTER).build();
+        final CourseEntity expectedCourseEntity = dummyCourseEntityBuilder().startYear(2023).yearDivision(YearDivision.FIRST_SEMESTER).build();
+        final UUID currentUser = UUID.randomUUID();
 
         // mock repository
         when(courseRepository.save(any(CourseEntity.class)))
                 .thenReturn(expectedCourseEntity);
 
         // act
-        Course actualCourse = courseService.createCourse(input);
+        final Course actualCourse = courseService.createCourse(input, currentUser);
 
         // assert
         assertThat(actualCourse.getId(), is(expectedCourseEntity.getId()));
@@ -106,18 +109,19 @@ class CourseServiceTest {
     @Test
     void testCreateCourseStartDateAfterEndDate() {
         // arrange
-        CreateCourseInput input = dummyCreateCourseInputBuilder()
+        final CreateCourseInput input = dummyCreateCourseInputBuilder()
                 .setStartDate(OffsetDateTime.parse("2021-01-02T00:00:00Z"))
                 .setEndDate(OffsetDateTime.parse("2021-01-01T00:00:00Z"))
                 .build();
-        CourseEntity expectedCourseEntity = dummyCourseEntityBuilder().build();
+        final CourseEntity expectedCourseEntity = dummyCourseEntityBuilder().build();
+        final UUID currentUser = UUID.randomUUID();
 
         // mock repository
         when(courseRepository.save(any(CourseEntity.class)))
                 .thenReturn(expectedCourseEntity);
 
         // act and assert
-        assertThrows(ValidationException.class, () -> courseService.createCourse(input));
+        assertThrows(ValidationException.class, () -> courseService.createCourse(input, currentUser));
 
         // verify
         verify(courseRepository, never()).save(any(CourseEntity.class));
@@ -131,10 +135,10 @@ class CourseServiceTest {
     @Test
     void testUpdateCourseSuccessful() {
         // arrange
-        CourseEntity expectedCourseEntity = dummyCourseEntityBuilder()
+        final CourseEntity expectedCourseEntity = dummyCourseEntityBuilder()
                 .description("New description")
                 .build();
-        UpdateCourseInput input = dummyUpdateCourseInputBuilder()
+        final UpdateCourseInput input = dummyUpdateCourseInputBuilder()
                 .setId(expectedCourseEntity.getId())
                 .setDescription("New description")
                 .build();
@@ -142,11 +146,11 @@ class CourseServiceTest {
         // mock repository
         doReturn(expectedCourseEntity)
                 .when(courseRepository).save(any(CourseEntity.class));
-        doReturn(true)
-                .when(courseRepository).existsById(any(UUID.class));
+        doReturn(Optional.of(expectedCourseEntity))
+                .when(courseRepository).findById(any(UUID.class));
 
         // act
-        Course actualCourse = courseService.updateCourse(input);
+        final Course actualCourse = courseService.updateCourse(input);
 
         // assert
         assertThat(actualCourse.getId(), is(expectedCourseEntity.getId()));
@@ -168,11 +172,11 @@ class CourseServiceTest {
     @Test
     void testUpdateCourseStartDateAfterEndDate() {
         // arrange
-        UpdateCourseInput input = dummyUpdateCourseInputBuilder()
+        final UpdateCourseInput input = dummyUpdateCourseInputBuilder()
                 .setStartDate(OffsetDateTime.parse("2021-01-02T00:00:00Z"))
                 .setEndDate(OffsetDateTime.parse("2021-01-01T00:00:00Z"))
                 .build();
-        CourseEntity expectedCourseEntity = dummyCourseEntityBuilder().build();
+        final CourseEntity expectedCourseEntity = dummyCourseEntityBuilder().build();
 
         // mock repository
         doReturn(expectedCourseEntity)
@@ -193,17 +197,14 @@ class CourseServiceTest {
     @Test
     void testDeleteCourseSuccessful() {
         // arrange
-        CourseEntity entity = dummyCourseEntityBuilder().build();
-
-
+        final CourseEntity entity = dummyCourseEntityBuilder().build();
 
         // mock repository
-        doReturn(true).when(courseRepository).existsById(entity.getId());
-        when(courseRepository.getReferenceById(entity.getId())).thenReturn(entity);
+        when(courseRepository.findById(entity.getId())).thenReturn(Optional.of(entity));
         entity.setChapters(List.of(dummyChapterBuilder(entity.getId()), dummyChapterBuilder(entity.getId())));
 
         // act
-        UUID actualId = courseService.deleteCourse(entity.getId());
+        final UUID actualId = courseService.deleteCourse(entity.getId());
 
         // assert
         assertThat(actualId, is(entity.getId()));
@@ -226,7 +227,7 @@ class CourseServiceTest {
     @Test
     void testDeleteCourseNonExisting() {
         // arrange
-        UUID id = UUID.randomUUID();
+        final UUID id = UUID.randomUUID();
 
         // mock repository
         doReturn(false).when(courseRepository).existsById(id);
@@ -245,16 +246,16 @@ class CourseServiceTest {
     @Test
     void testRequireCourseExisting() {
         // arrange
-        UUID id = UUID.randomUUID();
+        final CourseEntity entity = dummyCourseEntityBuilder().build();
 
         // mock repository
-        doReturn(true).when(courseRepository).existsById(id);
+        doReturn(Optional.of(entity)).when(courseRepository).findById(entity.getId());
 
         // act
-        assertDoesNotThrow(() -> courseService.requireCourseExisting(id));
+        assertThat(courseService.requireCourseExisting(entity.getId()), is(entity));
 
         // verify
-        verify(courseRepository).existsById(id);
+        verify(courseRepository).findById(entity.getId());
     }
 
     /**
@@ -265,16 +266,16 @@ class CourseServiceTest {
     @Test
     void testRequireCourseExistingNonExisting() {
         // arrange
-        UUID id = UUID.randomUUID();
+        final UUID id = UUID.randomUUID();
 
         // mock repository
-        doReturn(false).when(courseRepository).existsById(id);
+        doReturn(Optional.empty()).when(courseRepository).findById(id);
 
         // act and assert
         assertThrows(EntityNotFoundException.class, () -> courseService.requireCourseExisting(id));
 
         // verify
-        verify(courseRepository).existsById(id);
+        verify(courseRepository).findById(id);
     }
 
     private CreateCourseInput.Builder dummyCreateCourseInputBuilder() {
@@ -302,7 +303,7 @@ class CourseServiceTest {
                 .setEndDate(OffsetDateTime.parse("2021-01-01T00:00:00Z"));
     }
 
-    private ChapterEntity dummyChapterBuilder(UUID courseId){
+    private ChapterEntity dummyChapterBuilder(final UUID courseId) {
         return ChapterEntity.builder()
                 .id(UUID.randomUUID())
                 .courseId(courseId)

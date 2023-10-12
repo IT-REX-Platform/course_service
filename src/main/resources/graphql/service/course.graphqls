@@ -41,6 +41,7 @@ type Course {
     yearDivision: YearDivision
     """
     Chapters of the course. Can be filtered and sorted.
+    🔒 User needs to be enrolled in the course to access this field.
     """
     chapters(filter: ChapterFilter,
         """
@@ -53,6 +54,12 @@ type Course {
         """
         sortDirection: [SortDirection!]! = [ASC],
         pagination: Pagination): ChapterPayload!
+    """
+    Course Memberships of this course. Contains information about which users are members of the course and what
+    role they have in it.
+    🔒 User needs to be at least an admin of the course to access this field.
+    """
+    memberships: [CourseMembership!]!
 }
 
 """
@@ -138,6 +145,14 @@ input UpdateCourseInput {
     The new published status of the course.
     """
     published: Boolean!
+    """
+    The year in which the term starts.
+    """
+    startYear: Int
+    """
+    The division of the academic calendar in which the term takes place.
+    """
+    yearDivision: YearDivision
 }
 
 """

@@ -1,13 +1,14 @@
 package de.unistuttgart.iste.gits.course_service.integration;
 
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
+import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.course_service.test_config.MockTopicPublisherConfiguration;
 import de.unistuttgart.iste.gits.generated.dto.YearDivision;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.graphql.test.tester.HttpGraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.time.OffsetDateTime;
@@ -19,7 +20,7 @@ import static org.hamcrest.Matchers.is;
 /**
  * Tests for the `createCourse` mutation.
  */
-@ContextConfiguration(classes = MockTopicPublisherConfiguration.class)
+@ContextConfiguration(classes = MockTestPublisherConfiguration.class)
 @GraphQlApiTest
 class MutationCreateCourseTest {
 
@@ -35,8 +36,10 @@ class MutationCreateCourseTest {
      * Then the course is created and returned
      */
     @Test
-    void testCreateCourse(GraphQlTester tester) {
-        String query = """
+    void testCreateCourse(final HttpGraphQlTester tester) {
+        final String currentUser = getCurrentUser();
+
+        final String query = """
                 mutation {
                     createCourse(
                         input: {
@@ -61,7 +64,11 @@ class MutationCreateCourseTest {
                     }
                 }""";
 
-        UUID id = tester.document(query)
+        final UUID id = tester
+                .mutate()
+                .header("CurrentUser", currentUser)
+                .build()
+                .document(query)
                 .execute()
                 .path("createCourse.title").entity(String.class).isEqualTo("New Course")
                 .path("createCourse.description").entity(String.class).isEqualTo("This is a new course")
@@ -73,7 +80,7 @@ class MutationCreateCourseTest {
 
         // check that the course was created in the database
         assertThat(courseRepository.count(), is(1L));
-        var course = courseRepository.findAll().get(0);
+        final var course = courseRepository.findAll().get(0);
         assertThat(course.getId(), is(id));
         assertThat(course.getTitle(), is("New Course"));
         assertThat(course.getDescription(), is("This is a new course"));
@@ -84,14 +91,16 @@ class MutationCreateCourseTest {
         assertThat(chapterRepository.count(), is(0L));
     }
 
+
     /**
      * Given a valid CreateCourseInput
      * When the createCourse mutation is executed
      * Then the course is created and returned
      */
     @Test
-    void testCreateCourseWithTerm(GraphQlTester tester) {
-        String query = """
+    void testCreateCourseWithTerm(final HttpGraphQlTester tester) {
+        final String currentUser = getCurrentUser();
+        final String query = """
                 mutation {
                     createCourse(
                         input: {
@@ -120,7 +129,10 @@ class MutationCreateCourseTest {
                     }
                 }""";
 
-        UUID id = tester.document(query)
+        final UUID id = tester.mutate()
+                .header("CurrentUser", currentUser)
+                .build()
+                .document(query)
                 .execute()
                 .path("createCourse.title").entity(String.class).isEqualTo("New Course")
                 .path("createCourse.description").entity(String.class).isEqualTo("This is a new course")
@@ -134,7 +146,7 @@ class MutationCreateCourseTest {
 
         // check that the course was created in the database
         assertThat(courseRepository.count(), is(1L));
-        var course = courseRepository.findAll().get(0);
+        final var course = courseRepository.findAll().get(0);
         assertThat(course.getId(), is(id));
         assertThat(course.getTitle(), is("New Course"));
         assertThat(course.getDescription(), is("This is a new course"));
@@ -153,8 +165,8 @@ class MutationCreateCourseTest {
      * Then a validation error is returned
      */
     @Test
-    void testErrorOnBlankTitle(GraphQlTester tester) {
-        String query = """
+    void testErrorOnBlankTitle(final GraphQlTester tester) {
+        final String query = """
                 mutation {
                     createCourse(
                         input: {
@@ -183,8 +195,8 @@ class MutationCreateCourseTest {
      * Then a validation error is returned
      */
     @Test
-    void testTooLongTitle(GraphQlTester tester) {
-        String query = String.format("""
+    void testTooLongTitle(final GraphQlTester tester) {
+        final String query = String.format("""
                 mutation {
                     createCourse(
                         input: {
@@ -213,8 +225,8 @@ class MutationCreateCourseTest {
      * Then a validation error is returned
      */
     @Test
-    void testTooLongDescription(GraphQlTester tester) {
-        String query = String.format("""
+    void testTooLongDescription(final GraphQlTester tester) {
+        final String query = String.format("""
                 mutation {
                     createCourse(
                         input: {
@@ -243,8 +255,10 @@ class MutationCreateCourseTest {
      * Then a validation error is returned
      */
     @Test
-    void testStartDateAfterEndDate(GraphQlTester tester) {
-        String query = """
+    void testStartDateAfterEndDate(final HttpGraphQlTester tester) {
+        final String currentUser = getCurrentUser();
+
+        final String query = """
                 mutation {
                     createCourse(
                         input: {
@@ -260,11 +274,28 @@ class MutationCreateCourseTest {
                     }
                 }""";
 
-        tester.document(query)
+        tester.mutate()
+                .header("CurrentUser", currentUser)
+                .build()
+                .document(query)
                 .execute()
                 .errors()
                 .expect(responseError -> responseError.getMessage() != null
                                          && responseError.getMessage()
                                                  .toLowerCase().contains("start date must be before end date"));
+    }
+
+    private static String getCurrentUser() {
+        final UUID userId = UUID.randomUUID();
+        return """
+                {
+                    "id": "%s",
+                    "userName": "MyUserName",
+                    "firstName": "John",
+                    "lastName": "Doe",
+                    "courseMemberships": [],
+                    "realmRoles": ["course-creator"]
+                }
+                """.formatted(userId.toString());
     }
 }
