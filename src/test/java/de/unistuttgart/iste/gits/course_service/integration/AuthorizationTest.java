@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static de.unistuttgart.iste.gits.common.testutil.TestUsers.userWithMembershipInCourseWithId;
+import static de.unistuttgart.iste.gits.common.user_handling.LoggedInUser.UserRoleInCourse.STUDENT;
 import static de.unistuttgart.iste.gits.course_service.test_utils.TestUtils.dummyChapterBuilder;
 
 
@@ -34,7 +35,7 @@ public class AuthorizationTest {
     private final UUID courseId = UUID.randomUUID();
 
     @InjectCurrentUserHeader
-    private final LoggedInUser currentUser = userWithMembershipInCourseWithId(courseId, LoggedInUser.UserRoleInCourse.STUDENT);
+    private final LoggedInUser currentUser = userWithMembershipInCourseWithId(courseId, STUDENT);
 
 
     @Test
@@ -211,7 +212,7 @@ public class AuthorizationTest {
                 "Test",
                 "User",
                 List.of(new LoggedInUser.CourseMembership(courseId,
-                        LoggedInUser.UserRoleInCourse.STUDENT,
+                        STUDENT,
                         false,
                         OffsetDateTime.now(),
                         OffsetDateTime.now())
