@@ -3,7 +3,6 @@ package de.unistuttgart.iste.gits.course_service.persistence.repository;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseMembershipEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseMembershipPk;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,13 +15,12 @@ import java.util.UUID;
 public interface CourseMembershipRepository extends JpaRepository<CourseMembershipEntity, CourseMembershipPk> {
 
     /**
-     * Finds all course memberships for the specified users. Returns a list of CourseMembershipEntities for the given
-     * user ids in no particular order.
+     * Finds all course memberships for the specified user.
      *
-     * @param userIds IDs of the users to find their courses for.
-     * @return List of CourseMembershipEntities for the users with the given ids.
+     * @param userId ID of the user to find their courses for.
+     * @return List of CourseMembershipEntities for the users with the given id.
      */
-    List<CourseMembershipEntity> findByUserIdIn(List<UUID> userIds);
+    List<CourseMembershipEntity> findByUserId(UUID userId);
 
     /**
      * Finds all course memberships of the course with the specified id.

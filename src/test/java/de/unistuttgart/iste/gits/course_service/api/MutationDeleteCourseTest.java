@@ -1,12 +1,12 @@
-package de.unistuttgart.iste.gits.course_service.integration;
+package de.unistuttgart.iste.gits.course_service.api;
 
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
 import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
+import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser.UserRoleInCourse;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
-import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
-import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseMembershipRepository;
-import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
+import de.unistuttgart.iste.gits.course_service.persistence.repository.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.graphql.test.tester.HttpGraphQlTester;
@@ -21,7 +21,6 @@ import static de.unistuttgart.iste.gits.common.testutil.TestUsers.userWithMember
 import static de.unistuttgart.iste.gits.course_service.test_utils.TestUtils.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-
 /**
  * Tests for the `deleteCourse` mutation.
  */
@@ -52,7 +51,7 @@ class MutationDeleteCourseTest {
 
         // create admin user object
         final LoggedInUser adminUser = userWithMembershipInCourseWithId(initialCourses.get(0).getId(),
-                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+                UserRoleInCourse.ADMINISTRATOR);
         // save course memberships of admin to repository
         saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
 
@@ -89,8 +88,7 @@ class MutationDeleteCourseTest {
         final UUID courseId = UUID.randomUUID();
 
         // create admin user object
-        final LoggedInUser adminUser = userWithMembershipInCourseWithId(courseId,
-                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+        final LoggedInUser adminUser = userWithMembershipInCourseWithId(courseId, UserRoleInCourse.ADMINISTRATOR);
         // save course memberships of admin to repository
         saveCourseMembershipsOfUserToRepository(courseMembershipRepository, adminUser);
 

@@ -1,13 +1,11 @@
-package de.unistuttgart.iste.gits.course_service.integration;
+package de.unistuttgart.iste.gits.course_service.api;
 
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
+import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
 import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
-import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
 import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
-import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
-import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseMembershipRepository;
-import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
+import de.unistuttgart.iste.gits.course_service.persistence.repository.*;
 import de.unistuttgart.iste.gits.generated.dto.Chapter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,7 +107,7 @@ class MutationCreateChapterTest {
      */
     @Test
     void testCreateChapterCourseNotExisting(HttpGraphQlTester tester) {
-        UUID courseId = UUID.randomUUID();
+        final UUID courseId = UUID.randomUUID();
 
         // create admin user object
         final LoggedInUser adminUser = userWithMembershipInCourseWithId(courseId,
@@ -120,7 +118,7 @@ class MutationCreateChapterTest {
         // add admin user data to header
         tester = addCurrentUserHeader(tester, adminUser);
 
-        String query = """
+        final String query = """
                 mutation {
                     createChapter(
                         input: {

@@ -1,4 +1,4 @@
-package de.unistuttgart.iste.gits.course_service.integration;
+package de.unistuttgart.iste.gits.course_service.api;
 
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
 import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;

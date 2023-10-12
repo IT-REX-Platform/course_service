@@ -1,4 +1,4 @@
-package de.unistuttgart.iste.gits.course_service.integration;
+package de.unistuttgart.iste.gits.course_service.api;
 
 import de.unistuttgart.iste.gits.common.exception.NoAccessToCourseException;
 import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
@@ -22,6 +22,8 @@ import java.util.UUID;
 
 import static de.unistuttgart.iste.gits.common.testutil.HeaderUtils.addCurrentUserHeader;
 import static de.unistuttgart.iste.gits.common.testutil.TestUsers.userWithMembershipInCourseWithId;
+import static de.unistuttgart.iste.gits.common.user_handling.LoggedInUser.UserRoleInCourse.ADMINISTRATOR;
+import static de.unistuttgart.iste.gits.common.user_handling.LoggedInUser.UserRoleInCourse.STUDENT;
 
 @GraphQlApiTest
 class QueryCourseMembershipsTest {
@@ -33,31 +35,20 @@ class QueryCourseMembershipsTest {
     private CourseRepository courseRepository;
 
     @Test
-    void testNoMembershipExisting(final GraphQlTester tester){
-        final List<UUID> userIds = List.of(UUID.randomUUID());
-        final String query = """
-                query($userIds: [UUID!]!) {
-                        _internal_noauth_courseMembershipsByUserIds(userIds: $userIds) {
-                            userId
-                            courseId
-                            role
-                    }
-                }
-                """;
-        tester.document(query)
-                .variable("userIds", userIds.subList(0,1))
-                .execute()
-                .path("_internal_noauth_courseMembershipsByUserIds[*][*]")
+    void testNoMembershipExisting(final GraphQlTester tester) {
+        final UUID userId = UUID.randomUUID();
+
+        executeMembershipQuery(tester, userId)
+                .path("_internal_noauth_courseMembershipsByUserId[*]")
                 .entityList(CourseMembership.class)
                 .hasSize(0);
     }
 
     @Test
-    void testMembership(final GraphQlTester tester){
+    void testMembership(final GraphQlTester tester) {
 
         final UUID userId = UUID.randomUUID();
         final List<CourseMembership> courseMemberships = new ArrayList<>();
-        final List<UUID> userIds = List.of(userId);
         final List<CourseEntity> courseEntities = List.of(createTestCourse(), createTestCourse());
         courseRepository.saveAll(courseEntities);
         final Course course = createTestCourseDto();
@@ -79,25 +70,8 @@ class QueryCourseMembershipsTest {
             courseMemberships.add(dto);
         }
 
-        final String query = """
-                query($userIds: [UUID!]!) {
-                        _internal_noauth_courseMembershipsByUserIds(userIds: $userIds) {
-                            userId
-                            courseId
-                            role
-                            course {
-                                startDate
-                                endDate
-                                title
-                                description
-                            }
-                    }
-                }
-                """;
-        tester.document(query)
-                .variable("userIds", userIds.subList(0,1))
-                .execute()
-                .path("_internal_noauth_courseMembershipsByUserIds[*][*]")
+        executeMembershipQuery(tester, userId)
+                .path("_internal_noauth_courseMembershipsByUserId[*]")
                 .entityList(CourseMembership.class)
                 .hasSize(2)
                 .contains(courseMemberships.get(0), courseMemberships.get(1));
@@ -107,8 +81,7 @@ class QueryCourseMembershipsTest {
     void testMembershipsFieldInCourse(HttpGraphQlTester tester) {
         final CourseEntity course = courseRepository.save(createTestCourse());
 
-        final LoggedInUser currentUser = userWithMembershipInCourseWithId(course.getId(),
-                LoggedInUser.UserRoleInCourse.ADMINISTRATOR);
+        final LoggedInUser currentUser = userWithMembershipInCourseWithId(course.getId(), ADMINISTRATOR);
 
         tester = addCurrentUserHeader(tester, currentUser);
 
@@ -120,16 +93,16 @@ class QueryCourseMembershipsTest {
 
         final String query =
                 """
-                query($courseId: UUID!) {
-                    coursesByIds(ids: [$courseId]) {
-                        memberships {
-                            userId
-                            courseId
-                            role
+                        query($courseId: UUID!) {
+                            coursesByIds(ids: [$courseId]) {
+                                memberships {
+                                    userId
+                                    courseId
+                                    role
+                                }
+                            }
                         }
-                    }
-                }
-                """;
+                        """;
 
         tester.document(query)
                 .variable("courseId", course.getId())
@@ -144,8 +117,7 @@ class QueryCourseMembershipsTest {
     void testMembershipsFieldInCourseNoPermission(HttpGraphQlTester tester) {
         final CourseEntity course = courseRepository.save(createTestCourse());
 
-        final LoggedInUser currentUser = userWithMembershipInCourseWithId(course.getId(),
-                LoggedInUser.UserRoleInCourse.STUDENT);
+        final LoggedInUser currentUser = userWithMembershipInCourseWithId(course.getId(), STUDENT);
 
         tester = addCurrentUserHeader(tester, currentUser);
 
@@ -157,21 +129,43 @@ class QueryCourseMembershipsTest {
 
         final String query =
                 """
-                query($courseId: UUID!) {
-                    coursesByIds(ids: [$courseId]) {
-                        memberships {
-                            userId
-                            courseId
-                            role
+                        query($courseId: UUID!) {
+                            coursesByIds(ids: [$courseId]) {
+                                memberships {
+                                    userId
+                                    courseId
+                                    role
+                                }
+                            }
                         }
-                    }
-                }
-                """;
+                        """;
 
         tester.document(query)
                 .variable("courseId", course.getId())
                 .execute().errors().expect(e ->
                         e.getExtensions().get("exception").equals(NoAccessToCourseException.class.getSimpleName()));
+    }
+
+    private GraphQlTester.Response executeMembershipQuery(final GraphQlTester tester, final UUID uuid) {
+        final String query = """
+                query($userId: UUID!) {
+                        _internal_noauth_courseMembershipsByUserId(userId: $userId) {
+                            userId
+                            courseId
+                            role
+                            course {
+                                startDate
+                                endDate
+                                title
+                                description
+                            }
+                    }
+                }
+                """;
+
+        return tester.document(query)
+                .variable("userId", uuid)
+                .execute();
     }
 
     private static Course createTestCourseDto() {

@@ -1,9 +1,11 @@
-package de.unistuttgart.iste.gits.course_service.integration;
+package de.unistuttgart.iste.gits.course_service.api;
 
-import de.unistuttgart.iste.gits.common.testutil.GraphQlApiTest;
-import de.unistuttgart.iste.gits.common.testutil.HeaderUtils;
-import de.unistuttgart.iste.gits.common.testutil.MockTestPublisherConfiguration;
+import de.unistuttgart.iste.gits.common.testutil.*;
 import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser;
+import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser.CourseMembership;
+import de.unistuttgart.iste.gits.common.user_handling.LoggedInUser.UserRoleInCourse;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.ChapterEntity;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseEntity;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.ChapterRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
 import org.junit.jupiter.api.Test;
@@ -12,9 +14,7 @@ import org.springframework.graphql.test.tester.HttpGraphQlTester;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.time.OffsetDateTime;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static de.unistuttgart.iste.gits.course_service.test_utils.TestUtils.dummyChapterBuilder;
@@ -62,8 +62,8 @@ class MutationDeleteChapterTest {
                 "TestUser",
                 "Test",
                 "User",
-                List.of(new LoggedInUser.CourseMembership(course.getId(),
-                        LoggedInUser.UserRoleInCourse.ADMINISTRATOR,
+                List.of(new CourseMembership(course.getId(),
+                        UserRoleInCourse.ADMINISTRATOR,
                         false,
                         OffsetDateTime.now(),
                         OffsetDateTime.now())
@@ -97,8 +97,8 @@ class MutationDeleteChapterTest {
                 "TestUser",
                 "Test",
                 "User",
-                List.of(new LoggedInUser.CourseMembership(UUID.randomUUID(),
-                        LoggedInUser.UserRoleInCourse.ADMINISTRATOR,
+                List.of(new CourseMembership(UUID.randomUUID(),
+                        UserRoleInCourse.ADMINISTRATOR,
                         false,
                         OffsetDateTime.now(),
                         OffsetDateTime.now())

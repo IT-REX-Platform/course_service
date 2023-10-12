@@ -1,20 +1,19 @@
 package de.unistuttgart.iste.gits.course_service.service;
 
-import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseMembershipEntity;
-import de.unistuttgart.iste.gits.course_service.persistence.entity.CourseMembershipPk;
+import de.unistuttgart.iste.gits.course_service.persistence.entity.*;
+import de.unistuttgart.iste.gits.course_service.persistence.mapper.CourseMapper;
 import de.unistuttgart.iste.gits.course_service.persistence.mapper.MembershipMapper;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseMembershipRepository;
 import de.unistuttgart.iste.gits.course_service.persistence.repository.CourseRepository;
-import de.unistuttgart.iste.gits.generated.dto.CourseMembership;
-import de.unistuttgart.iste.gits.generated.dto.CourseMembershipInput;
+import de.unistuttgart.iste.gits.generated.dto.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
-
-import static de.unistuttgart.iste.gits.common.util.GitsCollectionUtils.groupIntoSubLists;
+import java.util.function.Predicate;
 
 @Service
 @RequiredArgsConstructor
@@ -26,30 +25,35 @@ public class MembershipService {
 
     private final MembershipMapper membershipMapper;
 
+    private final CourseMapper courseMapper;
 
     /**
-     * Allows to retrieve a List of Membership Objects that link a course with a User and their role in the course
-     * @param userIds User ID for which course memberships are queried
-     * @return List of course memberships
+     * Returns all memberships of a user
+     *
+     * @param userId             ID of the user
+     * @param availabilityFilter Filter field to filter for available or unavailable courses.
+     *                           If this field is true, only available courses are returned.
+     *                           If this field is false, only unavailable courses are returned.
+     *                           If this field is null, all courses are returned.
+     * @return List of memberships
      */
-    public List<List<CourseMembership>> getAllMembershipsByUserIds(final List<UUID> userIds) {
-        final List<CourseMembership> allCourseMemberships = courseMembershipRepository.findByUserIdIn(userIds)
+    public List<CourseMembership> getAllMembershipByUserId(final UUID userId, final Boolean availabilityFilter) {
+        return courseMembershipRepository.findByUserId(userId)
                 .stream()
                 .map(membershipMapper::entityToDto)
+                .filter(byAvailability(availabilityFilter))
                 .toList();
-
-        return groupIntoSubLists(allCourseMemberships, userIds, CourseMembership::getUserId);
     }
 
     /**
      * creates a new course membership
-     * @param inputDto contains user ID, course ID, and course role
+     *
      * @return created entity
      */
     public CourseMembership createMembership(final CourseMembershipInput inputDto) {
-            if (!courseRepository.existsById(inputDto.getCourseId())) {
-                throw new EntityNotFoundException("Course with id " + inputDto.getCourseId() + " not found");
-            }
+        if (!courseRepository.existsById(inputDto.getCourseId())) {
+            throw new EntityNotFoundException("Course with id " + inputDto.getCourseId() + " not found");
+        }
 
         final CourseMembershipEntity entity = courseMembershipRepository.save(membershipMapper.dtoToEntity(inputDto));
 
@@ -58,6 +62,7 @@ public class MembershipService {
 
     /**
      * Updates the role of a user in a course
+     *
      * @param inputDto contains user ID, course ID, and course role
      * @return updated entity
      */
@@ -72,6 +77,7 @@ public class MembershipService {
 
     /**
      * deletes a course membership of a user
+     *
      * @param inputDto contains user ID, course ID, and course role
      * @return deleted entity
      */
@@ -79,7 +85,7 @@ public class MembershipService {
 
         final CourseMembershipEntity entity = membershipMapper.dtoToEntity(inputDto);
 
-        //make sure entity exists in database
+        // make sure entity exists in database
         final CourseMembershipPk membershipPk = new CourseMembershipPk(entity.getUserId(), entity.getCourseId());
 
         requireMembershipExisting(membershipPk);
@@ -90,17 +96,24 @@ public class MembershipService {
 
     /**
      * removes all memberships for a given course ID from the database
+     *
      * @param courseId valid course ID
      */
-    public void deleteMembershipByCourseId(final UUID courseId){
+    public void deleteMembershipByCourseId(final UUID courseId) {
 
         final List<CourseMembershipEntity> memberships = courseMembershipRepository.findCourseMembershipEntitiesByCourseId(courseId);
 
-        if (memberships != null && !memberships.isEmpty()){
+        if (memberships != null && !memberships.isEmpty()) {
             courseMembershipRepository.deleteAll(memberships);
         }
     }
 
+    /**
+     * Returns all memberships of a course
+     *
+     * @param courseId ID of the course
+     * @return List of memberships
+     */
     public List<CourseMembership> getMembershipsOfCourse(final UUID courseId) {
         return courseMembershipRepository.findCourseMembershipEntitiesByCourseId(courseId)
                 .stream()
@@ -108,9 +121,37 @@ public class MembershipService {
                 .toList();
     }
 
+    private Predicate<? super CourseMembership> byAvailability(final Boolean availableCoursesFilter) {
+        return membership -> {
+            if (availableCoursesFilter == null) {
+                // no filter
+                return true;
+            }
+            return availableCoursesFilter == isAvailable(membership);
+        };
+    }
+
+    private boolean isAvailable(final CourseMembership membership) {
+        final Course course = getCourseById(membership.getCourseId());
+        if (!course.getPublished()) {
+            // course is not published
+            return false;
+        }
+
+        final OffsetDateTime now = OffsetDateTime.now();
+        final OffsetDateTime startDate = course.getStartDate();
+        final OffsetDateTime endDate = course.getEndDate();
+        return startDate.isBefore(now) && endDate.isAfter(now);
+    }
+
+    private Course getCourseById(final UUID courseId) {
+        final CourseEntity entity = courseRepository.getReferenceById(courseId);
+        return courseMapper.entityToDto(entity);
+    }
 
     /**
      * Helper function to validate existence of an entity in the database
+     *
      * @param membershipPk Primary key of entity to be checked
      */
     private void requireMembershipExisting(final CourseMembershipPk membershipPk) {
@@ -118,5 +159,4 @@ public class MembershipService {
             throw new EntityNotFoundException("User with id " + membershipPk.getUserId() + " not member in course" + membershipPk.getCourseId());
         }
     }
-
 }
