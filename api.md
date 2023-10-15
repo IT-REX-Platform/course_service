@@ -154,6 +154,7 @@ The id of the user to get the courseMemberships for.
 <td valign="top"><a href="#boolean">Boolean</a></td>
 <td>
 
+
         Filter field to filter for available or unavailable courses.
         If this field is true, only available courses are returned.
         If this field is false, only unavailable courses are returned.
@@ -282,6 +283,21 @@ Deletes an existing chapter, throws an error if no chapter with the given id exi
 
 
 Lets the current user join a course as a student.
+
+</td>
+</tr>
+<tr>
+<td colspan="2" align="right" valign="top">courseId</td>
+<td valign="top"><a href="#uuid">UUID</a>!</td>
+<td></td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><strong>leaveCourse</strong></td>
+<td valign="top"><a href="#coursemembership">CourseMembership</a>!</td>
+<td>
+
+
+Lets the current user leave a course. Returns the membership that was deleted.
 
 </td>
 </tr>
